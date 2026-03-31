@@ -165,6 +165,12 @@
     save();
   }
 
+  function findUserByEmail(email) {
+    const normalizedEmail = String(email || "").trim().toLowerCase();
+    if (!normalizedEmail) return null;
+    return state.users.find((user) => String(user.email || "").trim().toLowerCase() === normalizedEmail) || null;
+  }
+
   function createUser(payload) {
     const user = normalizeUser({
       id: uid("user"),
@@ -546,6 +552,7 @@
     currentUser,
     getUser,
     setCurrentUser,
+    findUserByEmail,
     createUser,
     updateCurrentUserProfile,
     completeOnboarding,

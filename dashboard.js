@@ -20,7 +20,7 @@
       primaryHref: "create-account.html",
       primaryLabel: "Create Account",
       secondaryHref: "admin.html",
-      secondaryLabel: "Open Studio",
+      secondaryLabel: "View Demo Profiles",
     });
     statsEl.innerHTML = "";
     nextEl.innerHTML = AppUI.renderEntryState({
@@ -70,7 +70,7 @@
         <p class="profile-name">Complete the setup</p>
         <p class="profile-meta">Finish profile and preference details before this account enters discovery.</p>
         <div class="cta-row">
-          <a class="primary-link" href="onboarding.html">Open Onboarding</a>
+          <a class="primary-link" href="onboarding.html">Finish Profile Setup</a>
         </div>
       </div>
     `;

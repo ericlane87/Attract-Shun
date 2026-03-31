@@ -3,13 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dashboard | Attract / Shun</title>
+  <title>Sign In | Attract Shun</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
 </head>
-<body data-page="dashboard">
+<body data-page="sign-in">
   <header class="site-header">
     <div class="brand-lockup">
       <p class="eyebrow">Intentional dating</p>
@@ -39,48 +39,45 @@
   <main class="page-shell">
     <section class="page-intro">
       <div>
-        <p class="eyebrow">Dashboard</p>
-        <h1>Your account state and next step</h1>
-        <p class="page-intro-copy">Everything important stays in one place: profile standing, incoming attention, and what should happen next.</p>
+        <p class="eyebrow">Sign in</p>
+        <h1>Return to your account and pick up where you left off.</h1>
+        <p class="page-intro-copy">Use the email attached to your profile, or choose one of the recent profiles below to continue directly into your dashboard.</p>
       </div>
-      <div class="info-chip" id="dashboard-user-chip"></div>
+      <div class="info-chip">Returning members</div>
     </section>
 
     <section class="dashboard-grid">
       <article class="panel-card">
         <div class="panel-head">
-          <h2>Profile status</h2>
+          <h2>Continue with your email</h2>
         </div>
-        <div id="dashboard-profile"></div>
+        <form id="sign-in-form" class="stack">
+          <label class="field">
+            <span>Email</span>
+            <input name="email" type="email" maxlength="80" placeholder="you@example.com" required>
+          </label>
+          <button class="primary-button" type="submit">Sign In</button>
+        </form>
+        <div class="summary-card sign-in-note">
+          <p class="profile-name">Need an account first?</p>
+          <p class="profile-meta">Create a profile, complete onboarding, and you will enter the matching pool immediately.</p>
+          <div class="cta-row">
+            <a class="ghost-link" href="create-account.html">Create Account</a>
+          </div>
+        </div>
       </article>
 
       <article class="panel-card">
         <div class="panel-head">
-          <h2>System summary</h2>
+          <h2>Recent profiles</h2>
         </div>
-        <div id="dashboard-stats" class="stat-grid"></div>
-      </article>
-    </section>
-
-    <section class="dashboard-grid">
-      <article class="panel-card">
-        <div class="panel-head">
-          <h2>Next action</h2>
-        </div>
-        <div id="dashboard-next-step"></div>
-      </article>
-
-      <article class="panel-card">
-        <div class="panel-head">
-          <h2>Interested in you</h2>
-        </div>
-        <div id="dashboard-likes" class="list-stack"></div>
+        <div id="recent-profiles" class="list-stack"></div>
       </article>
     </section>
   </main>
 
   <script src="data.js"></script>
   <script src="shared.js"></script>
-  <script src="dashboard.js"></script>
+  <script src="sign-in.js"></script>
 </body>
 </html>

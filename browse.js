@@ -18,7 +18,7 @@
       primaryHref: "create-account.html",
       primaryLabel: "Create Account",
       secondaryHref: "admin.html",
-      secondaryLabel: "Open Studio",
+      secondaryLabel: "View Demo Profiles",
     });
     likesPanel.innerHTML = `<div class="empty-state">People interested in you will appear here after your profile is active.</div>`;
     return;

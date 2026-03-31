@@ -20,7 +20,7 @@
       primaryHref: "create-account.html",
       primaryLabel: "Create Account",
       secondaryHref: "admin.html",
-      secondaryLabel: "Open Studio",
+      secondaryLabel: "View Demo Profiles",
     });
     queueEl.innerHTML = `<div class="empty-state">Moderation items will appear here once reports are submitted.</div>`;
     return;

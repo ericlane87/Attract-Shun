@@ -18,7 +18,7 @@
       primaryHref: "create-account.html",
       primaryLabel: "Create Account",
       secondaryHref: "admin.html",
-      secondaryLabel: "Open Studio",
+      secondaryLabel: "View Demo Profiles",
     });
     historyPanel.innerHTML = `<div class="empty-state">Connection history appears here after your first match.</div>`;
     return;

@@ -93,7 +93,7 @@
         <div class="ribbon-main">
           <div>
             <p class="ribbon-title">No active profile selected</p>
-            <p class="ribbon-copy">Open Studio to create profiles, switch users, or seed the experience.</p>
+            <p class="ribbon-copy">Create a profile to enter the pool, or use Studio to switch demo users and shape the experience.</p>
           </div>
         </div>
         <div class="ribbon-actions">
@@ -220,7 +220,7 @@
         ` : ""}
         <div class="cta-row">
           <a class="primary-link" href="${options.primaryHref || "create-account.html"}">${options.primaryLabel || "Create Account"}</a>
-          ${options.secondaryHref ? `<a class="ghost-link" href="${options.secondaryHref}">${options.secondaryLabel || "Open Studio"}</a>` : ""}
+          ${options.secondaryHref ? `<a class="ghost-link" href="${options.secondaryHref}">${options.secondaryLabel || "View Demo Profiles"}</a>` : ""}
         </div>
       </div>
     `;
