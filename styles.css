@@ -1408,6 +1408,34 @@ body[data-page="settings"] .site-nav a[href="settings.html"] {
   gap: 8px;
 }
 
+.swipe-button-row {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  margin: 4px 0 2px;
+}
+
+.swipe-icon-button {
+  min-width: 76px;
+  min-height: 52px;
+  border-radius: 999px;
+  border: 1px solid rgba(123, 145, 180, 0.14);
+  background: rgba(16, 22, 34, 0.96);
+  color: #f8fbff;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.swipe-no {
+  border-color: rgba(159, 36, 54, 0.24);
+  color: #ffc8d1;
+}
+
+.swipe-yes {
+  border-color: rgba(35, 103, 177, 0.24);
+  color: #d7ebff;
+}
+
 .inline-action-row {
   display: flex;
   gap: 10px;
@@ -1894,6 +1922,11 @@ input[type="range"] {
 }
 
 @media (max-width: 1120px) {
+  .site-header {
+    flex-wrap: wrap;
+    align-items: flex-start;
+  }
+
   .hero-grid,
   .section-grid,
   .diagram-card,
@@ -1921,6 +1954,15 @@ input[type="range"] {
     flex-wrap: wrap;
   }
 
+  .header-actions {
+    margin-left: auto;
+  }
+
+  .language-sheet-card {
+    width: min(560px, calc(100% - 28px));
+    margin-top: 10vh;
+  }
+
   .footer-grid {
     grid-template-columns: 1fr 1fr;
   }
@@ -1935,6 +1977,32 @@ input[type="range"] {
   .site-header,
   .page-shell {
     width: min(100% - 20px, 100%);
+  }
+
+  .site-header {
+    padding: 16px 0 10px;
+    gap: 12px;
+  }
+
+  .brand-lockup {
+    width: 100%;
+  }
+
+  .header-actions {
+    order: 2;
+    margin-left: 0;
+  }
+
+  .menu-toggle {
+    order: 2;
+    width: 50px;
+    height: 50px;
+  }
+
+  .header-center-cta {
+    order: 3;
+    width: 100%;
+    gap: 10px;
   }
 
   .hero-panel,
@@ -1962,9 +2030,131 @@ input[type="range"] {
     width: min(320px, 90%);
   }
 
+  .hero-badges,
+  .cta-row,
+  .button-row,
+  .swipe-actions,
+  .decision-actions,
+  .inline-action-row,
+  .location-lockup {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .feature-chip,
+  .ghost-link,
+  .primary-link,
+  .primary-button,
+  .ghost-button,
+  .danger-button,
+  .pass-button,
+  .success-button,
+  .language-trigger {
+    min-height: 48px;
+  }
+
   .store-badge {
     min-width: 0;
-    flex: 1;
+    width: 100%;
+  }
+
+  .store-copy strong {
+    font-size: 0.92rem;
+  }
+
+  .language-trigger {
+    padding: 0 8px 0 6px;
+  }
+
+  .page-intro {
+    padding: 20px 18px;
+  }
+
+  .dashboard-grid,
+  .browse-grid,
+  .admin-grid,
+  .section-grid,
+  .flow-grid,
+  .spotlight-grid {
+    gap: 16px;
+  }
+
+  .builder-section {
+    padding: 16px;
+    gap: 12px;
+  }
+
+  .profile-builder {
+    gap: 14px;
+  }
+
+  .choice-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .photo-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .journey-card {
+    gap: 10px;
+  }
+
+  .journey-step {
+    min-height: 56px;
+  }
+
+  .timeline-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .timeline-row > * {
+    width: 100%;
+  }
+
+  .chat-wrap {
+    padding: 14px;
+  }
+
+  .chat-bubble {
+    max-width: 92%;
+  }
+
+  .chat-compose {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .chat-compose input,
+  .inline-action-row input {
+    min-height: 48px;
+  }
+
+  .candidate-card {
+    padding: 16px;
+  }
+
+  .swipe-button-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+
+  .swipe-icon-button {
+    min-height: 58px;
+    border-radius: 20px;
+    font-size: 1rem;
+  }
+
+  .range-readout {
+    align-self: start;
+  }
+
+  .language-sheet-card {
+    width: min(100% - 20px, 100%);
+    margin-top: 8vh;
+    padding: 18px;
   }
 
   .footer-grid {
