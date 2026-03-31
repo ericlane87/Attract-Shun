@@ -427,30 +427,33 @@
   applyLanguage(translations[saved] ? saved : "en");
 
   const languageTrigger = document.getElementById("language-trigger");
-  languageTrigger?.addEventListener("click", () => {
-    window.AppUI.showModal({
-      title: "Choose a language",
-      body: `
-        <div class="language-modal-list">
-          <button class="ghost-button language-option-button" type="button" data-language="en">English</button>
-          <button class="ghost-button language-option-button" type="button" data-language="es">Español</button>
-          <button class="ghost-button language-option-button" type="button" data-language="fr">Français</button>
-          <button class="ghost-button language-option-button" type="button" data-language="pt">Português</button>
-        </div>
-      `,
-      primaryLabel: "Close",
-      secondaryLabel: "",
-      onPrimary: () => {},
-    });
+  const languageSheet = document.getElementById("language-sheet");
+  const languageSheetClose = document.getElementById("language-sheet-close");
+  const languageSheetBackdrop = document.getElementById("language-sheet-backdrop");
 
-    setTimeout(() => {
-      document.querySelectorAll(".language-option-button").forEach((button) => {
-        button.addEventListener("click", () => {
-          applyLanguage(button.dataset.language);
-          window.AppUI.closeModal();
-        });
-      });
-    }, 0);
+  function openLanguageSheet() {
+    if (!languageSheet) return;
+    languageSheet.hidden = false;
+    document.body.classList.add("language-sheet-open");
+  }
+
+  function closeLanguageSheet() {
+    if (!languageSheet) return;
+    languageSheet.hidden = true;
+    document.body.classList.remove("language-sheet-open");
+  }
+
+  languageTrigger?.addEventListener("click", () => {
+    openLanguageSheet();
+  });
+
+  languageSheetClose?.addEventListener("click", closeLanguageSheet);
+  languageSheetBackdrop?.addEventListener("click", closeLanguageSheet);
+  languageSheet?.querySelectorAll(".language-option-button").forEach((button) => {
+    button.addEventListener("click", () => {
+      applyLanguage(button.dataset.language);
+      closeLanguageSheet();
+    });
   });
 
   const iosAppButton = document.getElementById("ios-app-button");
