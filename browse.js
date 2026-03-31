@@ -58,6 +58,10 @@
 
   swipePanel.innerHTML = `
     <div class="candidate-card">
+      <div class="profile-rail">
+        <span class="rail-pill">Intent aligned</span>
+        <span class="rail-pill">One active match rule</span>
+      </div>
       <div class="profile-top">
         <div>
           <p class="profile-name">${candidate.name}, ${candidate.age}</p>
@@ -66,7 +70,13 @@
         <div class="avatar">${AppUI.initials(candidate.name)}</div>
       </div>
       <p class="small-copy">${candidate.bio}</p>
-      <div class="hint-box">A right swipe requires an interest score. If this person already liked you and both users are free, a match is created immediately.</div>
+      <div class="mini-journey">
+        <div class="mini-node active">Discover</div>
+        <div class="mini-line"></div>
+        <div class="mini-node">Match</div>
+        <div class="mini-line"></div>
+        <div class="mini-node">Intro</div>
+      </div>
       <div class="stack">
         <label class="field">
           <span>Interest score</span>

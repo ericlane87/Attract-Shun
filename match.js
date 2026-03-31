@@ -91,12 +91,22 @@
 
   matchPanel.innerHTML = `
     <div class="match-card">
+      <div class="profile-rail">
+        <span class="rail-pill">One live connection</span>
+        <span class="rail-pill">${messages.length || 0} messages</span>
+      </div>
       <div class="profile-top">
         <div>
           <p class="profile-name">${otherUser.name}</p>
           <p class="profile-meta">One active match. One guided flow.</p>
         </div>
         <span class="status-pill">${match.status.replace("_", " ")}</span>
+      </div>
+      <div class="journey-card compact">
+        <div class="journey-step ${["pending_intro","date_planning","decision_window"].includes(match.status) ? "done" : ""}"><span>1</span><strong>Match</strong></div>
+        <div class="journey-step ${match.status === "pending_intro" ? "active" : ["date_planning","decision_window"].includes(match.status) ? "done" : ""}"><span>2</span><strong>Intro</strong></div>
+        <div class="journey-step ${match.status === "date_planning" ? "active" : match.status === "decision_window" ? "done" : ""}"><span>3</span><strong>Date</strong></div>
+        <div class="journey-step ${match.status === "decision_window" ? "active" : ""}"><span>4</span><strong>Decision</strong></div>
       </div>
       <div class="hint-box">${phaseSummary}</div>
       <div class="timeline">
@@ -190,7 +200,7 @@
       <div class="chat-head">
         <div>
           <p class="profile-name">${otherUser.name}</p>
-          <p class="profile-meta">This is the only active conversation this user can hold.</p>
+          <p class="profile-meta">The only active conversation for this account.</p>
         </div>
         <span class="status-pill">${messages.length} messages</span>
       </div>
