@@ -1,20 +1,26 @@
-<svg width="980" height="180" viewBox="0 0 980 180" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+<svg width="1120" height="180" viewBox="0 0 1120 180" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
   <title id="title">ATTRACT Shun logo</title>
-  <desc id="desc">ATTRACT in red, Shun in blue, with a sideways split red and blue magnet pulling the words together.</desc>
-  <rect width="980" height="180" rx="28" fill="transparent"/>
-  <text x="18" y="114" font-family="Space Grotesk, Arial, sans-serif" font-size="74" font-weight="700" letter-spacing="2" fill="#9F2436">ATTRACT</text>
-  <g transform="translate(402 30)">
-    <path d="M30 30H98C130.033 30 156 55.9675 156 88V88C156 120.033 130.033 146 98 146H30" stroke="#9F2436" stroke-width="20" stroke-linecap="round"/>
-    <path d="M154 30H222C254.033 30 280 55.9675 280 88V88C280 120.033 254.033 146 222 146H154" stroke="#2367B1" stroke-width="20" stroke-linecap="round"/>
-    <rect x="12" y="18" width="34" height="34" rx="12" fill="#9F2436"/>
-    <rect x="12" y="124" width="34" height="34" rx="12" fill="#9F2436"/>
-    <rect x="264" y="18" width="34" height="34" rx="12" fill="#2367B1"/>
-    <rect x="264" y="124" width="34" height="34" rx="12" fill="#2367B1"/>
-    <path d="M-26 88H8" stroke="#9F2436" stroke-width="10" stroke-linecap="round"/>
-    <path d="M302 88H338" stroke="#2367B1" stroke-width="10" stroke-linecap="round"/>
-    <path d="M-10 76L-30 88L-10 100" fill="#9F2436" opacity="0.85"/>
-    <path d="M322 76L342 88L322 100" fill="#2367B1" opacity="0.92"/>
-    <rect x="128" y="78" width="44" height="20" rx="10" fill="#D9B46B"/>
+  <desc id="desc">ATTRACT in red and Shun in blue with a horizontal split magnet between them, pulling the words together.</desc>
+  <rect width="1120" height="180" rx="28" fill="transparent"/>
+
+  <text x="22" y="116" font-family="Space Grotesk, Arial, sans-serif" font-size="76" font-weight="700" letter-spacing="1.4" fill="#9F2436">ATTRACT</text>
+
+  <g transform="translate(486 28)">
+    <path d="M36 28C95 28 127 55 127 90C127 125 95 152 36 152" stroke="#9F2436" stroke-width="20" stroke-linecap="round"/>
+    <path d="M166 28C107 28 75 55 75 90C75 125 107 152 166 152" stroke="#2367B1" stroke-width="20" stroke-linecap="round"/>
+
+    <rect x="0" y="14" width="34" height="42" rx="12" fill="#9F2436"/>
+    <rect x="0" y="124" width="34" height="42" rx="12" fill="#9F2436"/>
+    <rect x="168" y="14" width="34" height="42" rx="12" fill="#2367B1"/>
+    <rect x="168" y="124" width="34" height="42" rx="12" fill="#2367B1"/>
+
+    <rect x="82" y="81" width="38" height="18" rx="9" fill="#D8B66F"/>
   </g>
-  <text x="762" y="114" font-family="Space Grotesk, Arial, sans-serif" font-size="74" font-weight="700" fill="#2367B1">Shun</text>
+
+  <path d="M414 89H454" stroke="#9F2436" stroke-width="8" stroke-linecap="round" opacity="0.72"/>
+  <path d="M430 74L454 89L430 104" fill="#9F2436" opacity="0.92"/>
+  <path d="M712 89H672" stroke="#2367B1" stroke-width="8" stroke-linecap="round" opacity="0.72"/>
+  <path d="M696 74L672 89L696 104" fill="#2367B1" opacity="0.92"/>
+
+  <text x="742" y="116" font-family="Space Grotesk, Arial, sans-serif" font-size="76" font-weight="700" letter-spacing="0.6" fill="#2367B1">Shun</text>
 </svg>
