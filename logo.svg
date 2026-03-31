@@ -10,7 +10,6 @@
     <path d="M26 128H142C171 128 194 105 194 76V74" stroke="#2367B1" stroke-width="22" stroke-linecap="round" stroke-linejoin="round"/>
     <rect x="182" y="18" width="38" height="48" rx="14" fill="#9F2436"/>
     <rect x="182" y="96" width="38" height="48" rx="14" fill="#2367B1"/>
-    <rect x="84" y="72" width="56" height="20" rx="10" fill="#D8B66F"/>
   </g>
 
   <path d="M706 72C733 63 753 55 768 44" stroke="#2367B1" stroke-width="6" stroke-linecap="round" opacity="0.52"/>

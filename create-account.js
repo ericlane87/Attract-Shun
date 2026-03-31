@@ -11,11 +11,9 @@
       name: formData.get("name"),
       email: formData.get("email"),
       age: formData.get("age"),
-      city: formData.get("city"),
       gender: formData.get("gender"),
       lookingFor: formData.get("lookingFor"),
       intent: formData.get("intent"),
-      bio: formData.get("bio"),
     });
     AppData.setCurrentUser(user.id);
     AppUI.showToast("Account created.");

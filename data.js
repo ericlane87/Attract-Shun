@@ -11,6 +11,12 @@
       minAge: 24,
       maxAge: 38,
       distanceMiles: 25,
+      minHeightInches: 0,
+      preferredRace: "any",
+      preferredChildrenStatus: "any",
+      excludedRace: "none",
+      excludedChildrenStatus: "none",
+      excludedZodiac: "none",
       allowWeeklyFeature: false,
       notifications: true,
       showIntentBadge: true,
@@ -44,6 +50,16 @@
       lookingFor: user.lookingFor || "",
       intent: user.intent || "long_term",
       bio: user.bio || "",
+      zodiacSign: user.zodiacSign || "Aries",
+      heightInches: Number(user.heightInches || 68),
+      race: user.race || "Prefer not to say",
+      childrenStatus: user.childrenStatus || "Open to kids",
+      interests: Array.isArray(user.interests) ? user.interests : [],
+      photos: Array.isArray(user.photos) ? user.photos.slice(0, 5) : [],
+      profilePhotoIndex: Number.isInteger(user.profilePhotoIndex) ? user.profilePhotoIndex : 0,
+      locationLabel: user.locationLabel || user.city || "",
+      latitude: typeof user.latitude === "number" ? user.latitude : null,
+      longitude: typeof user.longitude === "number" ? user.longitude : null,
       shunCount: Number(user.shunCount || 0),
       activeMatchId: user.activeMatchId || null,
       status: user.status || "available",
@@ -181,7 +197,7 @@
       gender: payload.gender,
       lookingFor: payload.lookingFor,
       intent: payload.intent,
-      bio: payload.bio,
+      bio: payload.bio || "",
       onboardingCompleted: false,
       onboardingStep: "identity",
       preferences: defaultPreferences(),
@@ -212,8 +228,24 @@
     const user = getUser(userId);
     if (!user) return null;
 
+    user.name = payload.name;
+    user.email = payload.email;
+    user.age = Number(payload.age);
+    user.gender = payload.gender;
+    user.lookingFor = payload.lookingFor;
     user.bio = payload.bio;
     user.intent = payload.intent;
+    user.zodiacSign = payload.zodiacSign;
+    user.heightInches = Number(payload.heightInches);
+    user.race = payload.race;
+    user.childrenStatus = payload.childrenStatus;
+    user.interests = Array.isArray(payload.interests) ? payload.interests : [];
+    user.photos = Array.isArray(payload.photos) ? payload.photos.slice(0, 5) : [];
+    user.profilePhotoIndex = Math.max(0, Math.min(Number(payload.profilePhotoIndex || 0), Math.max(user.photos.length - 1, 0)));
+    user.locationLabel = payload.locationLabel || user.locationLabel || "";
+    user.latitude = typeof payload.latitude === "number" ? payload.latitude : user.latitude;
+    user.longitude = typeof payload.longitude === "number" ? payload.longitude : user.longitude;
+    user.city = user.locationLabel;
     user.verified = true;
     user.onboardingCompleted = true;
     user.onboardingStep = "complete";
@@ -222,10 +254,34 @@
       minAge: Number(payload.minAge),
       maxAge: Number(payload.maxAge),
       distanceMiles: Number(payload.distanceMiles),
+      minHeightInches: Number(payload.minHeightInches || 0),
+      preferredRace: payload.preferredRace || "any",
+      preferredChildrenStatus: payload.preferredChildrenStatus || "any",
+      excludedRace: payload.excludedRace || "none",
+      excludedChildrenStatus: payload.excludedChildrenStatus || "none",
+      excludedZodiac: payload.excludedZodiac || "none",
       allowWeeklyFeature: Boolean(payload.allowWeeklyFeature),
     };
     save();
     return user;
+  }
+
+  function distanceMilesBetween(userA, userB) {
+    if ([userA.latitude, userA.longitude, userB.latitude, userB.longitude].some((value) => typeof value !== "number")) {
+      return null;
+    }
+
+    const toRadians = (value) => (value * Math.PI) / 180;
+    const earthRadiusMiles = 3958.8;
+    const dLat = toRadians(userB.latitude - userA.latitude);
+    const dLon = toRadians(userB.longitude - userA.longitude);
+    const lat1 = toRadians(userA.latitude);
+    const lat2 = toRadians(userB.latitude);
+
+    const a = Math.sin(dLat / 2) ** 2 +
+      Math.cos(lat1) * Math.cos(lat2) * Math.sin(dLon / 2) ** 2;
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    return earthRadiusMiles * c;
   }
 
   function getIncomingLikes(userId) {
@@ -251,7 +307,17 @@
       if (alreadySeen.has(candidate.id)) return false;
       if (candidate.accountStatus === "banned") return false;
       if (!candidate.preferences.profileVisible) return false;
-      return candidate.age >= user.preferences.minAge && candidate.age <= user.preferences.maxAge;
+      if (!(candidate.age >= user.preferences.minAge && candidate.age <= user.preferences.maxAge)) return false;
+      if (user.preferences.minHeightInches && candidate.heightInches < user.preferences.minHeightInches) return false;
+      if (user.preferences.preferredRace !== "any" && candidate.race !== user.preferences.preferredRace) return false;
+      if (user.preferences.preferredChildrenStatus !== "any" && candidate.childrenStatus !== user.preferences.preferredChildrenStatus) return false;
+      if (user.preferences.excludedRace !== "none" && candidate.race === user.preferences.excludedRace) return false;
+      if (user.preferences.excludedChildrenStatus !== "none" && candidate.childrenStatus === user.preferences.excludedChildrenStatus) return false;
+      if (user.preferences.excludedZodiac !== "none" && candidate.zodiacSign === user.preferences.excludedZodiac) return false;
+
+      const distance = distanceMilesBetween(user, candidate);
+      if (distance !== null && distance > user.preferences.distanceMiles) return false;
+      return true;
     });
   }
 
