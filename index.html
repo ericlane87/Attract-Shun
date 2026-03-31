@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Attract / Shun</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body data-page="landing">
+  <header class="site-header">
+    <div class="brand-lockup">
+      <p class="eyebrow">Intentional dating</p>
+      <a class="brand" href="index.html" aria-label="ATTRACT Shun home">
+        <img class="brand-logo" src="logo.svg" alt="ATTRACT Shun">
+      </a>
+    </div>
+    <nav class="site-nav">
+      <a href="onboarding.html">Onboarding</a>
+      <a href="dashboard.html">Dashboard</a>
+      <a href="browse.html">Browse</a>
+      <a href="match.html">Match</a>
+      <a href="reports.html">Reports</a>
+      <a href="success.html">Success</a>
+      <a href="settings.html">Settings</a>
+      <a href="admin.html">Admin</a>
+    </nav>
+  </header>
+
+  <main class="page-shell">
+    <section class="hero-panel hero-grid">
+      <div>
+        <p class="eyebrow">Local-first production prototype</p>
+        <img class="hero-logo" src="logo.svg" alt="ATTRACT Shun">
+        <h1>One match at a time. Built for people who mean it.</h1>
+        <p class="hero-copy">
+          This front-end prototype enforces strict intent pools, a single active match and conversation,
+          guided intro-to-date milestones, and attract-or-shun outcomes, all stored locally for testing.
+        </p>
+        <div class="cta-row">
+          <a class="primary-link" href="admin.html">Create Users</a>
+          <a class="ghost-link" href="dashboard.html">Open App Flow</a>
+        </div>
+      </div>
+      <div class="hero-card">
+        <div class="mini-stat">
+          <span>Storage</span>
+          <strong>Browser local storage</strong>
+        </div>
+        <div class="mini-stat">
+          <span>Auth</span>
+          <strong>Mocked for prototype</strong>
+        </div>
+        <div class="mini-stat">
+          <span>Payments</span>
+          <strong>Excluded</strong>
+        </div>
+        <div class="mini-stat">
+          <span>Firebase</span>
+          <strong>Ready to plug later</strong>
+        </div>
+      </div>
+    </section>
+
+    <section class="section-grid">
+      <article class="content-card">
+        <p class="card-kicker">Core rule</p>
+        <h2>Users can like many, but hold only one live match.</h2>
+        <p>
+          Incoming likes remain visible, but while a user is matched they cannot continue swiping or open new conversations.
+        </p>
+      </article>
+      <article class="content-card">
+        <p class="card-kicker">Intent separated</p>
+        <h2>Casual and long-term pools never overlap.</h2>
+        <p>
+          Discovery candidates are strictly filtered by chosen intent so the product feels opinionated and clear.
+        </p>
+      </article>
+      <article class="content-card">
+        <p class="card-kicker">Signal quality</p>
+        <h2>Every right swipe includes a 1 to 10 interest score.</h2>
+        <p>
+          Mutual matches can immediately see how strongly the other person was interested before investing energy.
+        </p>
+      </article>
+    </section>
+
+    <section class="showcase">
+      <div class="section-heading">
+        <p class="eyebrow">Product flow</p>
+        <h2>Logical screens built as a real website flow</h2>
+      </div>
+      <div class="flow-grid">
+        <article class="flow-step">
+          <span>01</span>
+          <h3>Admin setup</h3>
+          <p>Create users, seed demo data, switch active user, and simulate time.</p>
+        </article>
+        <article class="flow-step">
+          <span>02</span>
+          <h3>User dashboard</h3>
+          <p>See account state, shun count, next required action, and engagement lock status.</p>
+        </article>
+        <article class="flow-step">
+          <span>03</span>
+          <h3>Browse and swipe</h3>
+          <p>Review candidates in the same pool, pass, or swipe right with a required interest score.</p>
+        </article>
+        <article class="flow-step">
+          <span>04</span>
+          <h3>Active match</h3>
+          <p>Progress through intro video, date confirmation, chat, and attract-or-shun decision logic.</p>
+        </article>
+        <article class="flow-step">
+          <span>05</span>
+          <h3>Trust and safety</h3>
+          <p>File reports, review moderation state, and keep policy enforcement visible inside the product.</p>
+        </article>
+        <article class="flow-step">
+          <span>06</span>
+          <h3>Success and settings</h3>
+          <p>Capture testimonials after attract outcomes and manage visibility, notifications, and discovery preferences.</p>
+        </article>
+      </div>
+    </section>
+  </main>
+</body>
+</html>

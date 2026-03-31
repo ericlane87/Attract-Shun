@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Reports | Attract / Shun</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body data-page="reports">
+  <header class="site-header">
+    <div class="brand-lockup">
+      <p class="eyebrow">Intentional dating</p>
+      <a class="brand" href="index.html" aria-label="ATTRACT Shun home">
+        <img class="brand-logo" src="logo.svg" alt="ATTRACT Shun">
+      </a>
+    </div>
+    <nav class="site-nav">
+      <a href="onboarding.html">Onboarding</a>
+      <a href="dashboard.html">Dashboard</a>
+      <a href="browse.html">Browse</a>
+      <a href="match.html">Match</a>
+      <a href="reports.html">Reports</a>
+      <a href="success.html">Success</a>
+      <a href="settings.html">Settings</a>
+      <a href="admin.html">Admin</a>
+    </nav>
+  </header>
+
+  <main class="page-shell">
+    <section class="page-intro">
+      <div>
+        <p class="eyebrow">Trust and safety</p>
+        <h1>Reports, policy, and moderation state</h1>
+      </div>
+      <div class="info-chip" id="reports-user-chip"></div>
+    </section>
+
+    <section class="dashboard-grid">
+      <article class="panel-card">
+        <div class="panel-head">
+          <h2>File a report</h2>
+        </div>
+        <form id="report-form" class="stack">
+          <label class="field">
+            <span>Against</span>
+            <select id="reported-user-select" name="reportedUserId"></select>
+          </label>
+          <label class="field">
+            <span>Category</span>
+            <select name="category">
+              <option value="harassment">Sexual harassment</option>
+              <option value="disrespect">Disrespectful conduct</option>
+              <option value="misleading">Misleading profile information</option>
+              <option value="ghosting">Ghosting or no response</option>
+            </select>
+          </label>
+          <label class="field">
+            <span>Details</span>
+            <textarea name="details" rows="5" maxlength="400" required></textarea>
+          </label>
+          <button class="primary-button" type="submit">Submit Report</button>
+        </form>
+      </article>
+
+      <article class="panel-card">
+        <div class="panel-head">
+          <h2>Policy highlights</h2>
+        </div>
+        <div class="list-stack">
+          <div class="summary-card">Zero tolerance for verified sexual harassment.</div>
+          <div class="summary-card">Identity verification is assumed for all active profiles in this prototype.</div>
+          <div class="summary-card">Misleading info, ghosting, and disrespect can lead to shun marks or account action.</div>
+        </div>
+      </article>
+    </section>
+
+    <section class="dashboard-grid">
+      <article class="panel-card">
+        <div class="panel-head">
+          <h2>Your report history</h2>
+        </div>
+        <div id="reports-history" class="list-stack"></div>
+      </article>
+
+      <article class="panel-card">
+        <div class="panel-head">
+          <h2>Moderation queue</h2>
+        </div>
+        <div id="reports-queue" class="list-stack"></div>
+      </article>
+    </section>
+  </main>
+
+  <script src="data.js"></script>
+  <script src="shared.js"></script>
+  <script src="reports.js"></script>
+</body>
+</html>

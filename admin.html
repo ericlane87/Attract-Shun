@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin | Attract / Shun</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body data-page="admin">
+  <header class="site-header">
+    <div class="brand-lockup">
+      <p class="eyebrow">Intentional dating</p>
+      <a class="brand" href="index.html" aria-label="ATTRACT Shun home">
+        <img class="brand-logo" src="logo.svg" alt="ATTRACT Shun">
+      </a>
+    </div>
+    <nav class="site-nav">
+      <a href="onboarding.html">Onboarding</a>
+      <a href="dashboard.html">Dashboard</a>
+      <a href="browse.html">Browse</a>
+      <a href="match.html">Match</a>
+      <a href="reports.html">Reports</a>
+      <a href="success.html">Success</a>
+      <a href="settings.html">Settings</a>
+      <a href="admin.html">Admin</a>
+    </nav>
+  </header>
+
+  <main class="page-shell">
+    <section class="page-intro">
+      <div>
+        <p class="eyebrow">Admin</p>
+        <h1>Set up users and control the local environment</h1>
+      </div>
+      <div class="info-chip" id="system-date-chip"></div>
+    </section>
+
+    <section class="admin-grid">
+      <article class="panel-card">
+        <div class="panel-head">
+          <h2>Active user</h2>
+        </div>
+        <div class="stack">
+          <label class="field">
+            <span>Current testing identity</span>
+            <select id="active-user-select"></select>
+          </label>
+          <div id="active-user-card" class="summary-card empty-state">No users created yet.</div>
+        </div>
+      </article>
+
+      <article class="panel-card">
+        <div class="panel-head">
+          <h2>System actions</h2>
+        </div>
+        <div class="stack">
+          <div class="button-row">
+            <button id="seed-demo-btn" class="ghost-button" type="button">Seed Demo Users</button>
+            <button id="advance-day-btn" class="ghost-button" type="button">Advance 1 Day</button>
+          </div>
+          <button id="reset-app-btn" class="danger-button" type="button">Reset All Local Data</button>
+          <div class="hint-box">Use this page to simulate a realistic product workflow without any backend wiring.</div>
+        </div>
+      </article>
+    </section>
+
+    <section class="admin-grid">
+      <article class="panel-card">
+        <div class="panel-head">
+          <h2>Create user</h2>
+        </div>
+        <form id="create-user-form" class="stack">
+          <label class="field">
+            <span>Name</span>
+            <input name="name" type="text" maxlength="30" required>
+          </label>
+          <div class="two-col">
+            <label class="field">
+              <span>Age</span>
+              <input name="age" type="number" min="18" max="99" required>
+            </label>
+            <label class="field">
+              <span>City</span>
+              <input name="city" type="text" maxlength="40" required>
+            </label>
+          </div>
+          <label class="field">
+            <span>Intent pool</span>
+            <select name="intent" required>
+              <option value="long_term">Long term</option>
+              <option value="casual">Casual</option>
+            </select>
+          </label>
+          <label class="field">
+            <span>Bio</span>
+            <textarea name="bio" rows="5" maxlength="240" required></textarea>
+          </label>
+          <button class="primary-button" type="submit">Create User</button>
+        </form>
+      </article>
+
+      <article class="panel-card">
+        <div class="panel-head">
+          <h2>All users</h2>
+          <span class="pill" id="user-count-pill">0 users</span>
+        </div>
+        <div id="user-list" class="list-stack"></div>
+      </article>
+    </section>
+  </main>
+
+  <script src="data.js"></script>
+  <script src="shared.js"></script>
+  <script src="admin.js"></script>
+</body>
+</html>

@@ -1,0 +1,18 @@
+<svg width="820" height="180" viewBox="0 0 820 180" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title id="title">ATTRACT Shun logo</title>
+  <desc id="desc">ATTRACT in red, Shun in blue, with a split red and blue magnet between them pointing toward yes.</desc>
+  <rect width="820" height="180" rx="28" fill="transparent"/>
+  <text x="18" y="114" font-family="Space Grotesk, Arial, sans-serif" font-size="74" font-weight="700" letter-spacing="2" fill="#9F2436">ATTRAC</text>
+  <text x="305" y="114" font-family="Space Grotesk, Arial, sans-serif" font-size="74" font-weight="700" letter-spacing="2" fill="#9F2436">T</text>
+  <g transform="translate(350 38)">
+    <path d="M26 80V38C26 17.0132 43.0132 0 64 0V0C84.9868 0 102 17.0132 102 38V80" stroke="#9F2436" stroke-width="20" stroke-linecap="round"/>
+    <path d="M102 80V38C102 17.0132 119.013 0 140 0V0C160.987 0 178 17.0132 178 38V80" stroke="#2367B1" stroke-width="20" stroke-linecap="round"/>
+    <rect x="16" y="76" width="30" height="44" rx="12" fill="#9F2436"/>
+    <rect x="158" y="76" width="30" height="44" rx="12" fill="#2367B1"/>
+    <rect x="82" y="90" width="40" height="16" rx="8" fill="#D9B46B"/>
+    <path d="M196 44L230 60L196 76" fill="#2367B1"/>
+    <path d="M14 44L-14 60L14 76" fill="#9F2436" opacity="0.35"/>
+  </g>
+  <text x="570" y="114" font-family="Space Grotesk, Arial, sans-serif" font-size="74" font-weight="700" fill="#2367B1">Shun</text>
+  <text x="678" y="52" font-family="Space Grotesk, Arial, sans-serif" font-size="20" font-weight="700" fill="#2367B1" opacity="0.78">YES</text>
+</svg>

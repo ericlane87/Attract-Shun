@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Onboarding | Attract / Shun</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body data-page="onboarding">
+  <header class="site-header">
+    <div class="brand-lockup">
+      <p class="eyebrow">Intentional dating</p>
+      <a class="brand" href="index.html" aria-label="ATTRACT Shun home">
+        <img class="brand-logo" src="logo.svg" alt="ATTRACT Shun">
+      </a>
+    </div>
+    <nav class="site-nav">
+      <a href="onboarding.html">Onboarding</a>
+      <a href="dashboard.html">Dashboard</a>
+      <a href="browse.html">Browse</a>
+      <a href="match.html">Match</a>
+      <a href="reports.html">Reports</a>
+      <a href="success.html">Success</a>
+      <a href="settings.html">Settings</a>
+      <a href="admin.html">Admin</a>
+    </nav>
+  </header>
+
+  <main class="page-shell">
+    <section class="page-intro">
+      <div>
+        <p class="eyebrow">Onboarding</p>
+        <h1>Complete a realistic first-run setup</h1>
+      </div>
+      <div class="info-chip" id="onboarding-user-chip"></div>
+    </section>
+
+    <section class="dashboard-grid">
+      <article class="panel-card">
+        <div class="panel-head">
+          <h2>Progress</h2>
+        </div>
+        <div id="onboarding-progress"></div>
+      </article>
+
+      <article class="panel-card">
+        <div class="panel-head">
+          <h2>Finish onboarding</h2>
+        </div>
+        <form id="onboarding-form" class="stack">
+          <label class="field">
+            <span>Dating intent</span>
+            <select name="intent" required>
+              <option value="long_term">Long term</option>
+              <option value="casual">Casual</option>
+            </select>
+          </label>
+          <label class="field">
+            <span>Bio</span>
+            <textarea name="bio" rows="5" maxlength="240" required></textarea>
+          </label>
+          <div class="three-col">
+            <label class="field">
+              <span>Min age</span>
+              <input name="minAge" type="number" min="18" max="99" required>
+            </label>
+            <label class="field">
+              <span>Max age</span>
+              <input name="maxAge" type="number" min="18" max="99" required>
+            </label>
+            <label class="field">
+              <span>Distance</span>
+              <input name="distanceMiles" type="number" min="1" max="100" required>
+            </label>
+          </div>
+          <label class="toggle-row">
+            <input name="allowWeeklyFeature" type="checkbox">
+            <span>Allow weekly dating page feature if a verified first date happens</span>
+          </label>
+          <button class="primary-button" type="submit">Save Onboarding</button>
+        </form>
+      </article>
+    </section>
+  </main>
+
+  <script src="data.js"></script>
+  <script src="shared.js"></script>
+  <script src="onboarding.js"></script>
+</body>
+</html>

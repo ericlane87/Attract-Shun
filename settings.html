@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Settings | Attract / Shun</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body data-page="settings">
+  <header class="site-header">
+    <div class="brand-lockup">
+      <p class="eyebrow">Intentional dating</p>
+      <a class="brand" href="index.html" aria-label="ATTRACT Shun home">
+        <img class="brand-logo" src="logo.svg" alt="ATTRACT Shun">
+      </a>
+    </div>
+    <nav class="site-nav">
+      <a href="onboarding.html">Onboarding</a>
+      <a href="dashboard.html">Dashboard</a>
+      <a href="browse.html">Browse</a>
+      <a href="match.html">Match</a>
+      <a href="reports.html">Reports</a>
+      <a href="success.html">Success</a>
+      <a href="settings.html">Settings</a>
+      <a href="admin.html">Admin</a>
+    </nav>
+  </header>
+
+  <main class="page-shell">
+    <section class="page-intro">
+      <div>
+        <p class="eyebrow">Settings</p>
+        <h1>Control visibility, notifications, and match preferences</h1>
+      </div>
+      <div class="info-chip" id="settings-user-chip"></div>
+    </section>
+
+    <section class="dashboard-grid">
+      <article class="panel-card">
+        <div class="panel-head">
+          <h2>Discovery settings</h2>
+        </div>
+        <form id="settings-form" class="stack">
+          <div class="three-col">
+            <label class="field">
+              <span>Min age</span>
+              <input name="minAge" type="number" min="18" max="99" required>
+            </label>
+            <label class="field">
+              <span>Max age</span>
+              <input name="maxAge" type="number" min="18" max="99" required>
+            </label>
+            <label class="field">
+              <span>Distance miles</span>
+              <input name="distanceMiles" type="number" min="1" max="100" required>
+            </label>
+          </div>
+          <label class="toggle-row">
+            <input name="notifications" type="checkbox">
+            <span>Receive match and checklist notifications</span>
+          </label>
+          <label class="toggle-row">
+            <input name="profileVisible" type="checkbox">
+            <span>Allow this profile to appear in discovery</span>
+          </label>
+          <label class="toggle-row">
+            <input name="allowWeeklyFeature" type="checkbox">
+            <span>Allow weekly dating page feature after verified date</span>
+          </label>
+          <button class="primary-button" type="submit">Save Settings</button>
+        </form>
+      </article>
+
+      <article class="panel-card">
+        <div class="panel-head">
+          <h2>Current account state</h2>
+        </div>
+        <div id="settings-summary"></div>
+      </article>
+    </section>
+  </main>
+
+  <script src="data.js"></script>
+  <script src="shared.js"></script>
+  <script src="settings.js"></script>
+</body>
+</html>

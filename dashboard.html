@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard | Attract / Shun</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body data-page="dashboard">
+  <header class="site-header">
+    <div class="brand-lockup">
+      <p class="eyebrow">Intentional dating</p>
+      <a class="brand" href="index.html" aria-label="ATTRACT Shun home">
+        <img class="brand-logo" src="logo.svg" alt="ATTRACT Shun">
+      </a>
+    </div>
+    <nav class="site-nav">
+      <a href="onboarding.html">Onboarding</a>
+      <a href="dashboard.html">Dashboard</a>
+      <a href="browse.html">Browse</a>
+      <a href="match.html">Match</a>
+      <a href="reports.html">Reports</a>
+      <a href="success.html">Success</a>
+      <a href="settings.html">Settings</a>
+      <a href="admin.html">Admin</a>
+    </nav>
+  </header>
+
+  <main class="page-shell">
+    <section class="page-intro">
+      <div>
+        <p class="eyebrow">Dashboard</p>
+        <h1>Your account state and next step</h1>
+      </div>
+      <div class="info-chip" id="dashboard-user-chip"></div>
+    </section>
+
+    <section class="dashboard-grid">
+      <article class="panel-card">
+        <div class="panel-head">
+          <h2>Profile status</h2>
+        </div>
+        <div id="dashboard-profile"></div>
+      </article>
+
+      <article class="panel-card">
+        <div class="panel-head">
+          <h2>System summary</h2>
+        </div>
+        <div id="dashboard-stats" class="stat-grid"></div>
+      </article>
+    </section>
+
+    <section class="dashboard-grid">
+      <article class="panel-card">
+        <div class="panel-head">
+          <h2>Next action</h2>
+        </div>
+        <div id="dashboard-next-step"></div>
+      </article>
+
+      <article class="panel-card">
+        <div class="panel-head">
+          <h2>Interested in you</h2>
+        </div>
+        <div id="dashboard-likes" class="list-stack"></div>
+      </article>
+    </section>
+  </main>
+
+  <script src="data.js"></script>
+  <script src="shared.js"></script>
+  <script src="dashboard.js"></script>
+</body>
+</html>
