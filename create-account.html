@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Create Account | Attract Shun</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body data-page="create-account">
+  <header class="site-header">
+    <div class="brand-lockup">
+      <p class="eyebrow">Intentional dating</p>
+      <a class="brand" href="index.html" aria-label="ATTRACT Shun home">
+        <img class="brand-logo" src="logo.svg" alt="ATTRACT Shun">
+      </a>
+    </div>
+    <button class="menu-toggle" type="button" aria-label="Open menu" aria-expanded="false">
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
+    <nav class="site-nav">
+      <a href="create-account.html">Create Account</a>
+      <a href="onboarding.html">Onboarding</a>
+      <a href="dashboard.html">Dashboard</a>
+      <a href="connections.html">Connections</a>
+      <a href="browse.html">Browse</a>
+      <a href="match.html">Match</a>
+      <a href="reports.html">Reports</a>
+      <a href="settings.html">Settings</a>
+      <a href="admin.html">Studio</a>
+    </nav>
+  </header>
+
+  <main class="page-shell">
+    <section class="page-intro">
+      <div>
+        <p class="eyebrow">Create account</p>
+        <h1>Build a profile and enter the pool</h1>
+        <p class="page-intro-copy">Create a real account path with the kind of basic details people expect from a dating product, then move directly into onboarding and discovery.</p>
+      </div>
+      <div class="info-chip">New profile flow</div>
+    </section>
+
+    <section class="dashboard-grid">
+      <article class="panel-card">
+        <div class="panel-head">
+          <h2>Create your account</h2>
+        </div>
+        <form id="create-account-form" class="stack">
+          <div class="two-col">
+            <label class="field">
+              <span>First name</span>
+              <input name="name" type="text" maxlength="30" required>
+            </label>
+            <label class="field">
+              <span>Email</span>
+              <input name="email" type="email" maxlength="80" required>
+            </label>
+          </div>
+          <div class="three-col">
+            <label class="field">
+              <span>Age</span>
+              <input name="age" type="number" min="18" max="99" required>
+            </label>
+            <label class="field">
+              <span>City</span>
+              <input name="city" type="text" maxlength="40" required>
+            </label>
+            <label class="field">
+              <span>Intent</span>
+              <select name="intent" required>
+                <option value="long_term">Long term</option>
+                <option value="casual">Casual</option>
+              </select>
+            </label>
+          </div>
+          <div class="two-col">
+            <label class="field">
+              <span>Gender</span>
+              <input name="gender" type="text" maxlength="30" placeholder="Woman, man, non-binary..." required>
+            </label>
+            <label class="field">
+              <span>Looking for</span>
+              <input name="lookingFor" type="text" maxlength="40" placeholder="Men, women, everyone..." required>
+            </label>
+          </div>
+          <label class="field">
+            <span>Short bio</span>
+            <textarea name="bio" rows="5" maxlength="240" required></textarea>
+          </label>
+          <button class="primary-button" type="submit">Create Profile</button>
+        </form>
+      </article>
+
+      <article class="panel-card">
+        <div class="panel-head">
+          <h2>What happens next</h2>
+        </div>
+        <div class="journey-card">
+          <div class="journey-step active"><span>1</span><strong>Create</strong></div>
+          <div class="journey-step"><span>2</span><strong>Onboard</strong></div>
+          <div class="journey-step"><span>3</span><strong>Browse</strong></div>
+          <div class="journey-step"><span>4</span><strong>Match</strong></div>
+        </div>
+        <div class="list-stack">
+          <div class="summary-card">
+            <p class="profile-name">Create profile</p>
+            <p class="profile-meta">Basic dating details save immediately in this browser.</p>
+          </div>
+          <div class="summary-card">
+            <p class="profile-name">Finish onboarding</p>
+            <p class="profile-meta">Set preferences and polish the profile before discovery opens.</p>
+          </div>
+          <div class="summary-card">
+            <p class="profile-name">Enter the pool</p>
+            <p class="profile-meta">The account becomes available to matching candidates in the same intent pool.</p>
+          </div>
+        </div>
+      </article>
+    </section>
+  </main>
+
+  <script src="data.js"></script>
+  <script src="shared.js"></script>
+  <script src="create-account.js"></script>
+</body>
+</html>

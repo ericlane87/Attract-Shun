@@ -39,6 +39,9 @@
       name: user.name || "Unnamed",
       age: Number(user.age || 18),
       city: user.city || "",
+      email: user.email || "",
+      gender: user.gender || "",
+      lookingFor: user.lookingFor || "",
       intent: user.intent || "long_term",
       bio: user.bio || "",
       shunCount: Number(user.shunCount || 0),
@@ -168,6 +171,9 @@
       name: payload.name,
       age: payload.age,
       city: payload.city,
+      email: payload.email,
+      gender: payload.gender,
+      lookingFor: payload.lookingFor,
       intent: payload.intent,
       bio: payload.bio,
       onboardingCompleted: false,
@@ -253,6 +259,10 @@
 
   function getLatestMatchForUser(userId) {
     return state.matches.filter((match) => match.userIds.includes(userId)).slice(-1)[0] || null;
+  }
+
+  function getMatchesForUser(userId) {
+    return state.matches.filter((match) => match.userIds.includes(userId)).slice().reverse();
   }
 
   function maybeCreateMatch(fromUserId, toUserId) {
@@ -545,6 +555,7 @@
     getActiveMatchForUser,
     getOtherUser,
     getLatestMatchForUser,
+    getMatchesForUser,
     recordSwipe,
     submitIntro,
     confirmDate,
