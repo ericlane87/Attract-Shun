@@ -427,27 +427,30 @@
   applyLanguage(translations[saved] ? saved : "en");
 
   const languageTrigger = document.getElementById("language-trigger");
-  const languageDropdown = document.getElementById("language-dropdown");
-
   languageTrigger?.addEventListener("click", () => {
-    const opening = !languageDropdown.classList.contains("open");
-    languageDropdown.classList.toggle("open", opening);
-    languageTrigger.setAttribute("aria-expanded", opening ? "true" : "false");
-  });
-
-  languageDropdown?.querySelectorAll("[data-language]").forEach((button) => {
-    button.addEventListener("click", () => {
-      applyLanguage(button.dataset.language);
-      languageDropdown.classList.remove("open");
-      languageTrigger?.setAttribute("aria-expanded", "false");
+    window.AppUI.showModal({
+      title: "Choose a language",
+      body: `
+        <div class="language-modal-list">
+          <button class="ghost-button language-option-button" type="button" data-language="en">English</button>
+          <button class="ghost-button language-option-button" type="button" data-language="es">Español</button>
+          <button class="ghost-button language-option-button" type="button" data-language="fr">Français</button>
+          <button class="ghost-button language-option-button" type="button" data-language="pt">Português</button>
+        </div>
+      `,
+      primaryLabel: "Close",
+      secondaryLabel: "",
+      onPrimary: () => {},
     });
-  });
 
-  document.addEventListener("click", (event) => {
-    if (!languageDropdown || !languageTrigger) return;
-    if (languageDropdown.contains(event.target) || languageTrigger.contains(event.target)) return;
-    languageDropdown.classList.remove("open");
-    languageTrigger.setAttribute("aria-expanded", "false");
+    setTimeout(() => {
+      document.querySelectorAll(".language-option-button").forEach((button) => {
+        button.addEventListener("click", () => {
+          applyLanguage(button.dataset.language);
+          window.AppUI.closeModal();
+        });
+      });
+    }, 0);
   });
 
   const iosAppButton = document.getElementById("ios-app-button");
