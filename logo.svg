@@ -1,21 +1,21 @@
 <svg width="1120" height="180" viewBox="0 0 1120 180" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
   <title id="title">ATTRACT Shun logo</title>
-  <desc id="desc">ATTRACT in red and Shun in blue with a horizontal split magnet pulling the letter S inward.</desc>
+  <desc id="desc">ATTRACT in red and Shun in blue with a large horizontal magnet facing the S and pulling it inward.</desc>
   <rect width="1120" height="180" rx="28" fill="transparent"/>
 
-  <text x="22" y="118" font-family="Space Grotesk, Arial, sans-serif" font-size="76" font-weight="700" letter-spacing="1.4" fill="#9F2436">ATTRACT</text>
+  <text x="20" y="118" font-family="Space Grotesk, Arial, sans-serif" font-size="76" font-weight="700" letter-spacing="1.4" fill="#9F2436">ATTRACT</text>
 
-  <g transform="translate(470 30)">
-    <path d="M18 28H112C132 28 148 44 148 64V70" stroke="#9F2436" stroke-width="20" stroke-linecap="round" stroke-linejoin="round"/>
-    <path d="M18 122H112C132 122 148 106 148 86V80" stroke="#2367B1" stroke-width="20" stroke-linecap="round" stroke-linejoin="round"/>
-    <rect x="140" y="14" width="34" height="42" rx="12" fill="#9F2436"/>
-    <rect x="140" y="94" width="34" height="42" rx="12" fill="#2367B1"/>
-    <rect x="64" y="66" width="46" height="18" rx="9" fill="#D9B66A"/>
+  <g transform="translate(450 18)">
+    <path d="M26 34H142C171 34 194 57 194 86V88" stroke="#9F2436" stroke-width="22" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M26 128H142C171 128 194 105 194 76V74" stroke="#2367B1" stroke-width="22" stroke-linecap="round" stroke-linejoin="round"/>
+    <rect x="182" y="18" width="38" height="48" rx="14" fill="#9F2436"/>
+    <rect x="182" y="96" width="38" height="48" rx="14" fill="#2367B1"/>
+    <rect x="84" y="72" width="56" height="20" rx="10" fill="#D8B66F"/>
   </g>
 
-  <path d="M682 78C703 70 718 63 732 53" stroke="#2367B1" stroke-width="6" stroke-linecap="round" opacity="0.56"/>
-  <path d="M684 104C706 100 721 98 736 92" stroke="#2367B1" stroke-width="6" stroke-linecap="round" opacity="0.44"/>
+  <path d="M706 72C733 63 753 55 768 44" stroke="#2367B1" stroke-width="6" stroke-linecap="round" opacity="0.52"/>
+  <path d="M706 102C734 98 754 94 771 85" stroke="#2367B1" stroke-width="6" stroke-linecap="round" opacity="0.4"/>
 
-  <text x="650" y="118" font-family="Space Grotesk, Arial, sans-serif" font-size="84" font-weight="700" fill="#2367B1">S</text>
-  <text x="703" y="118" font-family="Space Grotesk, Arial, sans-serif" font-size="76" font-weight="700" letter-spacing="0.6" fill="#2367B1">hun</text>
+  <text x="684" y="120" font-family="Space Grotesk, Arial, sans-serif" font-size="90" font-weight="700" fill="#2367B1">S</text>
+  <text x="742" y="118" font-family="Space Grotesk, Arial, sans-serif" font-size="76" font-weight="700" letter-spacing="0.6" fill="#2367B1">hun</text>
 </svg>

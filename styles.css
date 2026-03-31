@@ -106,7 +106,7 @@ button:disabled {
 
 .brand-logo {
   display: block;
-  width: 250px;
+  width: 280px;
   max-width: 100%;
   height: auto;
   filter: drop-shadow(0 16px 34px rgba(0, 0, 0, 0.28));
@@ -114,7 +114,7 @@ button:disabled {
 
 .hero-logo {
   display: block;
-  width: min(430px, 82%);
+  width: min(470px, 88%);
   height: auto;
   margin: 10px 0 12px;
 }
