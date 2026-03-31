@@ -88,12 +88,21 @@
               </label>
               <label class="field">
                 <span>Gender</span>
-                <input name="gender" type="text" maxlength="30" required>
+                <select name="gender" required>
+                  <option value="woman">Woman</option>
+                  <option value="man">Man</option>
+                  <option value="non_binary">Non-binary</option>
+                </select>
               </label>
             </div>
             <label class="field">
               <span>Looking for</span>
-              <input name="lookingFor" type="text" maxlength="40" required>
+              <select name="lookingFor" required>
+                <option value="woman">Women</option>
+                <option value="man">Men</option>
+                <option value="non_binary">Non-binary people</option>
+                <option value="everyone">Everyone</option>
+              </select>
             </label>
           </section>
 

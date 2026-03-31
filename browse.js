@@ -86,6 +86,10 @@
         <div class="mini-line"></div>
         <div class="mini-node">Intro</div>
       </div>
+      <div class="swipe-button-row">
+        <button class="swipe-icon-button swipe-no" id="pass-icon-btn" type="button" aria-label="Pass on this person">X</button>
+        <button class="swipe-icon-button swipe-yes" id="like-icon-btn" type="button" aria-label="Like this person">Check</button>
+      </div>
       <div class="stack">
         <label class="field">
           <span>Interest score</span>
@@ -94,7 +98,7 @@
         <div class="range-readout" id="interest-readout">7</div>
       </div>
       <div class="swipe-actions">
-        <button class="pass-button" id="pass-btn" type="button">Pass</button>
+        <button class="pass-button" id="pass-btn" type="button">Swipe Left</button>
         <button class="primary-button" id="like-btn" type="button">Swipe Right</button>
       </div>
     </div>
@@ -106,13 +110,13 @@
     readout.textContent = range.value;
   });
 
-  document.getElementById("pass-btn").addEventListener("click", () => {
+  function handlePass() {
     AppData.recordSwipe(user.id, candidate.id, "left");
     AppUI.showToast(`Passed on ${candidate.name}.`);
     setTimeout(() => location.reload(), 350);
-  });
+  }
 
-  document.getElementById("like-btn").addEventListener("click", () => {
+  function handleLike() {
     const match = AppData.recordSwipe(user.id, candidate.id, "right", Number(range.value));
     if (match) {
       AppUI.showModal({
@@ -128,5 +132,25 @@
 
     AppUI.showToast(`Interest sent to ${candidate.name}.`);
     setTimeout(() => location.reload(), 350);
+  }
+
+  document.getElementById("pass-btn").addEventListener("click", handlePass);
+  document.getElementById("like-btn").addEventListener("click", handleLike);
+  document.getElementById("pass-icon-btn").addEventListener("click", handlePass);
+  document.getElementById("like-icon-btn").addEventListener("click", handleLike);
+
+  let touchStartX = 0;
+  const candidateCard = swipePanel.querySelector(".candidate-card");
+  candidateCard?.addEventListener("touchstart", (event) => {
+    touchStartX = event.changedTouches[0].clientX;
+  }, { passive: true });
+
+  candidateCard?.addEventListener("touchend", (event) => {
+    const deltaX = event.changedTouches[0].clientX - touchStartX;
+    if (deltaX <= -70) {
+      handlePass();
+    } else if (deltaX >= 70) {
+      handleLike();
+    }
   });
 })();

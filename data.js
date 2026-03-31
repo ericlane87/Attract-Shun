@@ -287,6 +287,22 @@
     return earthRadiusMiles * c;
   }
 
+  function normalizeGenderValue(value) {
+    const normalized = String(value || "").trim().toLowerCase().replaceAll("-", "_").replaceAll(" ", "_");
+    if (["woman", "women", "female"].includes(normalized)) return "woman";
+    if (["man", "men", "male"].includes(normalized)) return "man";
+    if (["non_binary", "nonbinary", "nb"].includes(normalized)) return "non_binary";
+    if (["everyone", "all"].includes(normalized)) return "everyone";
+    return normalized;
+  }
+
+  function lookingForMatches(lookingFor, candidateGender) {
+    const desired = normalizeGenderValue(lookingFor);
+    const candidate = normalizeGenderValue(candidateGender);
+    if (!desired || desired === "everyone") return true;
+    return desired === candidate;
+  }
+
   function getIncomingLikes(userId) {
     return state.swipes
       .filter((swipe) => swipe.toUserId === userId && swipe.direction === "right")
@@ -310,6 +326,8 @@
       if (alreadySeen.has(candidate.id)) return false;
       if (candidate.accountStatus === "banned") return false;
       if (!candidate.preferences.profileVisible) return false;
+      if (!lookingForMatches(user.lookingFor, candidate.gender)) return false;
+      if (!lookingForMatches(candidate.lookingFor, user.gender)) return false;
       if (!(candidate.age >= user.preferences.minAge && candidate.age <= user.preferences.maxAge)) return false;
       if (user.preferences.minHeightInches && candidate.heightInches < user.preferences.minHeightInches) return false;
       if (user.preferences.preferredRace !== "any" && candidate.race !== user.preferences.preferredRace) return false;
