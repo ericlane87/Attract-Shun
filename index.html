@@ -18,10 +18,27 @@
       </a>
     </div>
     <div class="header-center-cta">
-      <button class="app-store-button" id="ios-app-button" type="button">
-        <span class="app-store-kicker" data-i18n="appButtonKicker">Get the app</span>
-        <strong data-i18n="appButtonLabel">Download on the App Store</strong>
+      <button class="store-badge" id="ios-app-button" type="button">
+        <span class="store-kicker" data-i18n="appIosKicker">Download for iOS</span>
+        <strong data-i18n="appIosLabel">from the App Store</strong>
       </button>
+      <button class="store-badge" id="android-app-button" type="button">
+        <span class="store-kicker" data-i18n="appAndroidKicker">Download for Android</span>
+        <strong data-i18n="appAndroidLabel">from Google Play</strong>
+      </button>
+    </div>
+    <div class="header-actions">
+      <div class="language-menu">
+        <button class="language-trigger" id="language-trigger" type="button" aria-expanded="false">
+          <span data-i18n="languageShort">Language</span>
+        </button>
+        <div class="language-dropdown" id="language-dropdown">
+          <button type="button" data-language="en">English</button>
+          <button type="button" data-language="es">Español</button>
+          <button type="button" data-language="fr">Français</button>
+          <button type="button" data-language="pt">Português</button>
+        </div>
+      </div>
     </div>
     <button class="menu-toggle" type="button" aria-label="Open menu" aria-expanded="false">
       <span></span>
@@ -209,24 +226,6 @@
         <h3 data-i18n="spotlightThreeTitle">Bad behavior leaves a visible signal.</h3>
         <p data-i18n="spotlightThreeCopy">Ghosting, disrespect, and weak follow-through stop hiding behind infinite swiping.</p>
       </article>
-    </section>
-
-    <section class="language-bar">
-      <div class="language-row">
-        <div>
-          <p class="language-label" data-i18n="languageLabel">Language</p>
-          <p class="language-copy" data-i18n="languageCopy">Choose a language for this page.</p>
-        </div>
-        <label class="language-picker" for="language-select">
-          <span data-i18n="languageSelectLabel">Select language</span>
-          <select id="language-select">
-            <option value="en">English</option>
-            <option value="es">Español</option>
-            <option value="fr">Français</option>
-            <option value="pt">Português</option>
-          </select>
-        </label>
-      </div>
     </section>
 
     <footer class="site-footer">

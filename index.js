@@ -70,9 +70,7 @@
       spotlightThreeKicker: "Shun",
       spotlightThreeTitle: "Bad behavior leaves a visible signal.",
       spotlightThreeCopy: "Ghosting, disrespect, and weak follow-through stop hiding behind infinite swiping.",
-      languageLabel: "Language",
-      languageCopy: "Choose a language for this page.",
-      languageSelectLabel: "Select language",
+      languageShort: "Language",
       footerLeadEyebrow: "Built for clarity",
       footerLeadTitle: "A dating platform designed around focus, accountability, and real follow-through.",
       footerLeadCopy: "ATTRACT Shun is built for people who want clearer intent, stronger signals, safer interactions, and a relationship path that does not hide behind endless swiping.",
@@ -99,8 +97,10 @@
       footerCareersPortal: "Careers Portal",
       footerDestinations: "Destinations",
       footerRights: "© 2026 ATTRACT Shun. All rights reserved.",
-      appButtonKicker: "Get the app",
-      appButtonLabel: "Download on the App Store",
+      appIosKicker: "Download for iOS",
+      appIosLabel: "from the App Store",
+      appAndroidKicker: "Download for Android",
+      appAndroidLabel: "from Google Play",
     },
     es: {
       headerEyebrow: "Citas intencionales",
@@ -170,9 +170,7 @@
       spotlightThreeKicker: "Shun",
       spotlightThreeTitle: "El mal comportamiento deja una señal visible.",
       spotlightThreeCopy: "Ghosting, falta de respeto y mal seguimiento dejan de esconderse detrás del swipe infinito.",
-      languageLabel: "Idioma",
-      languageCopy: "Elige un idioma para esta página.",
-      languageSelectLabel: "Seleccionar idioma",
+      languageShort: "Idioma",
       footerLeadEyebrow: "Hecho para la claridad",
       footerLeadTitle: "Una plataforma de citas diseñada alrededor del enfoque, la responsabilidad y el seguimiento real.",
       footerLeadCopy: "ATTRACT Shun está hecho para personas que quieren una intención más clara, señales más fuertes, interacciones más seguras y un camino de relación que no se esconda detrás del swipe infinito.",
@@ -199,8 +197,10 @@
       footerCareersPortal: "Portal de carreras",
       footerDestinations: "Destinos",
       footerRights: "© 2026 ATTRACT Shun. Todos los derechos reservados.",
-      appButtonKicker: "Obtén la app",
-      appButtonLabel: "Descargar en App Store",
+      appIosKicker: "Descargar para iOS",
+      appIosLabel: "desde App Store",
+      appAndroidKicker: "Descargar para Android",
+      appAndroidLabel: "desde Google Play",
     },
     fr: {
       headerEyebrow: "Rencontres intentionnelles",
@@ -270,9 +270,7 @@
       spotlightThreeKicker: "Shun",
       spotlightThreeTitle: "Les mauvais comportements laissent un signal visible.",
       spotlightThreeCopy: "Le ghosting, l’impolitesse et le manque de suivi ne peuvent plus se cacher derrière le swipe infini.",
-      languageLabel: "Langue",
-      languageCopy: "Choisissez une langue pour cette page.",
-      languageSelectLabel: "Choisir la langue",
+      languageShort: "Langue",
       footerLeadEyebrow: "Pensé pour la clarté",
       footerLeadTitle: "Une plateforme de rencontre conçue autour du focus, de la responsabilité et d’un vrai suivi.",
       footerLeadCopy: "ATTRACT Shun est conçu pour les personnes qui veulent une intention plus claire, des signaux plus forts, des interactions plus sûres et un parcours relationnel qui ne se cache pas derrière un swipe infini.",
@@ -299,8 +297,10 @@
       footerCareersPortal: "Portail carrières",
       footerDestinations: "Destinations",
       footerRights: "© 2026 ATTRACT Shun. Tous droits réservés.",
-      appButtonKicker: "Télécharger l’app",
-      appButtonLabel: "Disponible bientôt sur l’App Store",
+      appIosKicker: "Télécharger pour iOS",
+      appIosLabel: "depuis l’App Store",
+      appAndroidKicker: "Télécharger pour Android",
+      appAndroidLabel: "depuis Google Play",
     },
     pt: {
       headerEyebrow: "Relacionamento intencional",
@@ -370,9 +370,7 @@
       spotlightThreeKicker: "Shun",
       spotlightThreeTitle: "Mau comportamento deixa um sinal visível.",
       spotlightThreeCopy: "Ghosting, desrespeito e falta de constância deixam de se esconder atrás do swipe infinito.",
-      languageLabel: "Idioma",
-      languageCopy: "Escolha um idioma para esta página.",
-      languageSelectLabel: "Selecionar idioma",
+      languageShort: "Idioma",
       footerLeadEyebrow: "Feito para clareza",
       footerLeadTitle: "Uma plataforma de namoro desenhada em torno de foco, responsabilidade e continuidade real.",
       footerLeadCopy: "ATTRACT Shun foi criado para pessoas que querem intenção mais clara, sinais mais fortes, interações mais seguras e um caminho de relacionamento que não se esconda atrás do swipe infinito.",
@@ -399,8 +397,10 @@
       footerCareersPortal: "Portal de carreiras",
       footerDestinations: "Destinos",
       footerRights: "© 2026 ATTRACT Shun. Todos os direitos reservados.",
-      appButtonKicker: "Baixe o app",
-      appButtonLabel: "Baixar na App Store",
+      appIosKicker: "Baixar para iOS",
+      appIosLabel: "na App Store",
+      appAndroidKicker: "Baixar para Android",
+      appAndroidLabel: "no Google Play",
     },
   };
 
@@ -414,15 +414,31 @@
     localStorage.setItem(STORAGE_KEY, language);
   }
 
-  const select = document.getElementById("language-select");
-  if (!select) return;
-
   const saved = localStorage.getItem(STORAGE_KEY) || "en";
-  select.value = translations[saved] ? saved : "en";
-  applyLanguage(select.value);
+  applyLanguage(translations[saved] ? saved : "en");
 
-  select.addEventListener("change", () => {
-    applyLanguage(select.value);
+  const languageTrigger = document.getElementById("language-trigger");
+  const languageDropdown = document.getElementById("language-dropdown");
+
+  languageTrigger?.addEventListener("click", () => {
+    const opening = !languageDropdown.classList.contains("open");
+    languageDropdown.classList.toggle("open", opening);
+    languageTrigger.setAttribute("aria-expanded", opening ? "true" : "false");
+  });
+
+  languageDropdown?.querySelectorAll("[data-language]").forEach((button) => {
+    button.addEventListener("click", () => {
+      applyLanguage(button.dataset.language);
+      languageDropdown.classList.remove("open");
+      languageTrigger?.setAttribute("aria-expanded", "false");
+    });
+  });
+
+  document.addEventListener("click", (event) => {
+    if (!languageDropdown || !languageTrigger) return;
+    if (languageDropdown.contains(event.target) || languageTrigger.contains(event.target)) return;
+    languageDropdown.classList.remove("open");
+    languageTrigger.setAttribute("aria-expanded", "false");
   });
 
   const iosAppButton = document.getElementById("ios-app-button");
@@ -430,6 +446,17 @@
     window.AppUI.showModal({
       title: "Coming soon",
       body: "The ATTRACT Shun iPhone app is in progress and will be announced soon.",
+      primaryLabel: "Close",
+      secondaryLabel: "",
+      onPrimary: () => {},
+    });
+  });
+
+  const androidAppButton = document.getElementById("android-app-button");
+  androidAppButton?.addEventListener("click", () => {
+    window.AppUI.showModal({
+      title: "Coming soon",
+      body: "The ATTRACT Shun Android app is in progress and will be announced soon.",
       primaryLabel: "Close",
       secondaryLabel: "",
       onPrimary: () => {},
