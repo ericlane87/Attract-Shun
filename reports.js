@@ -13,8 +13,16 @@
 
   if (!user) {
     form.innerHTML = "";
-    historyEl.innerHTML = `<div class="empty-state">Open <a href="admin.html">Studio</a> to create a profile first.</div>`;
-    queueEl.innerHTML = `<div class="empty-state">No active user.</div>`;
+    historyEl.innerHTML = AppUI.renderEntryState({
+      kicker: "Trust and safety",
+      title: "Reports appear after connections exist",
+      copy: "Safety tools become relevant once accounts are matching and interacting through the app.",
+      primaryHref: "create-account.html",
+      primaryLabel: "Create Account",
+      secondaryHref: "admin.html",
+      secondaryLabel: "Open Studio",
+    });
+    queueEl.innerHTML = `<div class="empty-state">Moderation items will appear here once reports are submitted.</div>`;
     return;
   }
 

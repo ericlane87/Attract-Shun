@@ -50,8 +50,17 @@
   }
 
   if (!user) {
-    matchPanel.innerHTML = `<div class="empty-state">Open <a href="admin.html">Studio</a> and create or seed profiles first.</div>`;
-    chatPanel.innerHTML = `<div class="empty-state">No active user.</div>`;
+    matchPanel.innerHTML = AppUI.renderEntryState({
+      kicker: "Live match",
+      title: "Your match flow starts after connection",
+      copy: "Create an account, browse, and match with someone to unlock the guided intro, date, and decision flow.",
+      steps: ["Create account", "Browse", "Match", "Start conversation"],
+      primaryHref: "create-account.html",
+      primaryLabel: "Create Account",
+      secondaryHref: "browse.html",
+      secondaryLabel: "See Browse",
+    });
+    chatPanel.innerHTML = `<div class="empty-state">The conversation area opens once you have an active match.</div>`;
     return;
   }
 

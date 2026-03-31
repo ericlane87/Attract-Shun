@@ -11,7 +11,15 @@
 
   if (!user) {
     form.innerHTML = "";
-    summary.innerHTML = `<div class="empty-state">Open <a href="admin.html">Studio</a> to create a profile first.</div>`;
+    summary.innerHTML = AppUI.renderEntryState({
+      kicker: "Settings",
+      title: "Settings unlock after account creation",
+      copy: "Create an account to manage visibility, match preferences, and notifications.",
+      primaryHref: "create-account.html",
+      primaryLabel: "Create Account",
+      secondaryHref: "admin.html",
+      secondaryLabel: "Open Studio",
+    });
     return;
   }
 

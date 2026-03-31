@@ -10,8 +10,17 @@
   const historyPanel = document.getElementById("connection-history");
 
   if (!user) {
-    activePanel.innerHTML = `<div class="empty-state">Open <a href="create-account.html">Create Account</a> or <a href="admin.html">Studio</a> to start.</div>`;
-    historyPanel.innerHTML = `<div class="empty-state">No active user.</div>`;
+    activePanel.innerHTML = AppUI.renderEntryState({
+      kicker: "Connections",
+      title: "Your relationships live here",
+      copy: "Once you create an account and start matching, this page becomes the home for live connections and recent history.",
+      steps: ["Create account", "Enter the pool", "Match with someone"],
+      primaryHref: "create-account.html",
+      primaryLabel: "Create Account",
+      secondaryHref: "admin.html",
+      secondaryLabel: "Open Studio",
+    });
+    historyPanel.innerHTML = `<div class="empty-state">Connection history appears here after your first match.</div>`;
     return;
   }
 

@@ -200,6 +200,32 @@
     }, 2200);
   }
 
+  function renderEntryState(options) {
+    return `
+      <div class="entry-state">
+        <div class="entry-state-copy">
+          <p class="entry-kicker">${options.kicker || "Get started"}</p>
+          <h3>${options.title}</h3>
+          <p>${options.copy}</p>
+        </div>
+        ${options.steps && options.steps.length ? `
+          <div class="entry-steps">
+            ${options.steps.map((step, index) => `
+              <div class="entry-step">
+                <span>${index + 1}</span>
+                <strong>${step}</strong>
+              </div>
+            `).join("")}
+          </div>
+        ` : ""}
+        <div class="cta-row">
+          <a class="primary-link" href="${options.primaryHref || "create-account.html"}">${options.primaryLabel || "Create Account"}</a>
+          ${options.secondaryHref ? `<a class="ghost-link" href="${options.secondaryHref}">${options.secondaryLabel || "Open Studio"}</a>` : ""}
+        </div>
+      </div>
+    `;
+  }
+
   window.AppUI = {
     initials,
     formatDate,
@@ -212,6 +238,7 @@
     closeModal,
     confirmAction,
     showToast,
+    renderEntryState,
   };
 
   initHamburgerMenu();

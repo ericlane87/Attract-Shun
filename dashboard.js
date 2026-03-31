@@ -12,10 +12,25 @@
   const likesEl = document.getElementById("dashboard-likes");
 
   if (!user) {
-    profileEl.innerHTML = `<div class="empty-state">Open <a href="admin.html">Studio</a> to create or seed profiles first.</div>`;
+    profileEl.innerHTML = AppUI.renderEntryState({
+      kicker: "Welcome in",
+      title: "Start with a real profile",
+      copy: "Create an account, finish your details, and enter the dating pool with a focused intent.",
+      steps: ["Create account", "Complete onboarding", "Start matching"],
+      primaryHref: "create-account.html",
+      primaryLabel: "Create Account",
+      secondaryHref: "admin.html",
+      secondaryLabel: "Open Studio",
+    });
     statsEl.innerHTML = "";
-    nextEl.innerHTML = `<div class="empty-state">No current user.</div>`;
-    likesEl.innerHTML = `<div class="empty-state">No current user.</div>`;
+    nextEl.innerHTML = AppUI.renderEntryState({
+      kicker: "Next step",
+      title: "Build your profile first",
+      copy: "The dashboard comes alive once an account exists and has entered onboarding.",
+      primaryHref: "create-account.html",
+      primaryLabel: "Create Account",
+    });
+    likesEl.innerHTML = `<div class="empty-state">Incoming interest appears here after your account enters discovery.</div>`;
     return;
   }
 

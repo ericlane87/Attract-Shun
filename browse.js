@@ -10,8 +10,17 @@
   const likesPanel = document.getElementById("incoming-likes-panel");
 
   if (!user) {
-    swipePanel.innerHTML = `<div class="empty-state">Open <a href="admin.html">Studio</a> and create or seed profiles first.</div>`;
-    likesPanel.innerHTML = `<div class="empty-state">No active user.</div>`;
+    swipePanel.innerHTML = AppUI.renderEntryState({
+      kicker: "Discovery",
+      title: "Create a profile to enter the pool",
+      copy: "Browsing opens after account creation and onboarding so discovery feels intentional from the start.",
+      steps: ["Create account", "Complete onboarding", "Browse matches"],
+      primaryHref: "create-account.html",
+      primaryLabel: "Create Account",
+      secondaryHref: "admin.html",
+      secondaryLabel: "Open Studio",
+    });
+    likesPanel.innerHTML = `<div class="empty-state">People interested in you will appear here after your profile is active.</div>`;
     return;
   }
 

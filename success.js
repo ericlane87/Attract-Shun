@@ -10,8 +10,16 @@
   const storiesEl = document.getElementById("success-stories");
 
   if (!user) {
-    formZone.innerHTML = `<div class="empty-state">Open <a href="admin.html">Studio</a> to create a profile first.</div>`;
-    storiesEl.innerHTML = `<div class="empty-state">No active user.</div>`;
+    formZone.innerHTML = AppUI.renderEntryState({
+      kicker: "Attract stories",
+      title: "Success stories come after real matches",
+      copy: "Create a profile, move through the match flow, and mutual attract outcomes can publish here.",
+      primaryHref: "create-account.html",
+      primaryLabel: "Create Account",
+      secondaryHref: "browse.html",
+      secondaryLabel: "See Browse",
+    });
+    storiesEl.innerHTML = `<div class="empty-state">Published attract stories will appear here.</div>`;
     return;
   }
 

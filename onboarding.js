@@ -10,8 +10,21 @@
   const form = document.getElementById("onboarding-form");
 
   if (!user) {
-    progressEl.innerHTML = `<div class="empty-state">Open <a href="admin.html">Studio</a> to create a profile first.</div>`;
-    form.innerHTML = "";
+    progressEl.innerHTML = AppUI.renderEntryState({
+      kicker: "Onboarding",
+      title: "Create an account to begin",
+      copy: "This flow shapes a profile, intent, and preferences before the account goes into the pool.",
+      steps: ["Create account", "Set intent", "Save preferences"],
+      primaryHref: "create-account.html",
+      primaryLabel: "Create Account",
+      secondaryHref: "admin.html",
+      secondaryLabel: "Open Studio",
+    });
+    form.innerHTML = `
+      <div class="empty-state">
+        Once an account is created, onboarding will appear here with the full setup flow.
+      </div>
+    `;
     return;
   }
 
