@@ -404,6 +404,13 @@
     },
   };
 
+  const languageNames = {
+    en: "English",
+    es: "Español",
+    fr: "Français",
+    pt: "Português",
+  };
+
   function applyLanguage(language) {
     const copy = translations[language] || translations.en;
     document.documentElement.lang = language;
@@ -411,6 +418,8 @@
       const key = node.dataset.i18n;
       if (copy[key]) node.textContent = copy[key];
     });
+    const currentLabel = document.getElementById("language-current");
+    if (currentLabel) currentLabel.textContent = `(${languageNames[language] || languageNames.en})`;
     localStorage.setItem(STORAGE_KEY, language);
   }
 

@@ -19,18 +19,27 @@
     </div>
     <div class="header-center-cta">
       <button class="store-badge" id="ios-app-button" type="button">
-        <span class="store-kicker" data-i18n="appIosKicker">Download for iOS</span>
-        <strong data-i18n="appIosLabel">from the App Store</strong>
+        <span class="store-icon apple-icon" aria-hidden="true"></span>
+        <span class="store-copy">
+          <span class="store-kicker" data-i18n="appIosKicker">Download for iOS</span>
+          <strong data-i18n="appIosLabel">from the App Store</strong>
+        </span>
       </button>
       <button class="store-badge" id="android-app-button" type="button">
-        <span class="store-kicker" data-i18n="appAndroidKicker">Download for Android</span>
-        <strong data-i18n="appAndroidLabel">from Google Play</strong>
+        <span class="store-icon play-icon" aria-hidden="true">
+          <span class="play-triangle"></span>
+        </span>
+        <span class="store-copy">
+          <span class="store-kicker" data-i18n="appAndroidKicker">Download for Android</span>
+          <strong data-i18n="appAndroidLabel">from Google Play</strong>
+        </span>
       </button>
     </div>
     <div class="header-actions">
       <div class="language-menu">
         <button class="language-trigger" id="language-trigger" type="button" aria-expanded="false">
-          <span data-i18n="languageShort">Language</span>
+          <span class="language-trigger-label" data-i18n="languageShort">Language</span>
+          <span class="language-current" id="language-current">English</span>
         </button>
         <div class="language-dropdown" id="language-dropdown">
           <button type="button" data-language="en">English</button>
