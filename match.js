@@ -90,13 +90,17 @@
 
   const otherUser = AppData.getOtherUser(match, user.id);
   const myIntro = Boolean(match.introVideos[user.id]);
-  const myDateConfirm = match.dateConfirmedBy.includes(user.id);
+  const myPlannedDate = match.plannedDateBy[user.id] || "";
+  const otherPlannedDate = match.plannedDateBy[otherUser.id] || "";
+  const agreedDate = match.agreedDate;
+  const myDateConfirm = match.dateOccurredBy.includes(user.id);
   const myDecision = match.decisions[user.id];
   const phaseSummary = match.status === "pending_intro"
     ? "Both people need to introduce themselves before the match can advance."
     : match.status === "date_planning"
-      ? "This stage is about planning and confirming the first date."
+      ? "This stage is about agreeing on the same date, then confirming the date happened."
       : "Both people now choose whether this becomes Attract or Shun.";
+  const messages = AppData.getMessages(match.id);
 
   matchPanel.innerHTML = `
     <div class="match-card">
@@ -129,9 +133,24 @@
         <div class="timeline-row ${match.status === "date_planning" ? "active" : myDateConfirm ? "done" : ""}">
           <div>
             <strong>Plan first date</strong>
-            <div class="small-copy">Confirm the date and mock photo verification by ${AppUI.formatDate(match.dateDeadline)}.</div>
+            <div class="small-copy">Pick the same date by ${AppUI.formatDate(match.dateDeadline)}. Once both dates match, confirm that the date happened.</div>
           </div>
-          <button id="date-btn" class="ghost-button" type="button" ${myDateConfirm || match.status !== "date_planning" ? "disabled" : ""}>${myDateConfirm ? "Confirmed" : "Confirm Date"}</button>
+          <div class="inline-action-row">
+            <input id="date-input" type="date" value="${myPlannedDate}" ${match.status !== "date_planning" ? "disabled" : ""}>
+            <button id="date-save-btn" class="ghost-button" type="button" ${match.status !== "date_planning" ? "disabled" : ""}>Save Date</button>
+          </div>
+        </div>
+        <div class="summary-card compact-card">
+          <p class="profile-name">Date alignment</p>
+          <p class="profile-meta">You: ${myPlannedDate || "Not set"} · ${otherUser.name}: ${otherPlannedDate || "Not set"}</p>
+          <p class="small-copy">${agreedDate ? `Both of you aligned on ${agreedDate}.` : "Once both people select the same date, the confirmation button unlocks."}</p>
+        </div>
+        <div class="timeline-row ${match.status === "date_planning" && agreedDate ? "active" : myDateConfirm ? "done" : ""}">
+          <div>
+            <strong>Confirm the date happened</strong>
+            <div class="small-copy">Both people confirm the date happened before the decision step opens.</div>
+          </div>
+          <button id="date-btn" class="ghost-button" type="button" ${(myDateConfirm || match.status !== "date_planning" || !agreedDate) ? "disabled" : ""}>${myDateConfirm ? "Confirmed" : "Confirm Date Happened"}</button>
         </div>
         <div class="timeline-row ${match.status === "decision_window" ? "active" : myDecision ? "done" : ""}">
           <div>
@@ -153,6 +172,19 @@
     document.getElementById("intro-btn").addEventListener("click", () => {
       AppData.submitIntro(match.id, user.id);
       AppUI.showToast("Introduction submitted.");
+      setTimeout(() => location.reload(), 350);
+    });
+  }
+
+  if (document.getElementById("date-save-btn")) {
+    document.getElementById("date-save-btn").addEventListener("click", () => {
+      const value = document.getElementById("date-input").value;
+      if (!value) {
+        AppUI.showToast("Choose a date first.");
+        return;
+      }
+      AppData.setPlannedDate(match.id, user.id, value);
+      AppUI.showToast("Date saved.");
       setTimeout(() => location.reload(), 350);
     });
   }
@@ -203,7 +235,6 @@
     });
   }
 
-  const messages = AppData.getMessages(match.id);
   chatPanel.innerHTML = `
     <div class="chat-wrap">
       <div class="chat-head">

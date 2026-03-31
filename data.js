@@ -83,6 +83,9 @@
       decisionDeadline: match.decisionDeadline || new Date().toISOString(),
       introVideos: match.introVideos || {},
       dateConfirmedBy: Array.isArray(match.dateConfirmedBy) ? match.dateConfirmedBy : [],
+      plannedDateBy: match.plannedDateBy || {},
+      agreedDate: match.agreedDate || "",
+      dateOccurredBy: Array.isArray(match.dateOccurredBy) ? match.dateOccurredBy : [],
       datePhotoUploaded: Boolean(match.datePhotoUploaded),
       decisions: match.decisions || {},
       closedReason: match.closedReason || "",
@@ -361,6 +364,9 @@
       decisionDeadline: addDays(createdAt, 28),
       introVideos: {},
       dateConfirmedBy: [],
+      plannedDateBy: {},
+      agreedDate: "",
+      dateOccurredBy: [],
       datePhotoUploaded: false,
       decisions: {},
       closedReason: "",
@@ -455,12 +461,30 @@
   function confirmDate(matchId, userId) {
     const match = state.matches.find((entry) => entry.id === matchId);
     if (!match || match.status !== "date_planning") return;
-    if (!match.dateConfirmedBy.includes(userId)) {
-      match.dateConfirmedBy.push(userId);
+    if (!match.agreedDate) return;
+    if (!match.dateOccurredBy.includes(userId)) {
+      match.dateOccurredBy.push(userId);
     }
-    if (match.dateConfirmedBy.length === 2) {
+    if (match.dateOccurredBy.length === 2) {
       match.datePhotoUploaded = true;
       match.status = "decision_window";
+    }
+    save();
+  }
+
+  function setPlannedDate(matchId, userId, dateValue) {
+    const match = state.matches.find((entry) => entry.id === matchId);
+    if (!match || match.status !== "date_planning") return;
+    const nextValue = String(dateValue || "").trim();
+    if (!nextValue) return;
+    match.plannedDateBy[userId] = nextValue;
+    match.dateOccurredBy = [];
+
+    const selectedDates = match.userIds.map((id) => match.plannedDateBy[id]).filter(Boolean);
+    if (selectedDates.length === 2 && selectedDates[0] === selectedDates[1]) {
+      match.agreedDate = selectedDates[0];
+    } else {
+      match.agreedDate = "";
     }
     save();
   }
@@ -631,6 +655,7 @@
     getMatchesForUser,
     recordSwipe,
     submitIntro,
+    setPlannedDate,
     confirmDate,
     submitDecision,
     unmatchCurrent,
