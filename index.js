@@ -426,9 +426,7 @@
   const saved = localStorage.getItem(STORAGE_KEY) || "en";
   applyLanguage(translations[saved] ? saved : "en");
 
-  const languageTrigger = document.getElementById("language-trigger");
   const languageSheet = document.getElementById("language-sheet");
-  const languageSheetClose = document.getElementById("language-sheet-close");
   const languageSheetBackdrop = document.getElementById("language-sheet-backdrop");
 
   function openLanguageSheet() {
@@ -443,18 +441,17 @@
     document.body.classList.remove("language-sheet-open");
   }
 
-  languageTrigger?.addEventListener("click", () => {
-    openLanguageSheet();
-  });
-
-  languageSheetClose?.addEventListener("click", closeLanguageSheet);
   languageSheetBackdrop?.addEventListener("click", closeLanguageSheet);
-  languageSheet?.querySelectorAll(".language-option-button").forEach((button) => {
-    button.addEventListener("click", () => {
-      applyLanguage(button.dataset.language);
-      closeLanguageSheet();
-    });
-  });
+  window.toggleLanguageSheet = function toggleLanguageSheet() {
+    if (!languageSheet) return;
+    if (languageSheet.hidden) openLanguageSheet();
+    else closeLanguageSheet();
+  };
+  window.closeLanguageSheet = closeLanguageSheet;
+  window.setSiteLanguage = function setSiteLanguage(language) {
+    applyLanguage(language);
+    closeLanguageSheet();
+  };
 
   const iosAppButton = document.getElementById("ios-app-button");
   iosAppButton?.addEventListener("click", () => {
