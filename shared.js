@@ -104,6 +104,28 @@
     pageShell.insertBefore(ribbon, pageShell.firstChild);
   }
 
+  function initHamburgerMenu() {
+    const nav = document.querySelector(".site-nav");
+    const toggle = document.querySelector(".menu-toggle");
+    if (!nav || !toggle) return;
+
+    function closeMenu() {
+      document.body.classList.remove("menu-open");
+      toggle.setAttribute("aria-expanded", "false");
+    }
+
+    toggle.addEventListener("click", () => {
+      const opening = !document.body.classList.contains("menu-open");
+      document.body.classList.toggle("menu-open", opening);
+      toggle.setAttribute("aria-expanded", opening ? "true" : "false");
+    });
+
+    nav.querySelectorAll("a").forEach((link) => link.addEventListener("click", closeMenu));
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape") closeMenu();
+    });
+  }
+
   function ensureOverlayRoot() {
     let root = document.getElementById("ui-overlay-root");
     if (!root) {
@@ -191,4 +213,6 @@
     confirmAction,
     showToast,
   };
+
+  initHamburgerMenu();
 })();
