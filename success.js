@@ -3,13 +3,14 @@
   const AppUI = window.AppUI;
   const user = AppData.currentUser();
 
+  AppUI.injectExperienceRibbon();
   AppUI.setPageChip("success-user-chip", user ? `Stories for ${user.name}` : "No active user");
 
   const formZone = document.getElementById("success-form-zone");
   const storiesEl = document.getElementById("success-stories");
 
   if (!user) {
-    formZone.innerHTML = `<div class="empty-state">Open <a href="admin.html">Admin</a> to create a user first.</div>`;
+    formZone.innerHTML = `<div class="empty-state">Open <a href="admin.html">Studio</a> to create a profile first.</div>`;
     storiesEl.innerHTML = `<div class="empty-state">No active user.</div>`;
     return;
   }
@@ -41,7 +42,8 @@
       event.preventDefault();
       const formData = new FormData(event.currentTarget);
       AppData.updateSuccessStory(eligibleMatch.id, user.id, formData.get("quote"));
-      location.reload();
+      AppUI.showToast("Story published.");
+      setTimeout(() => location.reload(), 350);
     });
   }
 

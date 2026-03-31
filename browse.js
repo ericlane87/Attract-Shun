@@ -3,13 +3,14 @@
   const AppUI = window.AppUI;
 
   const user = AppData.currentUser();
+  AppUI.injectExperienceRibbon();
   AppUI.setPageChip("browse-user-chip", user ? `Browsing as ${user.name}` : "No active user");
 
   const swipePanel = document.getElementById("swipe-panel");
   const likesPanel = document.getElementById("incoming-likes-panel");
 
   if (!user) {
-    swipePanel.innerHTML = `<div class="empty-state">Open <a href="admin.html">Admin</a> and create or seed users first.</div>`;
+    swipePanel.innerHTML = `<div class="empty-state">Open <a href="admin.html">Studio</a> and create or seed profiles first.</div>`;
     likesPanel.innerHTML = `<div class="empty-state">No active user.</div>`;
     return;
   }
@@ -88,11 +89,25 @@
 
   document.getElementById("pass-btn").addEventListener("click", () => {
     AppData.recordSwipe(user.id, candidate.id, "left");
-    location.reload();
+    AppUI.showToast(`Passed on ${candidate.name}.`);
+    setTimeout(() => location.reload(), 350);
   });
 
   document.getElementById("like-btn").addEventListener("click", () => {
-    AppData.recordSwipe(user.id, candidate.id, "right", Number(range.value));
-    location.href = "match.html";
+    const match = AppData.recordSwipe(user.id, candidate.id, "right", Number(range.value));
+    if (match) {
+      AppUI.showModal({
+        title: "It’s a match",
+        body: `<p>${user.name} and ${candidate.name} are now in an active match.</p><p>The next step is the video introduction stage.</p>`,
+        primaryLabel: "Open Match",
+        onPrimary: () => {
+          location.href = "match.html";
+        },
+      });
+      return;
+    }
+
+    AppUI.showToast(`Interest sent to ${candidate.name}.`);
+    setTimeout(() => location.reload(), 350);
   });
 })();

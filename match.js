@@ -3,13 +3,54 @@
   const AppUI = window.AppUI;
 
   const user = AppData.currentUser();
+  AppUI.injectExperienceRibbon();
   AppUI.setPageChip("match-user-chip", user ? `Matching as ${user.name}` : "No active user");
 
   const matchPanel = document.getElementById("match-panel");
   const chatPanel = document.getElementById("chat-panel");
 
+  function renderMessages(messages, otherUser) {
+    const log = document.getElementById("chat-log");
+    if (!log) return;
+    log.innerHTML = "";
+
+    if (!messages.length) {
+      log.innerHTML = `
+        <div class="empty-state">No messages yet. Start the conversation with intention.</div>
+        <div class="prompt-row">
+          <button class="prompt-chip" type="button" data-prompt="What made you interested in my profile?">Why were you interested?</button>
+          <button class="prompt-chip" type="button" data-prompt="What kind of connection are you hoping for here?">What are you looking for?</button>
+          <button class="prompt-chip" type="button" data-prompt="What would your ideal first date look like?">Ideal first date?</button>
+        </div>
+      `;
+
+      log.querySelectorAll("[data-prompt]").forEach((button) => {
+        button.addEventListener("click", () => {
+          document.getElementById("chat-input").value = button.dataset.prompt;
+          document.getElementById("chat-input").focus();
+        });
+      });
+      return;
+    }
+
+    messages.forEach((message) => {
+      const messageEl = document.createElement("div");
+      messageEl.className = `chat-message${message.senderId === user.id ? " mine" : ""}`;
+      messageEl.innerHTML = `
+        <div class="chat-bubble">
+          <strong>${message.senderId === user.id ? "You" : otherUser.name}</strong>
+          <div>${message.text}</div>
+          <div class="small-copy">${new Date(message.createdAt).toLocaleString()}</div>
+        </div>
+      `;
+      log.appendChild(messageEl);
+    });
+
+    log.scrollTop = log.scrollHeight;
+  }
+
   if (!user) {
-    matchPanel.innerHTML = `<div class="empty-state">Open <a href="admin.html">Admin</a> and create or seed users first.</div>`;
+    matchPanel.innerHTML = `<div class="empty-state">Open <a href="admin.html">Studio</a> and create or seed profiles first.</div>`;
     chatPanel.innerHTML = `<div class="empty-state">No active user.</div>`;
     return;
   }
@@ -42,6 +83,11 @@
   const myIntro = Boolean(match.introVideos[user.id]);
   const myDateConfirm = match.dateConfirmedBy.includes(user.id);
   const myDecision = match.decisions[user.id];
+  const phaseSummary = match.status === "pending_intro"
+    ? "Both people need to introduce themselves before the match can advance."
+    : match.status === "date_planning"
+      ? "This stage is about planning and confirming the first date."
+      : "Both people now choose whether this becomes Attract or Shun.";
 
   matchPanel.innerHTML = `
     <div class="match-card">
@@ -52,6 +98,7 @@
         </div>
         <span class="status-pill">${match.status.replace("_", " ")}</span>
       </div>
+      <div class="hint-box">${phaseSummary}</div>
       <div class="timeline">
         <div class="timeline-row ${match.status === "pending_intro" ? "active" : myIntro ? "done" : ""}">
           <div>
@@ -86,20 +133,31 @@
   if (document.getElementById("intro-btn")) {
     document.getElementById("intro-btn").addEventListener("click", () => {
       AppData.submitIntro(match.id, user.id);
-      location.reload();
+      AppUI.showToast("Introduction submitted.");
+      setTimeout(() => location.reload(), 350);
     });
   }
 
   if (document.getElementById("date-btn")) {
     document.getElementById("date-btn").addEventListener("click", () => {
       AppData.confirmDate(match.id, user.id);
-      location.reload();
+      AppUI.showToast("Date confirmation saved.");
+      setTimeout(() => location.reload(), 350);
     });
   }
 
   document.getElementById("unmatch-btn").addEventListener("click", () => {
-    AppData.unmatchCurrent(user.id);
-    location.reload();
+    AppUI.confirmAction({
+      title: "End this match?",
+      body: "<p>This closes the current connection and applies the configured shun logic.</p>",
+      primaryLabel: "End Match",
+      primaryClass: "danger-button",
+      onConfirm: () => {
+        AppData.unmatchCurrent(user.id);
+        AppUI.showToast("Match ended.");
+        setTimeout(() => location.reload(), 350);
+      },
+    });
   });
 
   if (match.status === "decision_window") {
@@ -111,15 +169,18 @@
     `;
     document.getElementById("attract-btn").addEventListener("click", () => {
       AppData.submitDecision(match.id, user.id, "attract");
-      location.reload();
+      AppUI.showToast("Attract decision saved.");
+      setTimeout(() => location.reload(), 350);
     });
     document.getElementById("fit-btn").addEventListener("click", () => {
       AppData.submitDecision(match.id, user.id, "not_a_fit");
-      location.reload();
+      AppUI.showToast("Decision saved.");
+      setTimeout(() => location.reload(), 350);
     });
     document.getElementById("shun-btn").addEventListener("click", () => {
       AppData.submitDecision(match.id, user.id, "shun");
-      location.reload();
+      AppUI.showToast("Shun decision saved.");
+      setTimeout(() => location.reload(), 350);
     });
   }
 
@@ -141,28 +202,15 @@
     </div>
   `;
 
-  const log = document.getElementById("chat-log");
-  if (!messages.length) {
-    log.innerHTML = `<div class="empty-state">No messages yet. Start the conversation.</div>`;
-  } else {
-    messages.forEach((message) => {
-      const messageEl = document.createElement("div");
-      messageEl.className = `chat-message${message.senderId === user.id ? " mine" : ""}`;
-      messageEl.innerHTML = `
-        <div class="chat-bubble">
-          <strong>${message.senderId === user.id ? "You" : otherUser.name}</strong>
-          <div>${message.text}</div>
-          <div class="small-copy">${new Date(message.createdAt).toLocaleString()}</div>
-        </div>
-      `;
-      log.appendChild(messageEl);
-    });
-  }
+  renderMessages(messages, otherUser);
 
   document.getElementById("chat-form").addEventListener("submit", (event) => {
     event.preventDefault();
     const input = document.getElementById("chat-input");
-    AppData.sendMessage(match.id, user.id, input.value);
-    location.reload();
+    const nextValue = input.value.trim();
+    if (!nextValue) return;
+    AppData.sendMessage(match.id, user.id, nextValue);
+    input.value = "";
+    renderMessages(AppData.getMessages(match.id), otherUser);
   });
 })();

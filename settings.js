@@ -3,6 +3,7 @@
   const AppUI = window.AppUI;
   const user = AppData.currentUser();
 
+  AppUI.injectExperienceRibbon();
   AppUI.setPageChip("settings-user-chip", user ? `Settings for ${user.name}` : "No active user");
 
   const form = document.getElementById("settings-form");
@@ -10,7 +11,7 @@
 
   if (!user) {
     form.innerHTML = "";
-    summary.innerHTML = `<div class="empty-state">Open <a href="admin.html">Admin</a> to create a user first.</div>`;
+    summary.innerHTML = `<div class="empty-state">Open <a href="admin.html">Studio</a> to create a profile first.</div>`;
     return;
   }
 
@@ -46,6 +47,7 @@
         allowWeeklyFeature: formData.get("allowWeeklyFeature") === "on",
       },
     });
-    location.reload();
+    AppUI.showToast("Settings saved.");
+    setTimeout(() => location.reload(), 350);
   });
 })();

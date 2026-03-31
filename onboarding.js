@@ -3,13 +3,14 @@
   const AppUI = window.AppUI;
   const user = AppData.currentUser();
 
+  AppUI.injectExperienceRibbon();
   AppUI.setPageChip("onboarding-user-chip", user ? `Onboarding ${user.name}` : "No active user");
 
   const progressEl = document.getElementById("onboarding-progress");
   const form = document.getElementById("onboarding-form");
 
   if (!user) {
-    progressEl.innerHTML = `<div class="empty-state">Open <a href="admin.html">Admin</a> to create a user first.</div>`;
+    progressEl.innerHTML = `<div class="empty-state">Open <a href="admin.html">Studio</a> to create a profile first.</div>`;
     form.innerHTML = "";
     return;
   }
@@ -56,6 +57,9 @@
       distanceMiles: formData.get("distanceMiles"),
       allowWeeklyFeature: formData.get("allowWeeklyFeature") === "on",
     });
-    location.href = "dashboard.html";
+    AppUI.showToast("Profile completed.");
+    setTimeout(() => {
+      location.href = "dashboard.html";
+    }, 350);
   });
 })();

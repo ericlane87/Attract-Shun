@@ -3,6 +3,7 @@
   const AppUI = window.AppUI;
   const user = AppData.currentUser();
 
+  AppUI.injectExperienceRibbon();
   AppUI.setPageChip("reports-user-chip", user ? `Reporting as ${user.name}` : "No active user");
 
   const form = document.getElementById("report-form");
@@ -12,7 +13,7 @@
 
   if (!user) {
     form.innerHTML = "";
-    historyEl.innerHTML = `<div class="empty-state">Open <a href="admin.html">Admin</a> to create a user first.</div>`;
+    historyEl.innerHTML = `<div class="empty-state">Open <a href="admin.html">Studio</a> to create a profile first.</div>`;
     queueEl.innerHTML = `<div class="empty-state">No active user.</div>`;
     return;
   }
@@ -43,7 +44,8 @@
       category: formData.get("category"),
       details: formData.get("details"),
     });
-    location.reload();
+    AppUI.showToast("Report submitted for review.");
+    setTimeout(() => location.reload(), 350);
   });
 
   const history = AppData.getReportsForUser(user.id);
@@ -89,9 +91,10 @@
     queueEl.querySelectorAll("button[data-id]").forEach((button) => {
       button.addEventListener("click", () => {
         const status = button.dataset.action;
-        const resolution = status === "actioned" ? "Admin action applied in local prototype." : "Dismissed in local prototype.";
+        const resolution = status === "actioned" ? "Admin action applied." : "Dismissed after review.";
         AppData.updateReportStatus(button.dataset.id, status, resolution);
-        location.reload();
+        AppUI.showToast(status === "actioned" ? "Report actioned." : "Report dismissed.");
+        setTimeout(() => location.reload(), 350);
       });
     });
   }

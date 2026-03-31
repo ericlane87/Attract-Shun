@@ -63,6 +63,121 @@
     if (el) el.textContent = text;
   }
 
+  function injectExperienceRibbon() {
+    const pageShell = document.querySelector(".page-shell");
+    const siteHeader = document.querySelector(".site-header");
+    if (!pageShell || !siteHeader || document.getElementById("experience-ribbon")) return;
+
+    const user = AppData.currentUser();
+    const activeMatch = user ? AppData.getActiveMatchForUser(user.id) : null;
+    const ribbon = document.createElement("section");
+    ribbon.id = "experience-ribbon";
+    ribbon.className = "experience-ribbon";
+
+    ribbon.innerHTML = user
+      ? `
+        <div class="ribbon-main">
+          <div class="ribbon-avatar">${initials(user.name)}</div>
+          <div>
+            <p class="ribbon-title">${user.name}</p>
+            <p class="ribbon-copy">${AppData.formatIntent(user.intent)} pool · ${activeMatch ? "Active match in progress" : "Available to browse"}</p>
+          </div>
+        </div>
+        <div class="ribbon-actions">
+          <a class="ghost-link" href="dashboard.html">Overview</a>
+          <a class="ghost-link" href="browse.html">Browse</a>
+          <a class="ghost-link" href="match.html">Match Flow</a>
+        </div>
+      `
+      : `
+        <div class="ribbon-main">
+          <div>
+            <p class="ribbon-title">No active profile selected</p>
+            <p class="ribbon-copy">Open Studio to create profiles, switch users, or seed the experience.</p>
+          </div>
+        </div>
+        <div class="ribbon-actions">
+          <a class="ghost-link" href="admin.html">Open Studio</a>
+        </div>
+      `;
+
+    pageShell.insertBefore(ribbon, pageShell.firstChild);
+  }
+
+  function ensureOverlayRoot() {
+    let root = document.getElementById("ui-overlay-root");
+    if (!root) {
+      root = document.createElement("div");
+      root.id = "ui-overlay-root";
+      document.body.appendChild(root);
+    }
+    return root;
+  }
+
+  function closeModal() {
+    const root = ensureOverlayRoot();
+    root.innerHTML = "";
+  }
+
+  function showModal(options) {
+    const root = ensureOverlayRoot();
+    root.innerHTML = `
+      <div class="modal-backdrop">
+        <div class="modal-card">
+          <div class="modal-head">
+            <h3>${options.title || "Notice"}</h3>
+            <button class="modal-close" type="button" aria-label="Close">&times;</button>
+          </div>
+          <div class="modal-body">${options.body || ""}</div>
+          <div class="modal-actions">
+            ${options.secondaryLabel ? `<button class="ghost-button" type="button" data-modal-action="secondary">${options.secondaryLabel}</button>` : ""}
+            <button class="${options.primaryClass || "primary-button"}" type="button" data-modal-action="primary">${options.primaryLabel || "Continue"}</button>
+          </div>
+        </div>
+      </div>
+    `;
+
+    root.querySelector(".modal-close")?.addEventListener("click", closeModal);
+    root.querySelector(".modal-backdrop")?.addEventListener("click", (event) => {
+      if (event.target.classList.contains("modal-backdrop")) {
+        closeModal();
+      }
+    });
+    root.querySelector("[data-modal-action='secondary']")?.addEventListener("click", () => {
+      closeModal();
+      if (options.onSecondary) options.onSecondary();
+    });
+    root.querySelector("[data-modal-action='primary']")?.addEventListener("click", () => {
+      closeModal();
+      if (options.onPrimary) options.onPrimary();
+    });
+  }
+
+  function confirmAction(options) {
+    showModal({
+      title: options.title,
+      body: options.body,
+      primaryLabel: options.primaryLabel || "Confirm",
+      secondaryLabel: options.secondaryLabel || "Cancel",
+      primaryClass: options.primaryClass || "primary-button",
+      onPrimary: options.onConfirm,
+      onSecondary: options.onCancel,
+    });
+  }
+
+  function showToast(message) {
+    const root = ensureOverlayRoot();
+    const toast = document.createElement("div");
+    toast.className = "toast";
+    toast.textContent = message;
+    root.appendChild(toast);
+    requestAnimationFrame(() => toast.classList.add("visible"));
+    setTimeout(() => {
+      toast.classList.remove("visible");
+      setTimeout(() => toast.remove(), 220);
+    }, 2200);
+  }
+
   window.AppUI = {
     initials,
     formatDate,
@@ -70,5 +185,10 @@
     renderUserSummaryCard,
     renderLikeList,
     setPageChip,
+    injectExperienceRibbon,
+    showModal,
+    closeModal,
+    confirmAction,
+    showToast,
   };
 })();

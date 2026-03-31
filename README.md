@@ -33,7 +33,13 @@ Local-first front-end prototype for a dating platform built around intentional m
 
 ## Local Usage
 
-Open [index.html](./index.html) in a browser, or serve the directory with a simple static server.
+Start the local site with:
+
+```bash
+npm start
+```
+
+Then open `http://localhost:3000`.
 
 Recommended flow:
 

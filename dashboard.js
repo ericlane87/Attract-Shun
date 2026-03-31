@@ -3,6 +3,7 @@
   const AppUI = window.AppUI;
 
   const user = AppData.currentUser();
+  AppUI.injectExperienceRibbon();
   AppUI.setPageChip("dashboard-user-chip", user ? `Viewing ${user.name}` : "No active user");
 
   const profileEl = document.getElementById("dashboard-profile");
@@ -11,7 +12,7 @@
   const likesEl = document.getElementById("dashboard-likes");
 
   if (!user) {
-    profileEl.innerHTML = `<div class="empty-state">Open <a href="admin.html">Admin</a> to create or seed users first.</div>`;
+    profileEl.innerHTML = `<div class="empty-state">Open <a href="admin.html">Studio</a> to create or seed profiles first.</div>`;
     statsEl.innerHTML = "";
     nextEl.innerHTML = `<div class="empty-state">No current user.</div>`;
     likesEl.innerHTML = `<div class="empty-state">No current user.</div>`;
