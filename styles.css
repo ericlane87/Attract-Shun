@@ -587,6 +587,11 @@ textarea {
   font-weight: 700;
 }
 
+button.heart-badge {
+  border: 0;
+  cursor: pointer;
+}
+
 .stat-grid {
   grid-template-columns: repeat(4, minmax(0, 1fr));
 }

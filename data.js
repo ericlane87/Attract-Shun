@@ -1,5 +1,5 @@
 (function () {
-  const STORAGE_KEY = "attract-shun-local-prototype-v6";
+  const STORAGE_KEY = "attract-shun-local-prototype-v7";
   const DAY_MS = 24 * 60 * 60 * 1000;
 
   function uid(prefix) {
@@ -15,6 +15,17 @@
       notifications: true,
       showIntentBadge: true,
       profileVisible: true,
+    };
+  }
+
+  function defaultShunBreakdown() {
+    return {
+      intro_timeout: 0,
+      date_timeout: 0,
+      decision_shun: 0,
+      unmatch_not_mutual: 0,
+      unmatch_no_response: 0,
+      moderation: 0,
     };
   }
 
@@ -119,7 +130,7 @@
   function createEmptyState() {
     return {
       system: {
-        now: new Date("2026-03-31T12:00:00-04:00").toISOString(),
+        now: new Date().toISOString(),
       },
       session: {
         loggedInUserId: "",
@@ -128,6 +139,7 @@
       users: [],
       swipes: [],
       matchRequests: [],
+      unmatchRequests: [],
       matches: [],
       messages: [],
       reports: [],
@@ -150,6 +162,7 @@
       dealMakers: Array.isArray(user.dealMakers) && user.dealMakers.length ? user.dealMakers : fallbackDealMakers(user.name),
       dealBreakers: Array.isArray(user.dealBreakers) && user.dealBreakers.length ? user.dealBreakers : fallbackDealBreakers(user.name),
       shunCount: Number(user.shunCount || 0),
+      shunBreakdown: { ...defaultShunBreakdown(), ...(user.shunBreakdown || {}) },
       activeMatchId: user.activeMatchId || null,
       status: user.status || "available",
       accountStatus: user.accountStatus || "good",
@@ -191,6 +204,21 @@
     };
   }
 
+  function normalizeUnmatchRequest(request) {
+    return {
+      id: request.id || uid("unmatch"),
+      matchId: request.matchId || "",
+      initiatorId: request.initiatorId || "",
+      responderId: request.responderId || "",
+      reason: request.reason || "not_interested",
+      status: request.status || "pending",
+      createdAt: request.createdAt || new Date().toISOString(),
+      respondBy: request.respondBy || new Date(Date.now() + DAY_MS).toISOString(),
+      respondedAt: request.respondedAt || "",
+      responderAnswer: request.responderAnswer || "",
+    };
+  }
+
   function normalizeReport(report) {
     return {
       id: report.id || uid("report"),
@@ -229,6 +257,7 @@
       users: Array.isArray(merged.users) ? merged.users.map(normalizeUser) : [],
       swipes: Array.isArray(merged.swipes) ? merged.swipes : [],
       matchRequests: Array.isArray(merged.matchRequests) ? merged.matchRequests.map(normalizeMatchRequest) : [],
+      unmatchRequests: Array.isArray(merged.unmatchRequests) ? merged.unmatchRequests.map(normalizeUnmatchRequest) : [],
       matches: Array.isArray(merged.matches) ? merged.matches.map(normalizeMatch) : [],
       messages: Array.isArray(merged.messages) ? merged.messages : [],
       reports: Array.isArray(merged.reports) ? merged.reports.map(normalizeReport) : [],
@@ -261,8 +290,13 @@
     localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
   }
 
+  function refreshSystemNow() {
+    state.system.now = new Date().toISOString();
+    return state.system.now;
+  }
+
   function nowIso() {
-    return new Date(state.system.now).toISOString();
+    return refreshSystemNow();
   }
 
   function addDays(dateIso, days) {
@@ -271,6 +305,18 @@
 
   function getUser(userId) {
     return state.users.find((user) => user.id === userId) || null;
+  }
+
+  function addShunToUser(userId, category) {
+    const user = getUser(userId);
+    if (!user) return;
+    const nextCategory = category || "moderation";
+    user.shunCount += 1;
+    user.shunBreakdown = {
+      ...defaultShunBreakdown(),
+      ...(user.shunBreakdown || {}),
+      [nextCategory]: Number((user.shunBreakdown && user.shunBreakdown[nextCategory]) || 0) + 1,
+    };
   }
 
   function currentUser() {
@@ -479,6 +525,13 @@
     return state.matches.find((match) => match.userIds.includes(userId) && ["pending_intro", "date_planning", "decision_window"].includes(match.status)) || null;
   }
 
+  function getPendingUnmatchRequestForUser(userId) {
+    return state.unmatchRequests.find((request) =>
+      request.status === "pending" &&
+      (request.initiatorId === userId || request.responderId === userId)
+    ) || null;
+  }
+
   function getOtherUser(match, userId) {
     return getUser(match.userIds.find((id) => id !== userId));
   }
@@ -615,13 +668,26 @@
     return match;
   }
 
-  function closeMatch(match, status, reason, applyShunToAll) {
+  function closeMatch(match, status, reason, applyShunToAll, shunCategory) {
     match.status = status;
     match.closedReason = reason;
     match.userIds.forEach((userId) => {
       const user = getUser(userId);
       if (!user) return;
-      if (applyShunToAll) user.shunCount += 1;
+      if (applyShunToAll) addShunToUser(userId, shunCategory);
+      user.activeMatchId = null;
+      user.status = "available";
+    });
+  }
+
+  function closeMatchForSpecificUsers(match, status, reason, usersToShun, shunCategory) {
+    match.status = status;
+    match.closedReason = reason;
+    const shunSet = new Set(usersToShun || []);
+    match.userIds.forEach((userId) => {
+      const user = getUser(userId);
+      if (!user) return;
+      if (shunSet.has(userId)) addShunToUser(userId, shunCategory);
       user.activeMatchId = null;
       user.status = "available";
     });
@@ -662,7 +728,7 @@
       return true;
     }
 
-    closeMatch(match, "shun", "Non-mutual withdrawal or negative fit decision.", true);
+    closeMatch(match, "shun", "Non-mutual withdrawal or negative fit decision.", true, "decision_shun");
     save();
     return true;
   }
@@ -701,9 +767,74 @@
 
   function unmatchCurrent(userId) {
     const match = getActiveMatchForUser(userId);
-    if (!match) return;
-    closeMatch(match, "shun", "Unmatched before completing the process.", true);
+    if (!match) return null;
+    const existing = getPendingUnmatchRequestForUser(userId);
+    if (existing && existing.matchId === match.id) return existing;
+
+    const responderId = match.userIds.find((id) => id !== userId);
+    const request = normalizeUnmatchRequest({
+      id: uid("unmatch"),
+      matchId: match.id,
+      initiatorId: userId,
+      responderId,
+      reason: "not_interested",
+      status: "pending",
+      createdAt: nowIso(),
+      respondBy: addDays(nowIso(), 1),
+      respondedAt: "",
+      responderAnswer: "",
+    });
+    state.unmatchRequests.push(request);
     save();
+    return request;
+  }
+
+  function submitUnmatchRequest(matchId, initiatorId, reason) {
+    const match = state.matches.find((entry) => entry.id === matchId);
+    if (!match || !match.userIds.includes(initiatorId)) return null;
+    if (!["pending_intro", "date_planning", "decision_window"].includes(match.status)) return null;
+
+    const existing = state.unmatchRequests.find((request) => request.matchId === matchId && request.status === "pending");
+    if (existing) return existing;
+
+    const responderId = match.userIds.find((id) => id !== initiatorId);
+    const createdAt = nowIso();
+    const request = normalizeUnmatchRequest({
+      id: uid("unmatch"),
+      matchId,
+      initiatorId,
+      responderId,
+      reason,
+      status: "pending",
+      createdAt,
+      respondBy: addDays(createdAt, 1),
+      respondedAt: "",
+      responderAnswer: "",
+    });
+    state.unmatchRequests.push(request);
+    save();
+    return request;
+  }
+
+  function respondToUnmatchRequest(requestId, responderId, isMutual) {
+    const request = state.unmatchRequests.find((entry) => entry.id === requestId && entry.status === "pending");
+    if (!request || request.responderId !== responderId) return null;
+
+    const match = state.matches.find((entry) => entry.id === request.matchId);
+    if (!match) return null;
+
+    request.status = isMutual ? "confirmed_mutual" : "rejected_not_mutual";
+    request.respondedAt = nowIso();
+    request.responderAnswer = isMutual ? "yes" : "no";
+
+    if (isMutual) {
+      closeMatch(match, "unmatched", "Mutual unmatch confirmed by both people.", false);
+    } else {
+      closeMatchForSpecificUsers(match, "shun", "Unmatch was not mutual.", [request.initiatorId], "unmatch_not_mutual");
+    }
+
+    save();
+    return request;
   }
 
   function getMessages(matchId) {
@@ -754,7 +885,7 @@
           user.status = "banned";
           user.activeMatchId = null;
         } else {
-          user.shunCount += 1;
+          addShunToUser(user.id, "moderation");
         }
       }
     }
@@ -788,18 +919,43 @@
   }
 
   function processDeadlines() {
-    const currentTime = new Date(state.system.now).getTime();
+    const currentTime = new Date(refreshSystemNow()).getTime();
+    let changed = false;
     state.matches.forEach((match) => {
       if (!["pending_intro", "date_planning", "decision_window"].includes(match.status)) return;
       if (match.status === "pending_intro" && currentTime > new Date(match.introDeadline).getTime()) {
-        closeMatch(match, "shun", "Failed to submit both intro videos in time.", true);
+        closeMatch(match, "shun", "Failed to submit both intro videos in time.", true, "intro_timeout");
+        changed = true;
       } else if (match.status === "date_planning" && currentTime > new Date(match.dateDeadline).getTime()) {
-        closeMatch(match, "shun", "Failed to plan and verify the first date in time.", true);
+        closeMatch(match, "shun", "Failed to plan and verify the first date in time.", true, "date_timeout");
+        changed = true;
       } else if (match.status === "decision_window" && currentTime > new Date(match.decisionDeadline).getTime()) {
         finalizeDecisionMatch(match);
+        changed = true;
       }
     });
-    save();
+    state.unmatchRequests.forEach((request) => {
+      if (request.status !== "pending") return;
+      if (currentTime <= new Date(request.respondBy).getTime()) return;
+      const match = state.matches.find((entry) => entry.id === request.matchId);
+      request.status = "expired_no_response";
+      request.respondedAt = nowIso();
+      request.responderAnswer = "no_response";
+      if (match) {
+        closeMatchForSpecificUsers(match, "shun", "Unmatch response deadline expired. Responder received a Shun.", [request.responderId], "unmatch_no_response");
+      } else {
+        const responder = getUser(request.responderId);
+        if (responder) {
+          addShunToUser(responder.id, "unmatch_no_response");
+        }
+      }
+      changed = true;
+    });
+    if (changed) {
+      save();
+    } else {
+      syncState();
+    }
   }
 
   function advanceDay() {
@@ -997,6 +1153,7 @@
     sendMatchRequest,
     confirmMatchRequest,
     getActiveMatchForUser,
+    getPendingUnmatchRequestForUser,
     getOtherUser,
     getLatestMatchForUser,
     recordSwipe,
@@ -1004,6 +1161,8 @@
     confirmDate,
     submitDecision,
     unmatchCurrent,
+    submitUnmatchRequest,
+    respondToUnmatchRequest,
     getMessages,
     sendMessage,
     createReport,
@@ -1018,6 +1177,7 @@
     defaultPreferences,
   });
 
+  processDeadlines();
   syncState();
   window.AppData = AppData;
 })();

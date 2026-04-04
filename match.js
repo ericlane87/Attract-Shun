@@ -56,7 +56,7 @@
         <div class="timeline-row ${match.status === "pending_intro" ? "active" : myIntro ? "done" : ""}">
           <div>
             <strong>Video intro</strong>
-            <div class="small-copy">Submit a mock 60 second to 2 minute intro by ${AppUI.formatDate(match.introDeadline)}.</div>
+            <div class="small-copy">Submit a mock 60 second to 2 minute intro within 24 hours by ${AppUI.formatDate(match.introDeadline)}. If both intros are not submitted in time, both people receive a Shun.</div>
           </div>
           <button id="intro-btn" class="ghost-button" type="button" ${myIntro || match.status !== "pending_intro" ? "disabled" : ""}>${myIntro ? "Submitted" : "Submit Intro"}</button>
         </div>

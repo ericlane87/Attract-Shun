@@ -60,10 +60,94 @@
       <p class="small-copy">${user.bio}</p>
       <div class="meta-row">
         <span class="status-pill">${activeMatch ? "Matched" : "Available"}</span>
-        <span class="heart-badge">Shun ${user.shunCount}</span>
+        <button class="heart-badge shun-breakdown-button" type="button" data-shun-user-id="${user.id}">Shun ${user.shunCount}</button>
       </div>
       <p class="small-copy">${user.email || "No login email assigned."}</p>
     `;
+  }
+
+  function shunLabel(category) {
+    return ({
+      intro_timeout: "Missed intro video deadline",
+      date_timeout: "Missed date planning deadline",
+      decision_shun: "Negative final match outcome",
+      unmatch_not_mutual: "Unmatch was not mutual",
+      unmatch_no_response: "Did not respond to unmatch request",
+      moderation: "Moderation or report action",
+    })[category] || category;
+  }
+
+  function ensureShunModal() {
+    let modal = document.getElementById("shun-breakdown-modal");
+    if (modal) return modal;
+
+    modal = document.createElement("div");
+    modal.id = "shun-breakdown-modal";
+    modal.className = "profile-modal";
+    modal.hidden = true;
+    modal.innerHTML = `
+      <div class="profile-modal-shell">
+        <button id="shun-breakdown-close" class="ghost-button modal-close" type="button">Close</button>
+        <div id="shun-breakdown-card" class="panel-card profile-modal-card"></div>
+      </div>
+    `;
+    document.body.appendChild(modal);
+    document.getElementById("shun-breakdown-close").addEventListener("click", closeShunModal);
+    modal.addEventListener("click", (event) => {
+      if (event.target === modal) closeShunModal();
+    });
+    return modal;
+  }
+
+  function closeShunModal() {
+    const modal = document.getElementById("shun-breakdown-modal");
+    if (!modal) return;
+    modal.hidden = true;
+    document.body.classList.remove("modal-open");
+  }
+
+  function openShunBreakdown(userId) {
+    const user = AppData.getUser(userId);
+    if (!user) return;
+    const modal = ensureShunModal();
+    const card = document.getElementById("shun-breakdown-card");
+    const entries = Object.entries(user.shunBreakdown || {})
+      .filter(([, count]) => Number(count) > 0);
+
+    card.innerHTML = `
+      <div class="stack">
+        <div class="profile-top">
+          <div>
+            <p class="profile-name">${user.name}</p>
+            <p class="profile-meta">Shun breakdown</p>
+          </div>
+          <span class="heart-badge">Shun ${user.shunCount}</span>
+        </div>
+        ${entries.length ? `
+          <div class="stack">
+            ${entries.map(([category, count]) => `
+              <div class="like-row">
+                <div>
+                  <p class="profile-name">${shunLabel(category)}</p>
+                </div>
+                <span class="interest-pill">${count}</span>
+              </div>
+            `).join("")}
+          </div>
+        ` : `<div class="empty-state">No shuns recorded for this profile.</div>`}
+      </div>
+    `;
+
+    modal.hidden = false;
+    document.body.classList.add("modal-open");
+  }
+
+  function bindShunBreakdownTriggers(root = document) {
+    root.querySelectorAll("[data-shun-user-id]").forEach((button) => {
+      if (button.dataset.shunBound === "true") return;
+      button.dataset.shunBound = "true";
+      button.addEventListener("click", () => openShunBreakdown(button.dataset.shunUserId));
+    });
   }
 
   function renderLikeList(container, likes) {
@@ -140,7 +224,10 @@
     renderLikeList,
     setPageChip,
     initSessionControls,
+    openShunBreakdown,
+    bindShunBreakdownTriggers,
   };
 
   initSessionControls();
+  bindShunBreakdownTriggers();
 })();

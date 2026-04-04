@@ -140,6 +140,7 @@
   const requests = AppData.getIncomingMatchRequests(user.id);
 
   profileEl.innerHTML = AppUI.renderUserSummaryCard(user);
+  AppUI.bindShunBreakdownTriggers(profileEl);
   statsEl.innerHTML = renderFlowPanel(activeMatch, likes, requests);
 
   if (!user.onboardingCompleted) {
