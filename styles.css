@@ -624,6 +624,18 @@ textarea {
   gap: 12px;
 }
 
+.pagination-pages {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.pagination-chip {
+  min-width: 44px;
+}
+
 .profile-tile {
   min-height: 300px;
   padding: 18px;

@@ -205,6 +205,15 @@
     }
     const start = browseState.page * browseState.pageSize;
     const pageCandidates = candidates.slice(start, start + browseState.pageSize);
+    const pageButtons = Array.from({ length: totalPages }, (_, index) => `
+      <button
+        class="${index === browseState.page ? "primary-button" : "ghost-button"} pagination-chip"
+        type="button"
+        data-page-index="${index}"
+        aria-label="Open page ${index + 1}">
+        ${index + 1}
+      </button>
+    `).join("");
 
     traditionalPanel.innerHTML = `
       <div class="browse-summary">
@@ -230,7 +239,7 @@
       </div>
       <div class="pagination-row">
         <button class="ghost-button" type="button" id="profiles-prev-btn" ${browseState.page === 0 ? "disabled" : ""}>Previous</button>
-        <span class="small-copy">Page ${browseState.page + 1} of ${totalPages}</span>
+        <div class="pagination-pages">${pageButtons}</div>
         <button class="primary-button" type="button" id="profiles-next-btn" ${browseState.page >= totalPages - 1 ? "disabled" : ""}>Next</button>
       </div>
     `;
@@ -269,6 +278,13 @@
         scrollToBrowseTop();
       });
     }
+    traditionalPanel.querySelectorAll("[data-page-index]").forEach((button) => {
+      button.addEventListener("click", () => {
+        browseState.page = Number(button.dataset.pageIndex);
+        render();
+        scrollToBrowseTop();
+      });
+    });
   }
 
   function render() {
