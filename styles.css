@@ -603,8 +603,16 @@ textarea {
 
 .profile-grid {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(5, minmax(0, 1fr));
   gap: 18px;
+}
+
+.pagination-row {
+  margin-top: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
 }
 
 .profile-tile {
@@ -937,9 +945,12 @@ input[type="range"] {
   .auth-shell,
   .three-col,
   .two-col,
-  .profile-grid,
   .stat-grid {
     grid-template-columns: 1fr;
+  }
+
+  .profile-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 
   .page-intro,
@@ -950,12 +961,21 @@ input[type="range"] {
 }
 
 @media (max-width: 860px) {
+  .profile-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
   .profile-modal-layout {
     grid-template-columns: 1fr;
   }
 
   .detail-card-inline {
     display: block;
+  }
+
+  .pagination-row {
+    flex-direction: column;
+    align-items: stretch;
   }
 
   .profile-modal-side {

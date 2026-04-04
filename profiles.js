@@ -15,6 +15,10 @@
     photoIndex: 0,
     touchStartX: 0,
   };
+  const browseState = {
+    page: 0,
+    pageSize: 25,
+  };
 
   function candidateMeta(candidate) {
     return `${candidate.city} · ${candidate.sex || "Unspecified"} · ${AppData.formatIntent(candidate.intent)}`;
@@ -101,12 +105,12 @@
           </div>
           <label class="field">
             <span>How much do you like this person?</span>
-            <input id="modal-interest-range" type="range" min="1" max="10" value="7">
+            <input id="modal-interest-range" type="range" min="0" max="10" value="0">
           </label>
-          <div class="range-readout" id="modal-interest-readout">7</div>
+          <div class="range-readout" id="modal-interest-readout">0</div>
           <div class="swipe-actions">
             <button class="pass-button" id="modal-pass-btn" type="button">Pass</button>
-            <button class="primary-button" id="modal-like-btn" type="button">Like With Score</button>
+            <button class="primary-button" id="modal-like-btn" type="button" disabled>Like</button>
           </div>
         </div>
         <aside class="profile-modal-side">
@@ -128,13 +132,16 @@
 
     const range = document.getElementById("modal-interest-range");
     const readout = document.getElementById("modal-interest-readout");
+    const likeButton = document.getElementById("modal-like-btn");
     range.addEventListener("input", () => {
       readout.textContent = range.value;
+      likeButton.disabled = Number(range.value) <= 0;
     });
     document.getElementById("modal-pass-btn").addEventListener("click", () => {
       applyAction(candidate.id, "left");
     });
-    document.getElementById("modal-like-btn").addEventListener("click", () => {
+    likeButton.addEventListener("click", () => {
+      if (Number(range.value) <= 0) return;
       applyAction(candidate.id, "right", Number(range.value));
     });
 
@@ -185,12 +192,19 @@
   }
 
   function renderGrid(candidates) {
+    const totalPages = Math.max(1, Math.ceil(candidates.length / browseState.pageSize));
+    if (browseState.page >= totalPages) {
+      browseState.page = totalPages - 1;
+    }
+    const start = browseState.page * browseState.pageSize;
+    const pageCandidates = candidates.slice(start, start + browseState.pageSize);
+
     traditionalPanel.innerHTML = `
       <div class="browse-summary">
-        <div class="hint-box">Grid browse lays profiles out like a traditional dating site. Click any profile to open details and like them with a 1 to 10 score.</div>
+        <div class="hint-box">Grid browse shows recently logged-in profiles first. Each page shows 25 profiles in a 5 by 5 layout.</div>
       </div>
       <div class="profile-grid">
-        ${candidates.map((candidate) => `
+        ${pageCandidates.map((candidate) => `
           <article class="profile-tile" data-open-profile="${candidate.id}" tabindex="0" role="button" aria-label="Open ${candidate.name}'s profile">
             ${AppUI.renderProfilePhoto(candidate)}
             <div class="profile-top profile-tile-meta">
@@ -206,6 +220,11 @@
             </div>
           </article>
         `).join("")}
+      </div>
+      <div class="pagination-row">
+        <button class="ghost-button" type="button" id="profiles-prev-btn" ${browseState.page === 0 ? "disabled" : ""}>Previous</button>
+        <span class="small-copy">Page ${browseState.page + 1} of ${totalPages}</span>
+        <button class="primary-button" type="button" id="profiles-next-btn" ${browseState.page >= totalPages - 1 ? "disabled" : ""}>Next</button>
       </div>
     `;
 
@@ -227,6 +246,20 @@
         }
       });
     });
+    const prevButton = document.getElementById("profiles-prev-btn");
+    const nextButton = document.getElementById("profiles-next-btn");
+    if (prevButton) {
+      prevButton.addEventListener("click", () => {
+        browseState.page = Math.max(0, browseState.page - 1);
+        render();
+      });
+    }
+    if (nextButton) {
+      nextButton.addEventListener("click", () => {
+        browseState.page += 1;
+        render();
+      });
+    }
   }
 
   function render() {
@@ -271,6 +304,7 @@
       return;
     }
 
+    browseState.page = Math.min(browseState.page, Math.max(0, Math.ceil(visibleCandidates.length / browseState.pageSize) - 1));
     renderGrid(visibleCandidates);
   }
 

@@ -47,6 +47,7 @@
       ],
       dealMakers: ["Clear communication", "Consistent effort", "Good listener"],
       dealBreakers: ["Dishonesty", "Smoking", "Zero accountability"],
+      lastLoginAt: new Date(Date.now() - (2 * 60 * 60 * 1000)).toISOString(),
     },
     {
       name: "Noah Brooks",
@@ -64,6 +65,7 @@
       ],
       dealMakers: ["Emotionally available", "Healthy lifestyle", "Affectionate"],
       dealBreakers: ["Flaky communication", "Cruel humor", "Rude to service staff"],
+      lastLoginAt: new Date(Date.now() - (4 * 60 * 60 * 1000)).toISOString(),
     },
     {
       name: "Mia Ellis",
@@ -81,6 +83,7 @@
       ],
       dealMakers: ["Playful humor", "Creative", "Travel curious"],
       dealBreakers: ["Love bombing", "Jealous behavior", "Poor hygiene"],
+      lastLoginAt: new Date(Date.now() - (6 * 60 * 60 * 1000)).toISOString(),
     },
   ];
 
@@ -154,6 +157,7 @@
       onboardingStep: user.onboardingStep || "complete",
       preferences: { ...defaultPreferences(), ...(user.preferences || {}) },
       createdAt: user.createdAt || new Date().toISOString(),
+      lastLoginAt: user.lastLoginAt || "",
     };
   }
 
@@ -276,6 +280,10 @@
   function setLoggedInUser(userId) {
     state.session.loggedInUserId = userId || "";
     state.currentUserId = userId || "";
+    const user = getUser(userId);
+    if (user) {
+      user.lastLoginAt = nowIso();
+    }
     save();
   }
 
@@ -314,6 +322,10 @@
       city: payload.city,
       intent: payload.intent,
       bio: payload.bio,
+      photos: payload.photos,
+      dealMakers: payload.dealMakers,
+      dealBreakers: payload.dealBreakers,
+      lastLoginAt: payload.lastLoginAt,
       onboardingCompleted: false,
       onboardingStep: "identity",
       preferences: defaultPreferences(),
@@ -392,24 +404,29 @@
     const user = getUser(userId);
     if (!user) return [];
 
-    const alreadySeen = new Set(
-      state.swipes
-        .filter((swipe) => swipe.fromUserId === userId)
-        .map((swipe) => swipe.toUserId)
-    );
-
-    return state.users
+    const recentThreshold = Date.now() - (30 * DAY_MS);
+    const baseCandidates = state.users
       .filter((candidate) => {
         if (candidate.id === user.id) return false;
         if (candidate.accountStatus === "banned") return false;
         if (!candidate.preferences.profileVisible) return false;
         return true;
-      })
+      });
+
+    const recentCandidates = baseCandidates
+      .filter((candidate) => candidate.lastLoginAt)
+      .filter((candidate) => new Date(candidate.lastLoginAt).getTime() >= recentThreshold);
+
+    const sortByRecentLogin = (left, right) => {
+      const leftTime = new Date(left.lastLoginAt || left.createdAt || 0).getTime();
+      const rightTime = new Date(right.lastLoginAt || right.createdAt || 0).getTime();
+      if (rightTime !== leftTime) return rightTime - leftTime;
+      return left.name.localeCompare(right.name);
+    };
+
+    return (recentCandidates.length ? recentCandidates : baseCandidates)
       .sort((left, right) => {
-        const leftSeen = alreadySeen.has(left.id) ? 1 : 0;
-        const rightSeen = alreadySeen.has(right.id) ? 1 : 0;
-        if (leftSeen !== rightSeen) return leftSeen - rightSeen;
-        return left.name.localeCompare(right.name);
+        return sortByRecentLogin(left, right);
       });
   }
 
@@ -787,6 +804,7 @@
         dealBreakerPool[(index + 4) % dealBreakerPool.length],
         dealBreakerPool[(index + 8) % dealBreakerPool.length],
       ];
+      const lastLoginAt = new Date(Date.now() - ((index % 20) * DAY_MS)).toISOString();
       const user = createUser({
         name,
         email,
@@ -799,6 +817,7 @@
         photos,
         dealMakers,
         dealBreakers,
+        lastLoginAt,
       });
       user.onboardingCompleted = true;
       user.onboardingStep = "complete";

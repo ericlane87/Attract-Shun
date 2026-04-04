@@ -115,21 +115,23 @@
         <div class="hint-box">Matching game mode keeps one profile in focus. A like always asks for a 1 to 10 score before recording interest.</div>
         <label class="field">
           <span>Interest score</span>
-          <input id="game-interest-range" type="range" min="1" max="10" value="7">
+          <input id="game-interest-range" type="range" min="0" max="10" value="0">
         </label>
-        <div class="range-readout" id="game-interest-readout">7</div>
+        <div class="range-readout" id="game-interest-readout">0</div>
         <div class="swipe-actions">
           <button class="pass-button" id="game-pass-btn" type="button">Pass</button>
           <button class="ghost-button" id="game-profile-btn" type="button">Open Profile</button>
-          <button class="primary-button" id="game-like-btn" type="button">Like With Score</button>
+          <button class="primary-button" id="game-like-btn" type="button" disabled>Like</button>
         </div>
       </div>
     `;
 
     const range = document.getElementById("game-interest-range");
     const readout = document.getElementById("game-interest-readout");
+    const likeButton = document.getElementById("game-like-btn");
     range.addEventListener("input", () => {
       readout.textContent = range.value;
+      likeButton.disabled = Number(range.value) <= 0;
     });
 
     document.getElementById("game-pass-btn").addEventListener("click", () => {
@@ -137,7 +139,8 @@
       render();
     });
     document.getElementById("game-profile-btn").addEventListener("click", () => openModal(candidate.id));
-    document.getElementById("game-like-btn").addEventListener("click", () => {
+    likeButton.addEventListener("click", () => {
+      if (Number(range.value) <= 0) return;
       const match = AppData.recordSwipe(user.id, candidate.id, "right", Number(range.value));
       if (match) {
         window.location.href = "match.html";
@@ -171,26 +174,29 @@
       </div>
       <label class="field">
         <span>How much do you like this person?</span>
-        <input id="modal-interest-range" type="range" min="1" max="10" value="7">
+        <input id="modal-interest-range" type="range" min="0" max="10" value="0">
       </label>
-      <div class="range-readout" id="modal-interest-readout">7</div>
+      <div class="range-readout" id="modal-interest-readout">0</div>
       <div class="swipe-actions">
         <button class="pass-button" id="modal-pass-btn" type="button">Pass</button>
         <a class="ghost-link" href="messages.html">Messages</a>
-        <button class="primary-button" id="modal-like-btn" type="button">Like With Score</button>
+        <button class="primary-button" id="modal-like-btn" type="button" disabled>Like</button>
       </div>
     `;
 
     const range = document.getElementById("modal-interest-range");
     const readout = document.getElementById("modal-interest-readout");
+    const likeButton = document.getElementById("modal-like-btn");
     range.addEventListener("input", () => {
       readout.textContent = range.value;
+      likeButton.disabled = Number(range.value) <= 0;
     });
 
     document.getElementById("modal-pass-btn").addEventListener("click", () => {
       applyAction(candidate.id, "left");
     });
-    document.getElementById("modal-like-btn").addEventListener("click", () => {
+    likeButton.addEventListener("click", () => {
+      if (Number(range.value) <= 0) return;
       applyAction(candidate.id, "right", Number(range.value));
     });
   }
