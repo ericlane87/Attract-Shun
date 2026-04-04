@@ -133,13 +133,22 @@
     }
 
     const other = AppData.getOtherUser(latest, user.id);
+    const latestUnmatchOutcome = AppData.getLatestUnmatchOutcomeForUser(user.id);
+    const unmatchSummary = AppData.getUnmatchOutcomeSummary(user.id, latestUnmatchOutcome);
     matchPanel.innerHTML = `
       <div class="match-card">
         <p class="profile-name">Latest match with ${other.name}</p>
         <p class="profile-meta">${latest.closedReason}</p>
+        ${unmatchSummary ? `
+          <div class="detail-card">
+            <p class="detail-heading">${unmatchSummary.title}</p>
+            <div class="small-copy">${unmatchSummary.detail}</div>
+          </div>
+        ` : ""}
         <div class="meta-row">
           <span class="status-pill">${latest.status.replace("_", " ")}</span>
           <a class="ghost-link" href="${latest.status === "attract" ? "success.html" : "browse.html"}">${latest.status === "attract" ? "Open Success Stories" : "Return To Browse"}</a>
+          ${unmatchSummary ? `<a class="ghost-link" href="notifications.html">View Notifications</a>` : ""}
         </div>
       </div>
     `;

@@ -215,6 +215,8 @@
   const activeMatch = AppData.getActiveMatchForUser(user.id);
   const likes = AppData.getIncomingLikes(user.id);
   const requests = AppData.getIncomingMatchRequests(user.id);
+  const latestUnmatchOutcome = AppData.getLatestUnmatchOutcomeForUser(user.id);
+  const unmatchSummary = AppData.getUnmatchOutcomeSummary(user.id, latestUnmatchOutcome);
 
   profileEl.innerHTML = AppUI.renderUserSummaryCard(user);
   AppUI.bindShunBreakdownTriggers(profileEl);
@@ -236,8 +238,10 @@
       <div class="summary-card">
         <p class="profile-name">${step.title}</p>
         <p class="profile-meta">${step.detail}</p>
+        ${unmatchSummary ? `<div class="hint-box"><strong>${unmatchSummary.title}</strong><div class="small-copy">${unmatchSummary.detail}</div></div>` : ""}
         <div class="cta-row">
           <a class="primary-link" href="${step.ctaHref}">${step.ctaLabel}</a>
+          ${unmatchSummary ? `<a class="ghost-link" href="match.html">View Match Outcome</a>` : ""}
           <a class="ghost-link" href="profiles.html">Find A Match</a>
         </div>
       </div>

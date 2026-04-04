@@ -551,6 +551,15 @@
     ) || null;
   }
 
+  function getLatestUnmatchOutcomeForUser(userId) {
+    return state.unmatchRequests
+      .filter((request) =>
+        request.status !== "pending" &&
+        (request.initiatorId === userId || request.responderId === userId)
+      )
+      .sort((left, right) => new Date(right.respondedAt || right.createdAt).getTime() - new Date(left.respondedAt || left.createdAt).getTime())[0] || null;
+  }
+
   function getOtherUser(match, userId) {
     return getUser(match.userIds.find((id) => id !== userId));
   }
@@ -943,6 +952,53 @@
     };
   }
 
+  function getUnmatchOutcomeSummary(userId, request) {
+    if (!request) return null;
+    const initiator = getUser(request.initiatorId);
+    const responder = getUser(request.responderId);
+    const initiatedByMe = request.initiatorId === userId;
+    const otherUser = initiatedByMe ? responder : initiator;
+    const otherName = otherUser ? otherUser.name : "your match";
+
+    if (request.status === "confirmed_mutual") {
+      return {
+        key: "mutual_unmatch",
+        title: "Mutual unmatch completed",
+        detail: `You and ${otherName} both agreed to end the match. No shun was assigned.`,
+      };
+    }
+
+    if (request.status === "rejected_not_mutual") {
+      return {
+        key: "unmatch_rejected",
+        title: initiatedByMe ? "Unmatch was not mutual" : "You rejected the unmatch",
+        detail: initiatedByMe
+          ? `${otherName} said the unmatch was not mutual. The requester received a Shun.`
+          : `You marked the unmatch as not mutual. The requester received a Shun.`,
+      };
+    }
+
+    if (request.status === "expired_no_response") {
+      return {
+        key: "unmatch_no_response",
+        title: request.responderId === userId ? "Unmatch response timed out" : "Unmatch timed out",
+        detail: request.responderId === userId
+          ? `You did not answer ${otherName}'s unmatch request in time and received a Shun.`
+          : `${otherName} did not answer the unmatch request in time and received a Shun.`,
+      };
+    }
+
+    if (request.status === "closed_match_ended") {
+      return {
+        key: "unmatch_closed",
+        title: "Unmatch request closed",
+        detail: `The match ended for another reason before the unmatch request was resolved.`,
+      };
+    }
+
+    return null;
+  }
+
   function getDateProposalHistory(matchId) {
     const match = state.matches.find((entry) => entry.id === matchId);
     if (!match) return [];
@@ -1205,6 +1261,19 @@
         detail: `${otherUser ? otherUser.name : "Your match"} has 24 hours to answer your unmatch request.`,
         href: "match.html",
         priority: 1,
+      });
+    }
+
+    const latestUnmatchOutcome = getLatestUnmatchOutcomeForUser(userId);
+    const unmatchSummary = getUnmatchOutcomeSummary(userId, latestUnmatchOutcome);
+    if (unmatchSummary) {
+      notifications.push({
+        id: `unmatch-outcome-${latestUnmatchOutcome.id}`,
+        type: "unmatch_outcome",
+        title: unmatchSummary.title,
+        detail: unmatchSummary.detail,
+        href: "match.html",
+        priority: 2,
       });
     }
 
@@ -1538,6 +1607,7 @@
     getActiveMatchForUser,
     getPendingUnmatchRequestForUser,
     getPendingUnmatchRequestToRespond,
+    getLatestUnmatchOutcomeForUser,
     getOtherUser,
     getLatestMatchForUser,
     recordSwipe,
@@ -1564,6 +1634,7 @@
     getNotificationsForUser,
     getDatePlanningState,
     getDateProposalHistory,
+    getUnmatchOutcomeSummary,
     advanceDay,
     resetAll,
     defaultPreferences,
