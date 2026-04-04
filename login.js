@@ -7,6 +7,11 @@
   const params = new URLSearchParams(window.location.search);
   const nextPage = params.get("next") || "dashboard.html";
 
+  AppData.ensureHardcodedTestUsers();
+  if (AppData.state.users.length < 100) {
+    AppData.seedDemoUsers();
+  }
+
   if (AppData.isAuthenticated()) {
     window.location.replace(nextPage);
     return;

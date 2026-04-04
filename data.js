@@ -30,6 +30,60 @@
     "No ambition", "Poor hygiene", "Love bombing", "Zero accountability", "Rude to service staff"
   ];
 
+  const HARD_CODED_TEST_USERS = [
+    {
+      name: "Ava Brooks",
+      email: "ava.brooks.1@attract.local",
+      password: "demo1234",
+      sex: "female",
+      age: 24,
+      city: "New York",
+      intent: "long_term",
+      bio: "Ava values consistency, enjoys coffee walks and weekend road trips, and wants dating to feel clear, respectful, and worth showing up for.",
+      photos: [
+        { id: "ava-brooks-photo-1", label: "Main profile photo" },
+        { id: "ava-brooks-photo-2", label: "Lifestyle photo" },
+        { id: "ava-brooks-photo-3", label: "Weekend photo" },
+      ],
+      dealMakers: ["Clear communication", "Consistent effort", "Good listener"],
+      dealBreakers: ["Dishonesty", "Smoking", "Zero accountability"],
+    },
+    {
+      name: "Noah Brooks",
+      email: "noah.brooks.1@attract.local",
+      password: "demo1234",
+      sex: "male",
+      age: 29,
+      city: "New York",
+      intent: "long_term",
+      bio: "Noah values consistency, enjoys bookstores and photography, and wants dating to feel clear, respectful, and worth showing up for.",
+      photos: [
+        { id: "noah-brooks-photo-1", label: "Main profile photo" },
+        { id: "noah-brooks-photo-2", label: "Lifestyle photo" },
+        { id: "noah-brooks-photo-3", label: "Weekend photo" },
+      ],
+      dealMakers: ["Emotionally available", "Healthy lifestyle", "Affectionate"],
+      dealBreakers: ["Flaky communication", "Cruel humor", "Rude to service staff"],
+    },
+    {
+      name: "Mia Ellis",
+      email: "mia.ellis.25@attract.local",
+      password: "demo1234",
+      sex: "female",
+      age: 25,
+      city: "Los Angeles",
+      intent: "casual",
+      bio: "Mia wants something fun and direct, enjoys live music and bookstores, and wants dating to feel clear, respectful, and worth showing up for.",
+      photos: [
+        { id: "mia-ellis-photo-1", label: "Main profile photo" },
+        { id: "mia-ellis-photo-2", label: "Lifestyle photo" },
+        { id: "mia-ellis-photo-3", label: "Weekend photo" },
+      ],
+      dealMakers: ["Playful humor", "Creative", "Travel curious"],
+      dealBreakers: ["Love bombing", "Jealous behavior", "Poor hygiene"],
+    },
+  ];
+
   function nameSeed(name) {
     return String(name || "").split("").reduce((sum, char) => sum + char.charCodeAt(0), 0);
   }
@@ -621,9 +675,34 @@
     save();
   }
 
+  function ensureHardcodedTestUsers() {
+    let changed = false;
+
+    HARD_CODED_TEST_USERS.forEach((payload) => {
+      const existing = state.users.find((user) => user.email === payload.email);
+      if (existing) return;
+
+      const user = createUser(payload);
+      user.onboardingCompleted = true;
+      user.onboardingStep = "complete";
+      changed = true;
+    });
+
+    if (!state.currentUserId && state.users[0]) {
+      state.currentUserId = state.users[0].id;
+      changed = true;
+    }
+
+    if (changed) {
+      save();
+    }
+  }
+
   function seedDemoUsers() {
     const targetCount = 100;
     if (state.users.length >= targetCount) return;
+
+    ensureHardcodedTestUsers();
 
     const femaleFirstNames = [
       "Ava", "Mia", "Nora", "Elena", "Jade", "Lena", "Sofia", "Ruby", "Chloe", "Zoe",
@@ -764,6 +843,7 @@
     createUser,
     updateCurrentUserProfile,
     completeOnboarding,
+    ensureHardcodedTestUsers,
     seedDemoUsers,
     getIncomingLikes,
     getAvailableCandidates,
