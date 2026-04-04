@@ -52,6 +52,12 @@
       ? candidate.photos
       : [{ id: `${candidate.id}-photo-1`, label: "Profile photo" }];
     const currentPhoto = photos[modalState.photoIndex] || photos[0];
+    const dealMakers = candidate.dealMakers && candidate.dealMakers.length
+      ? candidate.dealMakers
+      : ["Clear communication", "Consistency", "Shared values"];
+    const dealBreakers = candidate.dealBreakers && candidate.dealBreakers.length
+      ? candidate.dealBreakers
+      : ["Dishonesty", "Disrespect", "Flaky communication"];
 
     modalCard.innerHTML = `
       <div class="profile-modal-layout">
@@ -95,13 +101,13 @@
           <div class="detail-card">
             <p class="detail-heading">Deal Makers</p>
             <div class="detail-list">
-              ${(candidate.dealMakers || []).map((item) => `<span class="detail-pill positive">${item}</span>`).join("")}
+              ${dealMakers.map((item) => `<span class="detail-pill positive">${item}</span>`).join("")}
             </div>
           </div>
           <div class="detail-card">
             <p class="detail-heading">Deal Breakers</p>
             <div class="detail-list">
-              ${(candidate.dealBreakers || []).map((item) => `<span class="detail-pill negative">${item}</span>`).join("")}
+              ${dealBreakers.map((item) => `<span class="detail-pill negative">${item}</span>`).join("")}
             </div>
           </div>
         </aside>
