@@ -613,6 +613,83 @@ textarea {
   display: grid;
   grid-template-rows: auto 1fr auto;
   gap: 14px;
+  cursor: pointer;
+}
+
+.profile-tile:hover {
+  transform: translateY(-2px);
+}
+
+.profile-tile:focus-visible {
+  outline: 2px solid rgba(201, 164, 90, 0.65);
+  outline-offset: 2px;
+}
+
+.profile-tile-meta {
+  align-items: start;
+}
+
+.profile-photo {
+  position: relative;
+  min-height: 220px;
+  border-radius: 22px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background:
+    radial-gradient(circle at 25% 22%, var(--photo-glow), transparent 22%),
+    linear-gradient(160deg, var(--photo-start), var(--photo-end));
+}
+
+.profile-photo::after {
+  content: "";
+  position: absolute;
+  inset: auto 0 0;
+  height: 42%;
+  background: linear-gradient(180deg, transparent, rgba(7, 10, 16, 0.62));
+}
+
+.profile-photo-orb {
+  position: absolute;
+  top: 34px;
+  left: 50%;
+  width: 94px;
+  height: 94px;
+  margin-left: -47px;
+  border-radius: 50%;
+  background: linear-gradient(180deg, rgba(255, 235, 216, 0.94), rgba(214, 171, 146, 0.92));
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.18);
+}
+
+.profile-photo-bust {
+  position: absolute;
+  left: 50%;
+  bottom: -6px;
+  width: 162px;
+  height: 164px;
+  margin-left: -81px;
+  border-radius: 80px 80px 20px 20px;
+  background: linear-gradient(180deg, rgba(255, 235, 216, 0.94), rgba(180, 117, 111, 0.92));
+}
+
+.profile-photo-badge {
+  position: absolute;
+  left: 16px;
+  bottom: 16px;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: rgba(7, 10, 16, 0.55);
+  color: #fff7ef;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+.profile-photo-modal {
+  min-height: 280px;
 }
 
 .tile-actions {

@@ -34,6 +34,7 @@
     if (!candidate) return;
 
     modalCard.innerHTML = `
+      ${AppUI.renderProfilePhoto(candidate, "profile-photo profile-photo-modal")}
       <div class="profile-top">
         <div>
           <p class="profile-name">${candidate.name}, ${candidate.age}</p>
@@ -93,13 +94,13 @@
       </div>
       <div class="profile-grid">
         ${candidates.map((candidate) => `
-          <article class="profile-tile">
-            <div class="profile-top">
+          <article class="profile-tile" data-open-profile="${candidate.id}" tabindex="0" role="button" aria-label="Open ${candidate.name}'s profile">
+            ${AppUI.renderProfilePhoto(candidate)}
+            <div class="profile-top profile-tile-meta">
               <div>
                 <p class="profile-name">${candidate.name}, ${candidate.age}</p>
                 <p class="profile-meta">${candidateMeta(candidate)}</p>
               </div>
-              <div class="avatar">${AppUI.initials(candidate.name)}</div>
             </div>
             <p class="small-copy">${candidate.bio}</p>
             <div class="tile-actions">
@@ -116,6 +117,18 @@
     });
     traditionalPanel.querySelectorAll("[data-like-profile]").forEach((button) => {
       button.addEventListener("click", () => openModal(button.dataset.likeProfile));
+    });
+    traditionalPanel.querySelectorAll(".profile-tile[data-open-profile]").forEach((tile) => {
+      tile.addEventListener("click", (event) => {
+        if (event.target.closest("button")) return;
+        openModal(tile.dataset.openProfile);
+      });
+      tile.addEventListener("keydown", (event) => {
+        if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault();
+          openModal(tile.dataset.openProfile);
+        }
+      });
     });
   }
 

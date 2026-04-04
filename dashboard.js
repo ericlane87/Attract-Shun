@@ -130,9 +130,9 @@
     nextEl.innerHTML = `
       <div class="summary-card">
         <p class="profile-name">Current step: find a match</p>
-        <p class="profile-meta">This user has no active match. Open Find A Match for the grid-style dating page, or use Live Match when that separate flow is ready.</p>
+        <p class="profile-meta">This user has no active match. Open the grid-style dating page to browse clickable profiles with profile photos.</p>
         <div class="cta-row">
-          <a class="primary-link" href="find-match.html">Find A Match</a>
+          <a class="primary-link" href="profiles.html">Find A Match</a>
           <a class="ghost-link" href="live-match.html">Live Match</a>
         </div>
       </div>

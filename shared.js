@@ -16,6 +16,32 @@
     return el;
   }
 
+  function photoTheme(name) {
+    let hash = 0;
+    for (let index = 0; index < name.length; index += 1) {
+      hash = name.charCodeAt(index) + ((hash << 5) - hash);
+    }
+    const hue = Math.abs(hash % 360);
+    const hue2 = (hue + 42) % 360;
+    return {
+      start: `hsl(${hue} 45% 42%)`,
+      end: `hsl(${hue2} 48% 22%)`,
+      glow: `hsla(${hue2} 70% 72% / 0.22)`,
+    };
+  }
+
+  function renderProfilePhoto(user, className = "profile-photo") {
+    const theme = photoTheme(user.name || "Profile");
+    const style = `--photo-start:${theme.start};--photo-end:${theme.end};--photo-glow:${theme.glow};`;
+    return `
+      <div class="${className}" style="${style}" aria-hidden="true">
+        <div class="profile-photo-orb"></div>
+        <div class="profile-photo-bust"></div>
+        <span class="profile-photo-badge">${initials(user.name || "P")}</span>
+      </div>
+    `;
+  }
+
   function renderUserSummaryCard(user) {
     if (!user) {
       return `<div class="empty-state">No active user selected.</div>`;
@@ -100,6 +126,7 @@
     initials,
     formatDate,
     createElement,
+    renderProfilePhoto,
     renderUserSummaryCard,
     renderLikeList,
     setPageChip,
