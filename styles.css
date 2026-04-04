@@ -809,6 +809,10 @@ textarea {
   background: rgba(255, 255, 255, 0.04);
 }
 
+.detail-card-inline {
+  display: none;
+}
+
 .detail-heading {
   margin: 0 0 14px;
   font-size: 0.88rem;
@@ -948,6 +952,14 @@ input[type="range"] {
 @media (max-width: 860px) {
   .profile-modal-layout {
     grid-template-columns: 1fr;
+  }
+
+  .detail-card-inline {
+    display: block;
+  }
+
+  .profile-modal-side {
+    display: none;
   }
 }
 

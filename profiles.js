@@ -86,6 +86,18 @@
               <p class="profile-name">Profile details</p>
               <p class="profile-meta">Intent: ${AppData.formatIntent(candidate.intent)} · City: ${candidate.city} · Sex: ${candidate.sex || "Unspecified"}</p>
             </div>
+            <div class="detail-card detail-card-inline">
+              <p class="detail-heading">Deal Makers</p>
+              <div class="detail-list">
+                ${dealMakers.map((item) => `<span class="detail-pill positive">${item}</span>`).join("")}
+              </div>
+            </div>
+            <div class="detail-card detail-card-inline">
+              <p class="detail-heading">Deal Breakers</p>
+              <div class="detail-list">
+                ${dealBreakers.map((item) => `<span class="detail-pill negative">${item}</span>`).join("")}
+              </div>
+            </div>
           </div>
           <label class="field">
             <span>How much do you like this person?</span>
