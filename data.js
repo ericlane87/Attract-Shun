@@ -297,9 +297,20 @@
     AppData.state = state;
   }
 
-  function save() {
+  function emitChange(type = "state") {
+    if (typeof window === "undefined" || typeof window.dispatchEvent !== "function") return;
+    window.dispatchEvent(new CustomEvent("appdata:changed", {
+      detail: {
+        type,
+        at: new Date().toISOString(),
+      },
+    }));
+  }
+
+  function save(type = "state") {
     syncState();
     localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    emitChange(type);
   }
 
   function refreshSystemNow() {
@@ -1110,12 +1121,20 @@
     return getUnreadMessagesForUser(userId).length;
   }
 
-  function markMessagesRead(userId, matchId) {
+  function markMessagesRead(userId, matchId, options = {}) {
     if (!userId || !matchId) return;
     state.messageReads = state.messageReads || {};
     state.messageReads[userId] = state.messageReads[userId] || {};
-    state.messageReads[userId][matchId] = nowIso();
-    save();
+    const current = state.messageReads[userId][matchId] || "";
+    const next = nowIso();
+    if (current === next) return;
+    state.messageReads[userId][matchId] = next;
+    if (options.silent) {
+      syncState();
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      return;
+    }
+    save("messages_read");
   }
 
   function sendMessage(matchId, senderId, text) {

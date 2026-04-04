@@ -123,49 +123,44 @@
     return;
   }
 
-  const match = AppData.getActiveMatchForUser(user.id);
-  if (!match) {
-    const latest = AppData.getLatestMatchForUser(user.id);
-    if (!latest) {
-      matchPanel.innerHTML = `<div class="empty-state">No active or past match yet.</div>`;
-      chatPanel.innerHTML = `<div class="empty-state">Conversation opens only during an active match.</div>`;
+  let match = null;
+  let otherUser = null;
+  let pendingUnmatch = null;
+  let myIntro = null;
+  let otherIntro = null;
+  let datePlanningState = null;
+  let dateProposalHistory = [];
+  let myDecision = null;
+  let myMediaId = "";
+  let otherMediaId = "";
+
+  function refreshContext() {
+    match = AppData.getActiveMatchForUser(user.id);
+    if (!match) {
+      otherUser = null;
+      pendingUnmatch = null;
+      myIntro = null;
+      otherIntro = null;
+      datePlanningState = null;
+      dateProposalHistory = [];
+      myDecision = null;
+      myMediaId = "";
+      otherMediaId = "";
       return;
     }
-
-    const other = AppData.getOtherUser(latest, user.id);
-    const latestUnmatchOutcome = AppData.getLatestUnmatchOutcomeForUser(user.id);
-    const unmatchSummary = AppData.getUnmatchOutcomeSummary(user.id, latestUnmatchOutcome);
-    matchPanel.innerHTML = `
-      <div class="match-card">
-        <p class="profile-name">Latest match with ${other.name}</p>
-        <p class="profile-meta">${latest.closedReason}</p>
-        ${unmatchSummary ? `
-          <div class="detail-card">
-            <p class="detail-heading">${unmatchSummary.title}</p>
-            <div class="small-copy">${unmatchSummary.detail}</div>
-          </div>
-        ` : ""}
-        <div class="meta-row">
-          <span class="status-pill">${latest.status.replace("_", " ")}</span>
-          <a class="ghost-link" href="${latest.status === "attract" ? "success.html" : "browse.html"}">${latest.status === "attract" ? "Open Success Stories" : "Return To Browse"}</a>
-          ${unmatchSummary ? `<a class="ghost-link" href="notifications.html">View Notifications</a>` : ""}
-        </div>
-      </div>
-    `;
-    chatPanel.innerHTML = `<div class="empty-state">Conversation is unavailable because there is no active match.</div>`;
-    return;
+    otherUser = AppData.getOtherUser(match, user.id);
+    AppData.markMessagesRead(user.id, match.id, { silent: true });
+    pendingUnmatch = AppData.getPendingUnmatchRequestForUser(user.id);
+    myIntro = match.introVideos[user.id] || null;
+    otherIntro = match.introVideos[otherUser.id] || null;
+    datePlanningState = AppData.getDatePlanningState(match, user.id);
+    dateProposalHistory = AppData.getDateProposalHistory(match.id);
+    myDecision = match.decisions[user.id];
+    myMediaId = (myIntro && myIntro.mediaId) || `intro:${match.id}:${user.id}`;
+    otherMediaId = otherIntro && otherIntro.mediaId;
   }
 
-  const otherUser = AppData.getOtherUser(match, user.id);
-  AppData.markMessagesRead(user.id, match.id);
-  const pendingUnmatch = AppData.getPendingUnmatchRequestForUser(user.id);
-  const myIntro = match.introVideos[user.id] || null;
-  const otherIntro = match.introVideos[otherUser.id] || null;
-  const datePlanningState = AppData.getDatePlanningState(match, user.id);
-  const dateProposalHistory = AppData.getDateProposalHistory(match.id);
-  const myDecision = match.decisions[user.id];
-  const myMediaId = (myIntro && myIntro.mediaId) || `intro:${match.id}:${user.id}`;
-  const otherMediaId = otherIntro && otherIntro.mediaId;
+  refreshContext();
 
   async function startRecording() {
     const errorEl = document.getElementById("intro-recorder-error");
@@ -247,7 +242,8 @@
         durationSeconds: recorderState.durationSeconds,
       });
       resetRecorder();
-      location.reload();
+      refreshContext();
+      renderPage();
     } catch (error) {
       console.error("Failed to save recorded intro", error);
       if (errorEl) errorEl.textContent = "Could not save the intro video in this browser.";
@@ -261,7 +257,8 @@
       sizeBytes: 0,
       durationSeconds: 0,
     });
-    location.reload();
+    refreshContext();
+    renderPage();
   }
 
   async function handleUploadSelection(event) {
@@ -534,7 +531,8 @@
           if (errorEl) errorEl.textContent = (result && result.error) || "Could not save the date proposal.";
           return;
         }
-        location.reload();
+        refreshContext();
+        renderPage();
       });
     }
 
@@ -543,7 +541,8 @@
       acceptDateButton.addEventListener("click", () => {
         const accepted = AppData.acceptDateProposal(match.id, user.id);
         if (!accepted) return;
-        location.reload();
+        refreshContext();
+        renderPage();
       });
     }
 
@@ -571,7 +570,8 @@
         const request = AppData.submitUnmatchRequest(match.id, user.id, formData.get("reason"));
         if (!request) return;
         uiState.unmatchComposerOpen = false;
-        location.reload();
+        refreshContext();
+        renderPage();
       });
     }
 
@@ -580,7 +580,8 @@
       unmatchYesButton.addEventListener("click", () => {
         const result = AppData.respondToUnmatchRequest(pendingUnmatch.id, user.id, true);
         if (!result) return;
-        location.reload();
+        refreshContext();
+        renderPage();
       });
     }
 
@@ -589,7 +590,8 @@
       unmatchNoButton.addEventListener("click", () => {
         const result = AppData.respondToUnmatchRequest(pendingUnmatch.id, user.id, false);
         if (!result) return;
-        location.reload();
+        refreshContext();
+        renderPage();
       });
     }
 
@@ -602,15 +604,18 @@
       `;
       document.getElementById("attract-btn").addEventListener("click", () => {
         AppData.submitDecision(match.id, user.id, "attract");
-        location.reload();
+        refreshContext();
+        renderPage();
       });
       document.getElementById("fit-btn").addEventListener("click", () => {
         AppData.submitDecision(match.id, user.id, "not_a_fit");
-        location.reload();
+        refreshContext();
+        renderPage();
       });
       document.getElementById("shun-btn").addEventListener("click", () => {
         AppData.submitDecision(match.id, user.id, "shun");
-        location.reload();
+        refreshContext();
+        renderPage();
       });
     }
   }
@@ -664,50 +669,90 @@
     hydrateIntroVideos();
   }
 
-  renderMatchPanel();
-
-  const messages = AppData.getMessages(match.id);
-  AppUI.refreshSessionControls();
-  chatPanel.innerHTML = `
-    <div class="chat-wrap">
-      <div class="chat-head">
-        <div>
-          <p class="profile-name">${otherUser.name}</p>
-          <p class="profile-meta">This is the only active conversation this user can hold.</p>
+  function renderChatPanel() {
+    if (!match) {
+      chatPanel.innerHTML = `<div class="empty-state">Conversation is unavailable because there is no active match.</div>`;
+      return;
+    }
+    const messages = AppData.getMessages(match.id);
+    chatPanel.innerHTML = `
+      <div class="chat-wrap">
+        <div class="chat-head">
+          <div>
+            <p class="profile-name">${otherUser.name}</p>
+            <p class="profile-meta">This is the only active conversation this user can hold.</p>
+          </div>
+          <span class="status-pill">${messages.length} messages</span>
         </div>
-        <span class="status-pill">${messages.length} messages</span>
+        <div class="chat-log" id="chat-log"></div>
+        <form id="chat-form" class="chat-compose">
+          <input id="chat-input" type="text" maxlength="240" placeholder="Send a message">
+          <button class="primary-button" type="submit">Send</button>
+        </form>
       </div>
-      <div class="chat-log" id="chat-log"></div>
-      <form id="chat-form" class="chat-compose">
-        <input id="chat-input" type="text" maxlength="240" placeholder="Send a message">
-        <button class="primary-button" type="submit">Send</button>
-      </form>
-    </div>
-  `;
-
-  const log = document.getElementById("chat-log");
-  if (!messages.length) {
-    log.innerHTML = `<div class="empty-state">No messages yet. Start the conversation.</div>`;
-  } else {
-    messages.forEach((message) => {
-      const messageEl = document.createElement("div");
-      messageEl.className = `chat-message${message.senderId === user.id ? " mine" : ""}`;
-      messageEl.innerHTML = `
-        <div class="chat-bubble">
-          <strong>${message.senderId === user.id ? "You" : otherUser.name}</strong>
-          <div>${message.text}</div>
-          <div class="small-copy">${new Date(message.createdAt).toLocaleString()}</div>
-        </div>
-      `;
-      log.appendChild(messageEl);
+    `;
+    const log = document.getElementById("chat-log");
+    if (!messages.length) {
+      log.innerHTML = `<div class="empty-state">No messages yet. Start the conversation.</div>`;
+    } else {
+      messages.forEach((message) => {
+        const messageEl = document.createElement("div");
+        messageEl.className = `chat-message${message.senderId === user.id ? " mine" : ""}`;
+        messageEl.innerHTML = `
+          <div class="chat-bubble">
+            <strong>${message.senderId === user.id ? "You" : otherUser.name}</strong>
+            <div>${message.text}</div>
+            <div class="small-copy">${new Date(message.createdAt).toLocaleString()}</div>
+          </div>
+        `;
+        log.appendChild(messageEl);
+      });
+      log.scrollTop = log.scrollHeight;
+    }
+    document.getElementById("chat-form").addEventListener("submit", (event) => {
+      event.preventDefault();
+      const input = document.getElementById("chat-input");
+      if (!input.value.trim()) return;
+      AppData.sendMessage(match.id, user.id, input.value);
     });
   }
 
-  document.getElementById("chat-form").addEventListener("submit", (event) => {
-    event.preventDefault();
-    const input = document.getElementById("chat-input");
-    AppData.sendMessage(match.id, user.id, input.value);
+  function renderClosedState() {
+    const latest = AppData.getLatestMatchForUser(user.id);
+    if (!latest) {
+      matchPanel.innerHTML = `<div class="empty-state">No active or past match yet.</div>`;
+      chatPanel.innerHTML = `<div class="empty-state">Conversation opens only during an active match.</div>`;
+      return;
+    }
+    const other = AppData.getOtherUser(latest, user.id);
+    const latestUnmatchOutcome = AppData.getLatestUnmatchOutcomeForUser(user.id);
+    const unmatchSummary = AppData.getUnmatchOutcomeSummary(user.id, latestUnmatchOutcome);
+    matchPanel.innerHTML = `
+      <div class="match-card">
+        <p class="profile-name">Latest match with ${other.name}</p>
+        <p class="profile-meta">${latest.closedReason}</p>
+        ${unmatchSummary ? `<div class="detail-card"><p class="detail-heading">${unmatchSummary.title}</p><div class="small-copy">${unmatchSummary.detail}</div></div>` : ""}
+        <div class="meta-row">
+          <span class="status-pill">${latest.status.replace("_", " ")}</span>
+          <a class="ghost-link" href="${latest.status === "attract" ? "success.html" : "browse.html"}">${latest.status === "attract" ? "Open Success Stories" : "Return To Browse"}</a>
+          ${unmatchSummary ? `<a class="ghost-link" href="notifications.html">View Notifications</a>` : ""}
+        </div>
+      </div>
+    `;
+    chatPanel.innerHTML = `<div class="empty-state">Conversation is unavailable because there is no active match.</div>`;
+  }
+
+  function renderPage() {
+    refreshContext();
     AppUI.refreshSessionControls();
-    location.reload();
-  });
+    if (!match) {
+      renderClosedState();
+      return;
+    }
+    renderMatchPanel();
+    renderChatPanel();
+  }
+
+  window.addEventListener("appdata:changed", renderPage);
+  renderPage();
 })();
