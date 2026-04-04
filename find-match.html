@@ -35,18 +35,44 @@
     <section class="page-intro">
       <div>
         <p class="eyebrow">Find A Match</p>
-        <h1>Choose how you want to look for your next match</h1>
+        <h1>Browse profiles in the grid-style dating view</h1>
       </div>
-      <div class="info-chip" id="find-match-user-chip"></div>
+      <div class="info-chip" id="browse-user-chip"></div>
     </section>
 
-    <section id="find-match-options"></section>
+    <section class="browse-grid">
+      <article class="panel-card">
+        <div class="panel-head">
+          <h2>Profiles</h2>
+          <span class="pill">Grid browse</span>
+        </div>
+        <div class="cta-row" style="margin-bottom: 18px;">
+          <a class="ghost-link" href="live-match.html">Open Live Match</a>
+        </div>
+        <div id="traditional-panel" class="stack"></div>
+      </article>
+
+      <article class="panel-card">
+        <div class="panel-head">
+          <h2>Incoming likes</h2>
+          <span class="pill">Visible while engaged</span>
+        </div>
+        <div id="incoming-likes-panel" class="list-stack"></div>
+      </article>
+    </section>
   </main>
+
+  <div id="profile-modal" class="profile-modal" hidden>
+    <div class="profile-modal-shell">
+      <button id="profile-modal-close" class="ghost-button modal-close" type="button">Close</button>
+      <div id="profile-modal-card" class="panel-card profile-modal-card"></div>
+    </div>
+  </div>
 
   <script src="data.js"></script>
   <script src="auth.js"></script>
   <script>AppAuth.protectPage();</script>
   <script src="shared.js"></script>
-  <script src="find-match.js"></script>
+  <script src="profiles.js"></script>
 </body>
 </html>
