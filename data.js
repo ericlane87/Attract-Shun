@@ -743,10 +743,17 @@
     return true;
   }
 
-  function submitIntro(matchId, userId) {
+  function submitIntro(matchId, userId, payload = {}) {
     const match = state.matches.find((entry) => entry.id === matchId);
     if (!match || match.status !== "pending_intro") return;
-    match.introVideos[userId] = { uploadedAt: nowIso(), mockAsset: true };
+    match.introVideos[userId] = {
+      uploadedAt: nowIso(),
+      hasVideo: true,
+      mediaId: payload.mediaId || "",
+      mimeType: payload.mimeType || "",
+      sizeBytes: Number(payload.sizeBytes || 0),
+      durationSeconds: Number(payload.durationSeconds || 0),
+    };
     if (match.userIds.every((id) => match.introVideos[id])) {
       match.status = "date_planning";
     }
