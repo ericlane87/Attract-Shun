@@ -30,9 +30,10 @@
     };
   }
 
-  function renderProfilePhoto(user, className = "profile-photo") {
+  function renderProfilePhoto(user, className = "profile-photo", variant = 0) {
     const theme = photoTheme(user.name || "Profile");
-    const style = `--photo-start:${theme.start};--photo-end:${theme.end};--photo-glow:${theme.glow};`;
+    const shift = variant * 11;
+    const style = `--photo-start:${theme.start};--photo-end:${theme.end};--photo-glow:${theme.glow};--photo-shift:${shift}px;`;
     return `
       <div class="${className}" style="${style}" aria-hidden="true">
         <div class="profile-photo-orb"></div>

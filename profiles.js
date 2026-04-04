@@ -10,6 +10,11 @@
   const profileModal = document.getElementById("profile-modal");
   const modalCard = document.getElementById("profile-modal-card");
   const modalClose = document.getElementById("profile-modal-close");
+  const modalState = {
+    candidateId: "",
+    photoIndex: 0,
+    touchStartX: 0,
+  };
 
   function candidateMeta(candidate) {
     return `${candidate.city} · ${candidate.sex || "Unspecified"} · ${AppData.formatIntent(candidate.intent)}`;
@@ -17,6 +22,9 @@
 
   function closeModal() {
     profileModal.hidden = true;
+    document.body.classList.remove("modal-open");
+    modalState.candidateId = "";
+    modalState.photoIndex = 0;
   }
 
   function applyAction(candidateId, direction, score) {
@@ -32,31 +40,71 @@
   function openModal(candidateId) {
     const candidate = AppData.getUser(candidateId);
     if (!candidate) return;
+    modalState.candidateId = candidateId;
+    modalState.photoIndex = 0;
+    renderModal(candidate);
+    profileModal.hidden = false;
+    document.body.classList.add("modal-open");
+  }
+
+  function renderModal(candidate) {
+    const photos = candidate.photos && candidate.photos.length
+      ? candidate.photos
+      : [{ id: `${candidate.id}-photo-1`, label: "Profile photo" }];
+    const currentPhoto = photos[modalState.photoIndex] || photos[0];
 
     modalCard.innerHTML = `
-      ${AppUI.renderProfilePhoto(candidate, "profile-photo profile-photo-modal")}
-      <div class="profile-top">
-        <div>
-          <p class="profile-name">${candidate.name}, ${candidate.age}</p>
-          <p class="profile-meta">${candidateMeta(candidate)}</p>
+      <div class="profile-modal-layout">
+        <div class="profile-modal-main">
+          <div class="profile-carousel" id="profile-carousel">
+            <button class="ghost-button carousel-button" type="button" id="photo-prev-btn" ${photos.length <= 1 ? "disabled" : ""}>Prev</button>
+            ${AppUI.renderProfilePhoto(candidate, "profile-photo profile-photo-modal", modalState.photoIndex)}
+            <button class="ghost-button carousel-button" type="button" id="photo-next-btn" ${photos.length <= 1 ? "disabled" : ""}>Next</button>
+            <div class="photo-caption">${currentPhoto.label}</div>
+          </div>
+          <div class="photo-dots">
+            ${photos.map((photo, index) => `
+              <button class="photo-dot${index === modalState.photoIndex ? " active" : ""}" type="button" data-photo-index="${index}" aria-label="Open photo ${index + 1}"></button>
+            `).join("")}
+          </div>
+          <div class="profile-top">
+            <div>
+              <p class="profile-name">${candidate.name}, ${candidate.age}</p>
+              <p class="profile-meta">${candidateMeta(candidate)}</p>
+            </div>
+            <div class="avatar">${AppUI.initials(candidate.name)}</div>
+          </div>
+          <div class="modal-copy">
+            <p class="small-copy">${candidate.bio}</p>
+            <div class="summary-card">
+              <p class="profile-name">Profile details</p>
+              <p class="profile-meta">Intent: ${AppData.formatIntent(candidate.intent)} · City: ${candidate.city} · Sex: ${candidate.sex || "Unspecified"}</p>
+            </div>
+          </div>
+          <label class="field">
+            <span>How much do you like this person?</span>
+            <input id="modal-interest-range" type="range" min="1" max="10" value="7">
+          </label>
+          <div class="range-readout" id="modal-interest-readout">7</div>
+          <div class="swipe-actions">
+            <button class="pass-button" id="modal-pass-btn" type="button">Pass</button>
+            <button class="primary-button" id="modal-like-btn" type="button">Like With Score</button>
+          </div>
         </div>
-        <div class="avatar">${AppUI.initials(candidate.name)}</div>
-      </div>
-      <div class="modal-copy">
-        <p class="small-copy">${candidate.bio}</p>
-        <div class="summary-card">
-          <p class="profile-name">Profile details</p>
-          <p class="profile-meta">Intent: ${AppData.formatIntent(candidate.intent)} · City: ${candidate.city} · Sex: ${candidate.sex || "Unspecified"}</p>
-        </div>
-      </div>
-      <label class="field">
-        <span>How much do you like this person?</span>
-        <input id="modal-interest-range" type="range" min="1" max="10" value="7">
-      </label>
-      <div class="range-readout" id="modal-interest-readout">7</div>
-      <div class="swipe-actions">
-        <button class="pass-button" id="modal-pass-btn" type="button">Pass</button>
-        <button class="primary-button" id="modal-like-btn" type="button">Like With Score</button>
+        <aside class="profile-modal-side">
+          <div class="detail-card">
+            <p class="detail-heading">Deal Makers</p>
+            <div class="detail-list">
+              ${(candidate.dealMakers || []).map((item) => `<span class="detail-pill positive">${item}</span>`).join("")}
+            </div>
+          </div>
+          <div class="detail-card">
+            <p class="detail-heading">Deal Breakers</p>
+            <div class="detail-list">
+              ${(candidate.dealBreakers || []).map((item) => `<span class="detail-pill negative">${item}</span>`).join("")}
+            </div>
+          </div>
+        </aside>
       </div>
     `;
 
@@ -72,7 +120,38 @@
       applyAction(candidate.id, "right", Number(range.value));
     });
 
-    profileModal.hidden = false;
+    const prevBtn = document.getElementById("photo-prev-btn");
+    const nextBtn = document.getElementById("photo-next-btn");
+    if (prevBtn) {
+      prevBtn.addEventListener("click", () => {
+        modalState.photoIndex = (modalState.photoIndex - 1 + photos.length) % photos.length;
+        renderModal(candidate);
+      });
+    }
+    if (nextBtn) {
+      nextBtn.addEventListener("click", () => {
+        modalState.photoIndex = (modalState.photoIndex + 1) % photos.length;
+        renderModal(candidate);
+      });
+    }
+    modalCard.querySelectorAll("[data-photo-index]").forEach((button) => {
+      button.addEventListener("click", () => {
+        modalState.photoIndex = Number(button.dataset.photoIndex);
+        renderModal(candidate);
+      });
+    });
+    const carousel = document.getElementById("profile-carousel");
+    carousel.addEventListener("touchstart", (event) => {
+      modalState.touchStartX = event.changedTouches[0].clientX;
+    }, { passive: true });
+    carousel.addEventListener("touchend", (event) => {
+      const delta = event.changedTouches[0].clientX - modalState.touchStartX;
+      if (Math.abs(delta) < 30 || photos.length <= 1) return;
+      modalState.photoIndex = delta < 0
+        ? (modalState.photoIndex + 1) % photos.length
+        : (modalState.photoIndex - 1 + photos.length) % photos.length;
+      renderModal(candidate);
+    }, { passive: true });
   }
 
   function renderLockedState(title, body, href, label) {
@@ -158,17 +237,23 @@
     }
 
     const candidates = AppData.getBrowseCandidates(user.id);
-    if (!candidates.length) {
+    const fallbackCandidates = AppData.state.users
+      .filter((candidate) => candidate.id !== user.id)
+      .filter((candidate) => candidate.accountStatus !== "banned")
+      .filter((candidate) => candidate.preferences && candidate.preferences.profileVisible !== false)
+      .sort((left, right) => left.name.localeCompare(right.name));
+    const visibleCandidates = candidates.length ? candidates : fallbackCandidates;
+    if (!visibleCandidates.length) {
       traditionalPanel.innerHTML = `
         <div class="candidate-card">
           <p class="profile-name">No candidates available</p>
-          <p class="profile-meta">There are no visible profiles available right now. Seed more users or switch the active account.</p>
+          <p class="profile-meta">There are no visible profiles available right now. Reset local data or seed more users in Admin.</p>
         </div>
       `;
       return;
     }
 
-    renderGrid(candidates);
+    renderGrid(visibleCandidates);
   }
 
   modalClose.addEventListener("click", closeModal);

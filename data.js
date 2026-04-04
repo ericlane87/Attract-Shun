@@ -47,6 +47,9 @@
       city: user.city || "",
       intent: user.intent || "long_term",
       bio: user.bio || "",
+      photos: Array.isArray(user.photos) ? user.photos : [],
+      dealMakers: Array.isArray(user.dealMakers) ? user.dealMakers : [],
+      dealBreakers: Array.isArray(user.dealBreakers) ? user.dealBreakers : [],
       shunCount: Number(user.shunCount || 0),
       activeMatchId: user.activeMatchId || null,
       status: user.status || "available",
@@ -622,6 +625,16 @@
       "bookstores", "rooftop dinners", "pickleball", "cooking at home", "photography",
       "farmers markets", "concert nights", "trail runs", "vinyl collecting", "brunch spots"
     ];
+    const dealMakerPool = [
+      "Clear communication", "Emotionally available", "Consistent effort", "Family minded", "Ambitious",
+      "Playful humor", "Healthy lifestyle", "Wants commitment", "Travel curious", "Kind under pressure",
+      "Faith or values driven", "Financially responsible", "Good listener", "Affectionate", "Creative"
+    ];
+    const dealBreakerPool = [
+      "Dishonesty", "Flaky communication", "Cruel humor", "Smoking", "Still hung up on an ex",
+      "Avoids commitment", "Disrespectful tone", "Heavy partying", "No work-life balance", "Jealous behavior",
+      "No ambition", "Poor hygiene", "Love bombing", "Zero accountability", "Rude to service staff"
+    ];
 
     function buildBio(name, intent, index) {
       const traitList = intent === "long_term" ? longTermTraits : casualTraits;
@@ -639,6 +652,20 @@
       const emailBase = `${firstName}.${lastName}.${index + 1}`.toLowerCase().replace(/[^a-z0-9.]/g, "");
       const email = `${emailBase}@attract.local`;
       const bio = buildBio(firstName, intent, index);
+      const photos = [0, 1, 2].map((offset) => ({
+        id: `${emailBase}-photo-${offset + 1}`,
+        label: offset === 0 ? "Main profile photo" : offset === 1 ? "Lifestyle photo" : "Weekend photo",
+      }));
+      const dealMakers = [
+        dealMakerPool[index % dealMakerPool.length],
+        dealMakerPool[(index + 3) % dealMakerPool.length],
+        dealMakerPool[(index + 7) % dealMakerPool.length],
+      ];
+      const dealBreakers = [
+        dealBreakerPool[index % dealBreakerPool.length],
+        dealBreakerPool[(index + 4) % dealBreakerPool.length],
+        dealBreakerPool[(index + 8) % dealBreakerPool.length],
+      ];
       const user = createUser({
         name,
         email,
@@ -648,6 +675,9 @@
         city,
         intent,
         bio,
+        photos,
+        dealMakers,
+        dealBreakers,
       });
       user.onboardingCompleted = true;
       user.onboardingStep = "complete";
