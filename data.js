@@ -1,5 +1,5 @@
 (function () {
-  const STORAGE_KEY = "attract-shun-local-prototype-v4";
+  const STORAGE_KEY = "attract-shun-local-prototype-v5";
   const DAY_MS = 24 * 60 * 60 * 1000;
 
   function uid(prefix) {
