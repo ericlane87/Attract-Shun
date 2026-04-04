@@ -22,6 +22,7 @@
     return {
       intro_timeout: 0,
       date_timeout: 0,
+      decision_timeout: 0,
       decision_shun: 0,
       unmatch_not_mutual: 0,
       unmatch_no_response: 0,
@@ -142,6 +143,7 @@
       unmatchRequests: [],
       matches: [],
       messages: [],
+      messageReads: {},
       reports: [],
       successStories: [],
     };
@@ -260,6 +262,7 @@
       unmatchRequests: Array.isArray(merged.unmatchRequests) ? merged.unmatchRequests.map(normalizeUnmatchRequest) : [],
       matches: Array.isArray(merged.matches) ? merged.matches.map(normalizeMatch) : [],
       messages: Array.isArray(merged.messages) ? merged.messages : [],
+      messageReads: merged.messageReads && typeof merged.messageReads === "object" ? merged.messageReads : {},
       reports: Array.isArray(merged.reports) ? merged.reports.map(normalizeReport) : [],
       successStories: Array.isArray(merged.successStories) ? merged.successStories.map(normalizeStory) : [],
     };
@@ -529,6 +532,13 @@
     return state.unmatchRequests.find((request) =>
       request.status === "pending" &&
       (request.initiatorId === userId || request.responderId === userId)
+    ) || null;
+  }
+
+  function getPendingUnmatchRequestToRespond(userId) {
+    return state.unmatchRequests.find((request) =>
+      request.status === "pending" &&
+      request.responderId === userId
     ) || null;
   }
 
@@ -841,6 +851,28 @@
     return state.messages.filter((message) => message.matchId === matchId);
   }
 
+  function getUnreadMessagesForUser(userId) {
+    const activeMatch = getActiveMatchForUser(userId);
+    const latestMatch = getLatestMatchForUser(userId);
+    const match = activeMatch || latestMatch;
+    if (!match) return [];
+
+    const lastReadAt = (state.messageReads && state.messageReads[userId] && state.messageReads[userId][match.id]) || "";
+    return getMessages(match.id).filter((message) => {
+      if (message.senderId === userId) return false;
+      if (!lastReadAt) return true;
+      return new Date(message.createdAt).getTime() > new Date(lastReadAt).getTime();
+    });
+  }
+
+  function markMessagesRead(userId, matchId) {
+    if (!userId || !matchId) return;
+    state.messageReads = state.messageReads || {};
+    state.messageReads[userId] = state.messageReads[userId] || {};
+    state.messageReads[userId][matchId] = nowIso();
+    save();
+  }
+
   function sendMessage(matchId, senderId, text) {
     const trimmed = text.trim();
     if (!trimmed) return;
@@ -918,6 +950,81 @@
     return state.successStories.find((entry) => entry.matchId === matchId && entry.authorId === authorId) || null;
   }
 
+  function getNotificationsForUser(userId) {
+    const user = getUser(userId);
+    if (!user) return [];
+
+    const notifications = [];
+    const incomingRequests = getIncomingMatchRequests(userId);
+    const pendingUnmatch = getPendingUnmatchRequestToRespond(userId);
+    const activeMatch = getActiveMatchForUser(userId);
+
+    if (incomingRequests.length) {
+      notifications.push({
+        id: `match-requests-${userId}`,
+        type: "match_request",
+        title: `${incomingRequests.length} match request${incomingRequests.length === 1 ? "" : "s"} waiting`,
+        detail: "Review and confirm pending match requests.",
+        href: "match-requests.html",
+        priority: 1,
+      });
+    }
+
+    if (pendingUnmatch) {
+      const otherUser = getUser(pendingUnmatch.initiatorId);
+      notifications.push({
+        id: `unmatch-response-${pendingUnmatch.id}`,
+        type: "unmatch_response",
+        title: "Unmatch response required",
+        detail: `${otherUser ? otherUser.name : "Your match"} requested to unmatch. Respond within 24 hours or receive a Shun.`,
+        href: "match.html",
+        priority: 0,
+      });
+    }
+
+    if (activeMatch && activeMatch.status === "pending_intro") {
+      const hoursRemaining = Math.ceil((new Date(activeMatch.introDeadline).getTime() - new Date(state.system.now).getTime()) / (60 * 60 * 1000));
+      notifications.push({
+        id: `intro-deadline-${activeMatch.id}`,
+        type: "intro_deadline",
+        title: "Intro video deadline active",
+        detail: hoursRemaining > 0
+          ? `Submit the intro video within ${hoursRemaining} hour${hoursRemaining === 1 ? "" : "s"} to avoid a Shun.`
+          : "Intro deadline has expired. Reload to process the result.",
+        href: "match.html",
+        priority: 1,
+      });
+    }
+
+    const unreadMessages = getUnreadMessagesForUser(userId);
+    if (unreadMessages.length) {
+      const latestUnread = unreadMessages[unreadMessages.length - 1];
+      const sender = getUser(latestUnread.senderId);
+      notifications.push({
+        id: `message-${latestUnread.id}`,
+        type: "message",
+        title: `New message from ${sender ? sender.name : "your match"}`,
+        detail: "Open the conversation to read and reply.",
+        href: "messages.html",
+        priority: 0,
+      });
+    }
+
+    const shunEntries = Object.entries(user.shunBreakdown || {}).filter(([, count]) => Number(count) > 0);
+    if (shunEntries.length) {
+      notifications.push({
+        id: `shun-summary-${userId}`,
+        type: "shun_summary",
+        title: `${user.shunCount} total Shun${user.shunCount === 1 ? "" : "s"}`,
+        detail: "Open your profile summary and click the Shun badge to see the full category breakdown.",
+        href: "dashboard.html",
+        priority: 2,
+      });
+    }
+
+    return notifications.sort((left, right) => left.priority - right.priority);
+  }
+
   function processDeadlines() {
     const currentTime = new Date(refreshSystemNow()).getTime();
     let changed = false;
@@ -930,7 +1037,7 @@
         closeMatch(match, "shun", "Failed to plan and verify the first date in time.", true, "date_timeout");
         changed = true;
       } else if (match.status === "decision_window" && currentTime > new Date(match.decisionDeadline).getTime()) {
-        finalizeDecisionMatch(match);
+        closeMatch(match, "shun", "Failed to finish the final decision step in time.", true, "decision_timeout");
         changed = true;
       }
     });
@@ -1154,6 +1261,7 @@
     confirmMatchRequest,
     getActiveMatchForUser,
     getPendingUnmatchRequestForUser,
+    getPendingUnmatchRequestToRespond,
     getOtherUser,
     getLatestMatchForUser,
     recordSwipe,
@@ -1164,6 +1272,8 @@
     submitUnmatchRequest,
     respondToUnmatchRequest,
     getMessages,
+    getUnreadMessagesForUser,
+    markMessagesRead,
     sendMessage,
     createReport,
     updateReportStatus,
@@ -1172,6 +1282,7 @@
     updateSuccessStory,
     getStories,
     getDraftStory,
+    getNotificationsForUser,
     advanceDay,
     resetAll,
     defaultPreferences,

@@ -39,9 +39,20 @@
   }
 
   const otherUser = AppData.getOtherUser(match, user.id);
+  AppData.markMessagesRead(user.id, match.id);
   const myIntro = Boolean(match.introVideos[user.id]);
   const myDateConfirm = match.dateConfirmedBy.includes(user.id);
   const myDecision = match.decisions[user.id];
+
+  function formatTimeRemaining(deadlineIso) {
+    const diffMs = new Date(deadlineIso).getTime() - Date.now();
+    if (diffMs <= 0) return "Expired";
+    const totalHours = Math.ceil(diffMs / (60 * 60 * 1000));
+    if (totalHours < 24) return `${totalHours} hour${totalHours === 1 ? "" : "s"} left`;
+    const days = Math.floor(totalHours / 24);
+    const hours = totalHours % 24;
+    return hours ? `${days}d ${hours}h left` : `${days} day${days === 1 ? "" : "s"} left`;
+  }
 
   matchPanel.innerHTML = `
     <div class="match-card">
@@ -56,21 +67,21 @@
         <div class="timeline-row ${match.status === "pending_intro" ? "active" : myIntro ? "done" : ""}">
           <div>
             <strong>Video intro</strong>
-            <div class="small-copy">Submit a mock 60 second to 2 minute intro within 24 hours by ${AppUI.formatDate(match.introDeadline)}. If both intros are not submitted in time, both people receive a Shun.</div>
+            <div class="small-copy">Submit a mock 60 second to 2 minute intro within 24 hours by ${AppUI.formatDate(match.introDeadline)}. Time left: ${formatTimeRemaining(match.introDeadline)}. If both intros are not submitted in time, both people receive a Shun.</div>
           </div>
           <button id="intro-btn" class="ghost-button" type="button" ${myIntro || match.status !== "pending_intro" ? "disabled" : ""}>${myIntro ? "Submitted" : "Submit Intro"}</button>
         </div>
         <div class="timeline-row ${match.status === "date_planning" ? "active" : myDateConfirm ? "done" : ""}">
           <div>
             <strong>Plan first date</strong>
-            <div class="small-copy">Confirm the date and mock photo verification by ${AppUI.formatDate(match.dateDeadline)}.</div>
+            <div class="small-copy">Confirm the date and mock photo verification within two weeks by ${AppUI.formatDate(match.dateDeadline)}. Time left: ${formatTimeRemaining(match.dateDeadline)}. If the timer runs out, both people receive a Shun.</div>
           </div>
           <button id="date-btn" class="ghost-button" type="button" ${myDateConfirm || match.status !== "date_planning" ? "disabled" : ""}>${myDateConfirm ? "Confirmed" : "Confirm Date"}</button>
         </div>
         <div class="timeline-row ${match.status === "decision_window" ? "active" : myDecision ? "done" : ""}">
           <div>
             <strong>Attract or shun</strong>
-            <div class="small-copy">Choose the result by ${AppUI.formatDate(match.decisionDeadline)}.</div>
+            <div class="small-copy">Choose the result by ${AppUI.formatDate(match.decisionDeadline)}. Time left: ${formatTimeRemaining(match.decisionDeadline)}. If the timer runs out, both people receive a Shun.</div>
           </div>
           <span class="interest-pill">${myDecision ? myDecision.replaceAll("_", " ") : "Awaiting choice"}</span>
         </div>

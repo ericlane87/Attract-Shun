@@ -178,6 +178,17 @@
   function initSessionControls() {
     const nav = document.querySelector(".site-nav");
     if (!nav || !window.AppAuth || !AppData.isAuthenticated()) return;
+    const currentUser = AppData.currentUser();
+    const notificationCount = currentUser ? AppData.getNotificationsForUser(currentUser.id).length : 0;
+
+    if (!nav.querySelector("[data-notifications-link]")) {
+      const notificationsLink = document.createElement("a");
+      notificationsLink.href = "notifications.html";
+      notificationsLink.dataset.notificationsLink = "true";
+      notificationsLink.innerHTML = `Notifications${notificationCount ? ` <span class="nav-count">${notificationCount}</span>` : ""}`;
+      nav.appendChild(notificationsLink);
+    }
+
     if (!nav.querySelector("[data-messages-link]")) {
       const messagesLink = document.createElement("a");
       messagesLink.href = "messages.html";

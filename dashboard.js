@@ -10,6 +10,56 @@
   const nextEl = document.getElementById("dashboard-next-step");
   const likesEl = document.getElementById("dashboard-likes");
 
+  function formatTimeRemaining(deadlineIso) {
+    if (!deadlineIso) return "No timer";
+    const diffMs = new Date(deadlineIso).getTime() - Date.now();
+    if (diffMs <= 0) return "Expired";
+
+    const totalHours = Math.ceil(diffMs / (60 * 60 * 1000));
+    if (totalHours < 24) {
+      return `${totalHours} hour${totalHours === 1 ? "" : "s"} left`;
+    }
+
+    const days = Math.floor(totalHours / 24);
+    const hours = totalHours % 24;
+    if (!hours) {
+      return `${days} day${days === 1 ? "" : "s"} left`;
+    }
+    return `${days}d ${hours}h left`;
+  }
+
+  function getStepTimer(match) {
+    if (!match) {
+      return {
+        stepLabel: "No active step",
+        deadlineLabel: "No active deadline",
+        remaining: "Open",
+      };
+    }
+
+    if (match.status === "pending_intro") {
+      return {
+        stepLabel: "Intro video",
+        deadlineLabel: "24 hour intro deadline",
+        remaining: formatTimeRemaining(match.introDeadline),
+      };
+    }
+
+    if (match.status === "date_planning") {
+      return {
+        stepLabel: "Date planning",
+        deadlineLabel: "2 week date deadline",
+        remaining: formatTimeRemaining(match.dateDeadline),
+      };
+    }
+
+    return {
+      stepLabel: "Final decision",
+      deadlineLabel: "Decision deadline",
+      remaining: formatTimeRemaining(match.decisionDeadline),
+    };
+  }
+
   function getMatchStep(match, likes, requests) {
     if (!match) {
       if (requests.length) {
@@ -45,7 +95,7 @@
       return {
         key: "pending_intro",
         title: "Matched: intro video step",
-        detail: "A match exists and both people need to complete the intro video requirement before the process can move forward.",
+        detail: `A match exists and both people must submit the intro video within 24 hours. Time left: ${formatTimeRemaining(match.introDeadline)}.`,
         ctaLabel: "Open Match Flow",
         ctaHref: "match.html",
       };
@@ -55,7 +105,7 @@
       return {
         key: "date_planning",
         title: "Matched: date planning step",
-        detail: "The intro step is done. The next required action is confirming the first date.",
+        detail: `The intro step is done. The next required action is confirming the first date within two weeks of the match. Time left: ${formatTimeRemaining(match.dateDeadline)}.`,
         ctaLabel: "Open Match Flow",
         ctaHref: "match.html",
       };
@@ -72,6 +122,7 @@
 
   function renderFlowPanel(activeMatch, likes, requests) {
     const nextStep = getMatchStep(activeMatch, likes, requests);
+    const stepTimer = getStepTimer(activeMatch);
     const steps = [
       {
         title: "Profile onboarding",
@@ -89,7 +140,9 @@
       },
       {
         title: activeMatch ? "Current match step" : "Next destination",
-        detail: nextStep.detail,
+        detail: activeMatch
+          ? `${nextStep.detail} Current timer: ${stepTimer.remaining}.`
+          : nextStep.detail,
         state: user.onboardingCompleted ? "active" : "",
       },
     ];
@@ -99,6 +152,14 @@
         <div class="stat-card">
           <div class="stat-label">Current mode</div>
           <div class="stat-value">${activeMatch ? "Match" : user.onboardingCompleted ? "Browse" : "Onboarding"}</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Current step</div>
+          <div class="stat-value">${activeMatch ? stepTimer.stepLabel : "Discovery"}</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">${activeMatch ? stepTimer.deadlineLabel : "Timer"}</div>
+          <div class="stat-value">${activeMatch ? stepTimer.remaining : "No active timer"}</div>
         </div>
         <a class="stat-card" href="likes.html">
           <div class="stat-label">Incoming likes</div>

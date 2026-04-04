@@ -26,6 +26,7 @@
 
   const otherUser = AppData.getOtherUser(match, user.id);
   const messages = AppData.getMessages(match.id);
+  AppData.markMessagesRead(user.id, match.id);
 
   summaryEl.innerHTML = `
     <div class="summary-card">
