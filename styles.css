@@ -168,6 +168,15 @@ body[data-page="settings"] .site-nav a[href="settings.html"] {
   box-shadow: var(--shadow);
 }
 
+.actionable-row {
+  cursor: pointer;
+}
+
+a.stat-card {
+  color: inherit;
+  text-decoration: none;
+}
+
 .hero-panel {
   padding: 34px;
   margin-top: 12px;
@@ -579,7 +588,7 @@ textarea {
 }
 
 .stat-grid {
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
 }
 
 .stat-card {

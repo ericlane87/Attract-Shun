@@ -69,6 +69,8 @@
     const dealBreakers = candidate.dealBreakers && candidate.dealBreakers.length
       ? candidate.dealBreakers
       : ["Dishonesty", "Disrespect", "Flaky communication"];
+    const candidateLikedYou = AppData.hasIncomingLike(candidate.id, user.id);
+    const pendingRequest = AppData.getPendingMatchRequestBetween(user.id, candidate.id);
 
     modalCard.innerHTML = `
       <div class="profile-modal-layout">
@@ -97,6 +99,12 @@
               <p class="profile-name">Profile details</p>
               <p class="profile-meta">Intent: ${AppData.formatIntent(candidate.intent)} · City: ${candidate.city} · Sex: ${candidate.sex || "Unspecified"}</p>
             </div>
+            ${candidateLikedYou ? `
+              <div class="summary-card">
+                <p class="profile-name">This person already liked you</p>
+                <p class="profile-meta">Use Match to send a match request. The other person will need to confirm before you both lock into one active match.</p>
+              </div>
+            ` : ""}
             <div class="detail-card detail-card-inline">
               <p class="detail-heading">Deal Makers</p>
               <div class="detail-list">
@@ -110,14 +118,18 @@
               </div>
             </div>
           </div>
-          <label class="field">
-            <span>How much do you like this person?</span>
-            <input id="modal-interest-range" type="range" min="0" max="10" value="0">
-          </label>
-          <div class="range-readout" id="modal-interest-readout">0</div>
+          ${candidateLikedYou ? "" : `
+            <label class="field">
+              <span>How much do you like this person?</span>
+              <input id="modal-interest-range" type="range" min="0" max="10" value="0">
+            </label>
+            <div class="range-readout" id="modal-interest-readout">0</div>
+          `}
           <div class="swipe-actions">
             <button class="pass-button" id="modal-pass-btn" type="button">Pass</button>
-            <button class="primary-button" id="modal-like-btn" type="button" disabled>Like</button>
+            <button class="primary-button" id="modal-like-btn" type="button" ${candidateLikedYou ? (pendingRequest ? "disabled" : "") : "disabled"}>
+              ${candidateLikedYou ? (pendingRequest ? "Match Request Sent" : "Match") : "Like"}
+            </button>
           </div>
         </div>
         <aside class="profile-modal-side">
@@ -137,17 +149,26 @@
       </div>
     `;
 
+    const likeButton = document.getElementById("modal-like-btn");
     const range = document.getElementById("modal-interest-range");
     const readout = document.getElementById("modal-interest-readout");
-    const likeButton = document.getElementById("modal-like-btn");
-    range.addEventListener("input", () => {
-      readout.textContent = range.value;
-      likeButton.disabled = Number(range.value) <= 0;
-    });
+    if (range && readout) {
+      range.addEventListener("input", () => {
+        readout.textContent = range.value;
+        likeButton.disabled = Number(range.value) <= 0;
+      });
+    }
     document.getElementById("modal-pass-btn").addEventListener("click", () => {
       applyAction(candidate.id, "left");
     });
     likeButton.addEventListener("click", () => {
+      if (candidateLikedYou) {
+        const request = AppData.sendMatchRequest(user.id, candidate.id);
+        if (!request) return;
+        closeModal();
+        render();
+        return;
+      }
       if (Number(range.value) <= 0) return;
       applyAction(candidate.id, "right", Number(range.value));
     });

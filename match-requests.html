@@ -3,14 +3,14 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Likes | Attract / Shun</title>
+  <title>Match Requests | Attract / Shun</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
   <script src="version.js"></script>
   <script>AppAssets.loadStyle("styles.css");</script>
 </head>
-<body data-page="likes">
+<body data-page="match-requests">
   <header class="site-header">
     <div class="brand-lockup">
       <p class="eyebrow">Intentional dating</p>
@@ -34,33 +34,33 @@
   <main class="page-shell">
     <section class="page-intro">
       <div>
-        <p class="eyebrow">Likes</p>
-        <h1>People who liked you and your current interest queue</h1>
+        <p class="eyebrow">Match Requests</p>
+        <h1>Review and confirm pending match requests</h1>
       </div>
-      <div class="info-chip" id="likes-user-chip"></div>
+      <div class="info-chip" id="match-requests-user-chip"></div>
     </section>
 
     <section class="dashboard-grid">
       <article class="panel-card">
         <div class="panel-head">
-          <h2>Incoming likes</h2>
+          <h2>Pending match requests</h2>
         </div>
-        <div id="likes-list" class="list-stack"></div>
+        <div id="match-requests-list" class="list-stack"></div>
       </article>
 
       <article class="panel-card">
         <div class="panel-head">
           <h2>Status</h2>
         </div>
-        <div id="likes-summary" class="stack"></div>
+        <div id="match-requests-summary" class="stack"></div>
       </article>
     </section>
   </main>
 
-  <div id="likes-profile-modal" class="profile-modal" hidden>
+  <div id="match-request-modal" class="profile-modal" hidden>
     <div class="profile-modal-shell">
-      <button id="likes-profile-modal-close" class="ghost-button modal-close" type="button">Close</button>
-      <div id="likes-profile-modal-card" class="panel-card profile-modal-card"></div>
+      <button id="match-request-modal-close" class="ghost-button modal-close" type="button">Close</button>
+      <div id="match-request-modal-card" class="panel-card profile-modal-card"></div>
     </div>
   </div>
 
@@ -68,7 +68,7 @@
     AppAssets.loadScripts(["data.js", "auth.js"])
       .then(() => {
         AppAuth.protectPage();
-        return AppAssets.loadScripts(["shared.js", "likes.js"]);
+        return AppAssets.loadScripts(["shared.js", "match-requests.js"]);
       });
   </script>
 </body>

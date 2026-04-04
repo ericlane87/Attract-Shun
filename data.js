@@ -402,6 +402,17 @@
       .sort((left, right) => new Date(right.swipe.createdAt).getTime() - new Date(left.swipe.createdAt).getTime());
   }
 
+  function getLatestRightSwipe(fromUserId, toUserId) {
+    const matches = state.swipes
+      .filter((swipe) =>
+        swipe.fromUserId === fromUserId &&
+        swipe.toUserId === toUserId &&
+        swipe.direction === "right"
+      )
+      .sort((left, right) => new Date(right.createdAt).getTime() - new Date(left.createdAt).getTime());
+    return matches[0] || null;
+  }
+
   function hasIncomingLike(fromUserId, toUserId) {
     return state.swipes.some((swipe) =>
       swipe.fromUserId === fromUserId &&
@@ -534,6 +545,10 @@
     ) || null;
   }
 
+  function hasPendingMatchRequestBetween(userId, otherUserId) {
+    return Boolean(getPendingMatchRequestBetween(userId, otherUserId));
+  }
+
   function getIncomingMatchRequests(userId) {
     return state.matchRequests
       .filter((request) => request.toUserId === userId && request.status === "pending")
@@ -586,8 +601,13 @@
     state.matchRequests.forEach((entry) => {
       const samePair = [entry.fromUserId, entry.toUserId].includes(request.fromUserId) &&
         [entry.fromUserId, entry.toUserId].includes(request.toUserId);
+      const touchesEitherUser = [entry.fromUserId, entry.toUserId].includes(request.fromUserId) ||
+        [entry.fromUserId, entry.toUserId].includes(request.toUserId);
       if (entry.id !== request.id && samePair && entry.status === "pending") {
         entry.status = "confirmed";
+        entry.respondedAt = request.respondedAt;
+      } else if (entry.id !== request.id && touchesEitherUser && entry.status === "pending") {
+        entry.status = "closed_locked";
         entry.respondedAt = request.respondedAt;
       }
     });
@@ -966,10 +986,12 @@
     ensureHardcodedTestUsers,
     seedDemoUsers,
     getIncomingLikes,
+    getLatestRightSwipe,
     hasIncomingLike,
     getAvailableCandidates,
     getBrowseCandidates,
     getPendingMatchRequestBetween,
+    hasPendingMatchRequestBetween,
     getIncomingMatchRequests,
     getOutgoingMatchRequests,
     sendMatchRequest,

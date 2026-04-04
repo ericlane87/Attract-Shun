@@ -1,5 +1,5 @@
 (function () {
-  const APP_VERSION = "20260404-4";
+  const APP_VERSION = "20260404-5";
 
   function versionedPath(path) {
     return `${path}?v=${APP_VERSION}`;
