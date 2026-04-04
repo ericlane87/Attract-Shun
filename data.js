@@ -290,6 +290,7 @@
   }
 
   function login(identifier, password) {
+    ensureHardcodedTestUsers();
     const normalizedIdentifier = String(identifier || "").trim().toLowerCase();
     const normalizedPassword = String(password || "");
     const user = state.users.find((entry) => {
