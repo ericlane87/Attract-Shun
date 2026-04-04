@@ -401,6 +401,15 @@ body[data-page="settings"] .site-nav a[href="settings.html"] {
   gap: 22px;
 }
 
+.browse-grid-full {
+  display: grid;
+  grid-template-columns: 1fr;
+}
+
+.browse-grid-full > .panel-card {
+  width: 100%;
+}
+
 .browse-mode-switch {
   display: flex;
   gap: 12px;
