@@ -302,11 +302,9 @@
     return state.users
       .filter((candidate) => {
         if (candidate.id === user.id) return false;
-        if (candidate.intent !== user.intent) return false;
-        if (user.sex && candidate.sex && candidate.sex === user.sex) return false;
         if (candidate.accountStatus === "banned") return false;
         if (!candidate.preferences.profileVisible) return false;
-        return candidate.age >= user.preferences.minAge && candidate.age <= user.preferences.maxAge;
+        return true;
       })
       .sort((left, right) => {
         const leftSeen = alreadySeen.has(left.id) ? 1 : 0;

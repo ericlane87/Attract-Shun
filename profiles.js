@@ -162,7 +162,7 @@
       traditionalPanel.innerHTML = `
         <div class="candidate-card">
           <p class="profile-name">No candidates available</p>
-          <p class="profile-meta">There are no opposite-sex profiles left in this intent pool. Seed more users or switch the active account.</p>
+          <p class="profile-meta">There are no visible profiles available right now. Seed more users or switch the active account.</p>
         </div>
       `;
       return;
