@@ -102,10 +102,11 @@
     }
 
     if (match.status === "date_planning") {
+      const dateState = AppData.getDatePlanningState(match, user.id);
       return {
         key: "date_planning",
-        title: "Matched: date planning step",
-        detail: `The intro step is done. The next required action is confirming the first date within two weeks of the match. Time left: ${formatTimeRemaining(match.dateDeadline)}.`,
+        title: dateState.title,
+        detail: `${dateState.detail} Time left: ${formatTimeRemaining(match.dateDeadline)}.`,
         ctaLabel: "Open Match Flow",
         ctaHref: "match.html",
       };

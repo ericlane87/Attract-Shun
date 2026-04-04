@@ -137,7 +137,7 @@
   AppData.markMessagesRead(user.id, match.id);
   const myIntro = match.introVideos[user.id] || null;
   const otherIntro = match.introVideos[otherUser.id] || null;
-  const myDateConfirm = match.dateConfirmedBy.includes(user.id);
+  const datePlanningState = AppData.getDatePlanningState(match, user.id);
   const myDecision = match.decisions[user.id];
   const myMediaId = (myIntro && myIntro.mediaId) || `intro:${match.id}:${user.id}`;
   const otherMediaId = otherIntro && otherIntro.mediaId;
@@ -229,6 +229,16 @@
     }
   }
 
+  function submitMockIntro() {
+    AppData.submitIntro(match.id, user.id, {
+      mediaId: "",
+      mimeType: "mock/testing",
+      sizeBytes: 0,
+      durationSeconds: 0,
+    });
+    location.reload();
+  }
+
   async function handleUploadSelection(event) {
     const errorEl = document.getElementById("intro-recorder-error");
     if (errorEl) errorEl.textContent = "";
@@ -293,8 +303,10 @@
           <button id="start-recording-btn" class="ghost-button" type="button" ${isRecording ? "disabled" : ""}>Start Recording</button>
           <button id="stop-recording-btn" class="ghost-button" type="button" ${isRecording ? "" : "disabled"}>Stop Recording</button>
           <label class="ghost-button file-upload-button" for="intro-upload-input">Upload Video</label>
+          <button id="submit-mock-intro-btn" class="ghost-button" type="button">Mark Intro As Sent</button>
         </div>
         <input id="intro-upload-input" class="visually-hidden" type="file" accept="video/*">
+        <div class="small-copy">Testing shortcut: use "Mark Intro As Sent" to move forward without recording or uploading a real video.</div>
         ${hasReviewVideo ? `
           <div class="button-row">
             <button id="record-again-btn" class="ghost-button" type="button">Record Again</button>
@@ -313,6 +325,60 @@
         <div id="other-intro-slot" class="intro-video-stack">
           <div class="small-copy">${otherIntro ? "Intro submitted. Playback appears below if this browser has access to the stored video." : "Waiting for intro submission."}</div>
         </div>
+      </div>
+    `;
+  }
+
+  function datePlannerMarkup() {
+    if (match.status !== "date_planning") return "";
+
+    const proposal = match.dateProposal;
+    const hasProposal = !!(proposal && proposal.proposedFor);
+    const proposedByOther = hasProposal && proposal.proposedByUserId !== user.id;
+    const acceptedByMe = hasProposal && proposal.acceptedBy.includes(user.id);
+    const proposedDateTimeValue = hasProposal ? proposal.proposedFor.slice(0, 16) : "";
+
+    return `
+      <div class="summary-card intro-studio">
+        <p class="profile-name">Plan the first date</p>
+        <p class="profile-meta">One live proposal stays active at a time. Either person can propose a time and place. The other person can confirm it or suggest a different plan. If the two-week timer expires before agreement, both people receive a Shun.</p>
+        <div class="hint-box">
+          <strong>${datePlanningState.title}</strong>
+          <div class="small-copy">${datePlanningState.detail}</div>
+        </div>
+        ${hasProposal ? `
+          <div class="detail-card">
+            <p class="detail-heading">Current proposal</p>
+            <div class="stack">
+              <div class="small-copy"><strong>Proposed by:</strong> ${proposal.proposedByUserId === user.id ? "You" : otherUser.name}</div>
+              <div class="small-copy"><strong>When:</strong> ${new Date(proposal.proposedFor).toLocaleString()}</div>
+              <div class="small-copy"><strong>Where:</strong> ${proposal.location}</div>
+              <div class="small-copy"><strong>Note:</strong> ${proposal.note || "No note added."}</div>
+              <div class="small-copy"><strong>Accepted by:</strong> ${proposal.acceptedBy.map((id) => id === user.id ? "You" : otherUser.name).join(" and ")}</div>
+            </div>
+          </div>
+        ` : ""}
+        <div id="date-plan-error" class="auth-error"></div>
+        <form id="date-proposal-form" class="stack">
+          <label class="field">
+            <span>${hasProposal ? "Suggest a different date and time" : "Propose a date and time"}</span>
+            <input name="proposedFor" type="datetime-local" required value="${proposedDateTimeValue}">
+          </label>
+          <label class="field">
+            <span>Location or venue</span>
+            <input name="location" type="text" maxlength="80" required value="${hasProposal ? proposal.location : ""}" placeholder="Coffee shop, neighborhood, restaurant, etc.">
+          </label>
+          <label class="field">
+            <span>Note</span>
+            <textarea name="note" rows="4" maxlength="220" placeholder="Add a short note about the plan">${hasProposal ? (proposal.note || "") : ""}</textarea>
+          </label>
+          <div class="button-row">
+            <button class="ghost-button" type="submit">${hasProposal ? "Suggest Different Time" : "Send Date Proposal"}</button>
+            ${proposedByOther ? `
+              <button id="accept-date-btn" class="primary-button" type="button" ${acceptedByMe ? "disabled" : ""}>${acceptedByMe ? "Confirmed" : "Confirm This Date"}</button>
+            ` : ""}
+          </div>
+        </form>
       </div>
     `;
   }
@@ -339,6 +405,7 @@
     const startButton = document.getElementById("start-recording-btn");
     const stopButton = document.getElementById("stop-recording-btn");
     const submitButton = document.getElementById("submit-recording-btn");
+    const mockIntroButton = document.getElementById("submit-mock-intro-btn");
     const uploadInput = document.getElementById("intro-upload-input");
     const recordAgainButton = document.getElementById("record-again-btn");
     const livePreview = document.getElementById("intro-live-preview");
@@ -349,6 +416,7 @@
     if (startButton) startButton.addEventListener("click", startRecording);
     if (stopButton) stopButton.addEventListener("click", stopRecording);
     if (submitButton) submitButton.addEventListener("click", submitRecordedIntro);
+    if (mockIntroButton) mockIntroButton.addEventListener("click", submitMockIntro);
     if (uploadInput) uploadInput.addEventListener("change", handleUploadSelection);
     if (recordAgainButton) {
       recordAgainButton.addEventListener("click", () => {
@@ -357,10 +425,31 @@
       });
     }
 
-    const dateBtn = document.getElementById("date-btn");
-    if (dateBtn) {
-      dateBtn.addEventListener("click", () => {
-        AppData.confirmDate(match.id, user.id);
+    const dateProposalForm = document.getElementById("date-proposal-form");
+    if (dateProposalForm) {
+      dateProposalForm.addEventListener("submit", (event) => {
+        event.preventDefault();
+        const errorEl = document.getElementById("date-plan-error");
+        if (errorEl) errorEl.textContent = "";
+        const formData = new FormData(dateProposalForm);
+        const proposal = AppData.proposeDate(match.id, user.id, {
+          proposedFor: formData.get("proposedFor"),
+          location: formData.get("location"),
+          note: formData.get("note"),
+        });
+        if (!proposal) {
+          if (errorEl) errorEl.textContent = "Add a date, time, and location to send a proposal.";
+          return;
+        }
+        location.reload();
+      });
+    }
+
+    const acceptDateButton = document.getElementById("accept-date-btn");
+    if (acceptDateButton) {
+      acceptDateButton.addEventListener("click", () => {
+        const accepted = AppData.acceptDateProposal(match.id, user.id);
+        if (!accepted) return;
         location.reload();
       });
     }
@@ -406,16 +495,16 @@
           <div class="timeline-row ${match.status === "pending_intro" ? "active" : myIntro ? "done" : ""}">
             <div>
               <strong>Video intro</strong>
-              <div class="small-copy">Submit a 60 second to 2 minute intro within 24 hours by ${AppUI.formatDate(match.introDeadline)}. Time left: ${formatTimeRemaining(match.introDeadline)}. If both intros are not submitted in time, both people receive a Shun.</div>
+              <div class="small-copy">Submit a video intro within 24 hours by ${AppUI.formatDate(match.introDeadline)}. Time left: ${formatTimeRemaining(match.introDeadline)}. If both intros are not submitted in time, both people receive a Shun.</div>
             </div>
             <span class="interest-pill">${myIntro ? "Submitted" : "Pending"}</span>
           </div>
-          <div class="timeline-row ${match.status === "date_planning" ? "active" : myDateConfirm ? "done" : ""}">
+          <div class="timeline-row ${match.status === "date_planning" ? "active" : match.dateProposal && match.userIds.every((id) => match.dateProposal.acceptedBy.includes(id)) ? "done" : ""}">
             <div>
               <strong>Plan first date</strong>
-              <div class="small-copy">Confirm the date and mock photo verification within two weeks by ${AppUI.formatDate(match.dateDeadline)}. Time left: ${formatTimeRemaining(match.dateDeadline)}. If the timer runs out, both people receive a Shun.</div>
+              <div class="small-copy">${datePlanningState.detail} Time left: ${formatTimeRemaining(match.dateDeadline)}. If the timer runs out, both people receive a Shun.</div>
             </div>
-            <button id="date-btn" class="ghost-button" type="button" ${myDateConfirm || match.status !== "date_planning" ? "disabled" : ""}>${myDateConfirm ? "Confirmed" : "Confirm Date"}</button>
+            <span class="interest-pill">${match.status === "date_planning" ? datePlanningState.title : "Done"}</span>
           </div>
           <div class="timeline-row ${match.status === "decision_window" ? "active" : myDecision ? "done" : ""}">
             <div>
@@ -427,6 +516,7 @@
         </div>
         ${introStudioMarkup()}
         ${partnerIntroMarkup()}
+        ${datePlannerMarkup()}
         <div class="decision-actions" id="decision-actions"></div>
         <div class="button-row">
           <button id="unmatch-btn" class="danger-button" type="button">Unmatch Now</button>

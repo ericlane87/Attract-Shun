@@ -188,6 +188,14 @@
       decisionDeadline: match.decisionDeadline || new Date().toISOString(),
       introVideos: match.introVideos || {},
       dateConfirmedBy: Array.isArray(match.dateConfirmedBy) ? match.dateConfirmedBy : [],
+      dateProposal: match.dateProposal ? {
+        proposedByUserId: match.dateProposal.proposedByUserId || "",
+        proposedFor: match.dateProposal.proposedFor || "",
+        location: match.dateProposal.location || "",
+        note: match.dateProposal.note || "",
+        proposedAt: match.dateProposal.proposedAt || "",
+        acceptedBy: Array.isArray(match.dateProposal.acceptedBy) ? match.dateProposal.acceptedBy : [],
+      } : null,
       datePhotoUploaded: Boolean(match.datePhotoUploaded),
       decisions: match.decisions || {},
       closedReason: match.closedReason || "",
@@ -567,6 +575,7 @@
       decisionDeadline: addDays(createdAt, 28),
       introVideos: {},
       dateConfirmedBy: [],
+      dateProposal: null,
       datePhotoUploaded: false,
       decisions: {},
       closedReason: "",
@@ -771,6 +780,90 @@
       match.status = "decision_window";
     }
     save();
+  }
+
+  function proposeDate(matchId, userId, payload) {
+    const match = state.matches.find((entry) => entry.id === matchId);
+    if (!match || match.status !== "date_planning") return null;
+    if (!match.userIds.includes(userId)) return null;
+
+    const proposedFor = String(payload.proposedFor || "").trim();
+    const location = String(payload.location || "").trim();
+    const note = String(payload.note || "").trim();
+    if (!proposedFor || !location) return null;
+
+    match.dateProposal = {
+      proposedByUserId: userId,
+      proposedFor,
+      location,
+      note,
+      proposedAt: nowIso(),
+      acceptedBy: [userId],
+    };
+    match.dateConfirmedBy = [userId];
+    save();
+    return match.dateProposal;
+  }
+
+  function acceptDateProposal(matchId, userId) {
+    const match = state.matches.find((entry) => entry.id === matchId);
+    if (!match || match.status !== "date_planning" || !match.dateProposal) return false;
+    if (!match.userIds.includes(userId)) return false;
+
+    if (!match.dateProposal.acceptedBy.includes(userId)) {
+      match.dateProposal.acceptedBy.push(userId);
+    }
+    if (!match.dateConfirmedBy.includes(userId)) {
+      match.dateConfirmedBy.push(userId);
+    }
+
+    if (match.userIds.every((id) => match.dateProposal.acceptedBy.includes(id))) {
+      match.datePhotoUploaded = true;
+      match.status = "decision_window";
+    }
+    save();
+    return true;
+  }
+
+  function getDatePlanningState(match, userId) {
+    if (!match || match.status !== "date_planning") {
+      return {
+        key: "inactive",
+        title: "Date planning inactive",
+        detail: "",
+      };
+    }
+
+    const proposal = match.dateProposal;
+    if (!proposal || !proposal.proposedFor) {
+      return {
+        key: "awaiting_proposal",
+        title: "Waiting for first date proposal",
+        detail: "No date has been proposed yet. Either person can suggest the first plan.",
+      };
+    }
+
+    if (match.userIds.every((id) => proposal.acceptedBy.includes(id))) {
+      return {
+        key: "date_confirmed",
+        title: "Date agreed",
+        detail: `Both people agreed on ${proposal.proposedFor} at ${proposal.location}.`,
+      };
+    }
+
+    if (proposal.proposedByUserId === userId) {
+      return {
+        key: "waiting_on_them",
+        title: "Waiting for their response",
+        detail: `You proposed ${proposal.proposedFor} at ${proposal.location}. They can confirm it or suggest a different time.`,
+      };
+    }
+
+    return {
+      key: "waiting_on_you",
+      title: "Review their date proposal",
+      detail: `${getUser(proposal.proposedByUserId)?.name || "Your match"} proposed ${proposal.proposedFor} at ${proposal.location}. You can confirm it or suggest a different time.`,
+    };
   }
 
   function submitDecision(matchId, userId, decision) {
@@ -998,6 +1091,18 @@
         detail: hoursRemaining > 0
           ? `Submit the intro video within ${hoursRemaining} hour${hoursRemaining === 1 ? "" : "s"} to avoid a Shun.`
           : "Intro deadline has expired. Reload to process the result.",
+        href: "match.html",
+        priority: 1,
+      });
+    }
+
+    if (activeMatch && activeMatch.status === "date_planning") {
+      const dateState = getDatePlanningState(activeMatch, userId);
+      notifications.push({
+        id: `date-planning-${activeMatch.id}`,
+        type: "date_planning",
+        title: dateState.title,
+        detail: `${dateState.detail} Finish setting the date before ${new Date(activeMatch.dateDeadline).toLocaleString()} or both people receive a Shun.`,
         href: "match.html",
         priority: 1,
       });
@@ -1274,6 +1379,8 @@
     recordSwipe,
     submitIntro,
     confirmDate,
+    proposeDate,
+    acceptDateProposal,
     submitDecision,
     unmatchCurrent,
     submitUnmatchRequest,
@@ -1290,6 +1397,7 @@
     getStories,
     getDraftStory,
     getNotificationsForUser,
+    getDatePlanningState,
     advanceDay,
     resetAll,
     defaultPreferences,
