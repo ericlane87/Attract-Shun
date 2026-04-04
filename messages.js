@@ -26,12 +26,15 @@
 
   const otherUser = AppData.getOtherUser(match, user.id);
   const messages = AppData.getMessages(match.id);
+  const unreadCount = AppData.getUnreadMessageCount(user.id);
   AppData.markMessagesRead(user.id, match.id);
+  AppUI.refreshSessionControls();
 
   summaryEl.innerHTML = `
     <div class="summary-card">
       <p class="profile-name">${activeMatch ? "Active conversation" : "Latest conversation"}</p>
       <p class="profile-meta">${otherUser.name} · ${match.status.replaceAll("_", " ")}</p>
+      <p class="small-copy">${unreadCount} unread message${unreadCount === 1 ? "" : "s"} were marked read when this page opened.</p>
       <div class="cta-row">
         <a class="primary-link" href="match.html">Open Match</a>
         <a class="ghost-link" href="browse.html">Back To Browse</a>
@@ -54,6 +57,12 @@
         <span class="status-pill">${activeMatch ? "Active" : "Archived"}</span>
       </div>
       <div class="chat-log" id="messages-chat-log"></div>
+      ${activeMatch ? `
+        <form id="messages-compose-form" class="chat-compose">
+          <input id="messages-compose-input" type="text" maxlength="240" placeholder="Send a message">
+          <button class="primary-button" type="submit">Send</button>
+        </form>
+      ` : ""}
     </div>
   `;
 
@@ -70,4 +79,17 @@
     `;
     chatLog.appendChild(messageEl);
   });
+  chatLog.scrollTop = chatLog.scrollHeight;
+
+  const composeForm = document.getElementById("messages-compose-form");
+  if (composeForm) {
+    composeForm.addEventListener("submit", (event) => {
+      event.preventDefault();
+      const input = document.getElementById("messages-compose-input");
+      if (!input.value.trim()) return;
+      AppData.sendMessage(match.id, user.id, input.value);
+      AppUI.refreshSessionControls();
+      location.reload();
+    });
+  }
 })();

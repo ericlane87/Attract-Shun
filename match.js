@@ -8,6 +8,9 @@
 
   const matchPanel = document.getElementById("match-panel");
   const chatPanel = document.getElementById("chat-panel");
+  const uiState = {
+    unmatchComposerOpen: false,
+  };
   const recorderState = {
     stream: null,
     recorder: null,
@@ -28,6 +31,17 @@
     const days = Math.floor(totalHours / 24);
     const hours = totalHours % 24;
     return hours ? `${days}d ${hours}h left` : `${days} day${days === 1 ? "" : "s"} left`;
+  }
+
+  function unmatchReasonLabel(reason) {
+    return ({
+      upset_gestures: "Upsetting gestures or behavior",
+      not_interested: "Not interested",
+      mutual: "Feels mutual",
+      timing: "Bad timing",
+      distance: "Distance or logistics",
+      communication: "Communication issues",
+    })[reason] || reason.replaceAll("_", " ");
   }
 
   function preferredMimeType() {
@@ -135,9 +149,11 @@
 
   const otherUser = AppData.getOtherUser(match, user.id);
   AppData.markMessagesRead(user.id, match.id);
+  const pendingUnmatch = AppData.getPendingUnmatchRequestForUser(user.id);
   const myIntro = match.introVideos[user.id] || null;
   const otherIntro = match.introVideos[otherUser.id] || null;
   const datePlanningState = AppData.getDatePlanningState(match, user.id);
+  const dateProposalHistory = AppData.getDateProposalHistory(match.id);
   const myDecision = match.decisions[user.id];
   const myMediaId = (myIntro && myIntro.mediaId) || `intro:${match.id}:${user.id}`;
   const otherMediaId = otherIntro && otherIntro.mediaId;
@@ -358,6 +374,22 @@
             </div>
           </div>
         ` : ""}
+        ${dateProposalHistory.length ? `
+          <div class="detail-card">
+            <p class="detail-heading">Proposal history</p>
+            <div class="stack">
+              ${dateProposalHistory.map((entry) => `
+                <div class="like-row">
+                  <div>
+                    <p class="profile-name">${entry.type === "accept" ? "Accepted proposal" : entry.type === "counter" ? "Counter proposal" : "Date proposal"}</p>
+                    <p class="profile-meta">${entry.actorUserId === user.id ? "You" : otherUser.name} · ${new Date(entry.createdAt).toLocaleString()}</p>
+                    <p class="small-copy">${new Date(entry.proposedFor).toLocaleString()} · ${entry.location}${entry.note ? ` · ${entry.note}` : ""}</p>
+                  </div>
+                </div>
+              `).join("")}
+            </div>
+          </div>
+        ` : ""}
         <div id="date-plan-error" class="auth-error"></div>
         <form id="date-proposal-form" class="stack">
           <label class="field">
@@ -379,6 +411,58 @@
             ` : ""}
           </div>
         </form>
+      </div>
+    `;
+  }
+
+  function unmatchWorkflowMarkup() {
+    if (!pendingUnmatch) {
+      if (!uiState.unmatchComposerOpen) return "";
+      return `
+        <div class="summary-card">
+          <p class="profile-name">Request unmatch</p>
+          <p class="profile-meta">Choose why you want to unmatch. ${otherUser.name} will be asked whether it was mutual and will have 24 hours to respond.</p>
+          <form id="unmatch-request-form" class="stack">
+            <label class="field">
+              <span>Reason for unmatching</span>
+              <select name="reason" required>
+                <option value="upset_gestures">Upsetting gestures or behavior</option>
+                <option value="not_interested">Not interested</option>
+                <option value="mutual">Feels mutual</option>
+                <option value="timing">Bad timing</option>
+                <option value="distance">Distance or logistics</option>
+                <option value="communication">Communication issues</option>
+              </select>
+            </label>
+            <div class="button-row">
+              <button class="danger-button" type="submit">Send Unmatch Request</button>
+              <button id="cancel-unmatch-request-btn" class="ghost-button" type="button">Cancel</button>
+            </div>
+          </form>
+        </div>
+      `;
+    }
+
+    const initiatedByMe = pendingUnmatch.initiatorId === user.id;
+    const responseDeadline = formatTimeRemaining(pendingUnmatch.respondBy);
+    return `
+      <div class="summary-card">
+        <p class="profile-name">${initiatedByMe ? "Unmatch request sent" : "Unmatch response required"}</p>
+        <p class="profile-meta">${initiatedByMe
+          ? `You asked to unmatch for: ${unmatchReasonLabel(pendingUnmatch.reason)}. ${otherUser.name} has 24 hours to respond.`
+          : `${otherUser.name} asked to unmatch for: ${unmatchReasonLabel(pendingUnmatch.reason)}. Answer yes or no within 24 hours or you will receive a Shun.`}</p>
+        <div class="detail-card">
+          <p class="detail-heading">Response deadline</p>
+          <div class="small-copy">${new Date(pendingUnmatch.respondBy).toLocaleString()} • ${responseDeadline}</div>
+        </div>
+        ${initiatedByMe ? `
+          <div class="small-copy">Discovery stays locked until the response is completed.</div>
+        ` : `
+          <div class="button-row">
+            <button id="unmatch-yes-btn" class="primary-button" type="button">Yes, It Was Mutual</button>
+            <button id="unmatch-no-btn" class="danger-button" type="button">No, It Was Not Mutual</button>
+          </div>
+        `}
       </div>
     `;
   }
@@ -454,10 +538,51 @@
       });
     }
 
-    document.getElementById("unmatch-btn").addEventListener("click", () => {
-      AppData.unmatchCurrent(user.id);
-      location.reload();
-    });
+    const openUnmatchButton = document.getElementById("unmatch-btn");
+    if (openUnmatchButton) {
+      openUnmatchButton.addEventListener("click", () => {
+        uiState.unmatchComposerOpen = true;
+        renderMatchPanel();
+      });
+    }
+
+    const cancelUnmatchButton = document.getElementById("cancel-unmatch-request-btn");
+    if (cancelUnmatchButton) {
+      cancelUnmatchButton.addEventListener("click", () => {
+        uiState.unmatchComposerOpen = false;
+        renderMatchPanel();
+      });
+    }
+
+    const unmatchRequestForm = document.getElementById("unmatch-request-form");
+    if (unmatchRequestForm) {
+      unmatchRequestForm.addEventListener("submit", (event) => {
+        event.preventDefault();
+        const formData = new FormData(unmatchRequestForm);
+        const request = AppData.submitUnmatchRequest(match.id, user.id, formData.get("reason"));
+        if (!request) return;
+        uiState.unmatchComposerOpen = false;
+        location.reload();
+      });
+    }
+
+    const unmatchYesButton = document.getElementById("unmatch-yes-btn");
+    if (unmatchYesButton) {
+      unmatchYesButton.addEventListener("click", () => {
+        const result = AppData.respondToUnmatchRequest(pendingUnmatch.id, user.id, true);
+        if (!result) return;
+        location.reload();
+      });
+    }
+
+    const unmatchNoButton = document.getElementById("unmatch-no-btn");
+    if (unmatchNoButton) {
+      unmatchNoButton.addEventListener("click", () => {
+        const result = AppData.respondToUnmatchRequest(pendingUnmatch.id, user.id, false);
+        if (!result) return;
+        location.reload();
+      });
+    }
 
     if (match.status === "decision_window") {
       const actions = document.getElementById("decision-actions");
@@ -517,9 +642,10 @@
         ${introStudioMarkup()}
         ${partnerIntroMarkup()}
         ${datePlannerMarkup()}
+        ${unmatchWorkflowMarkup()}
         <div class="decision-actions" id="decision-actions"></div>
         <div class="button-row">
-          <button id="unmatch-btn" class="danger-button" type="button">Unmatch Now</button>
+          ${pendingUnmatch ? "" : `<button id="unmatch-btn" class="danger-button" type="button">Request Unmatch</button>`}
           <a class="ghost-link" href="reports.html">Report This Match</a>
         </div>
       </div>
@@ -532,6 +658,7 @@
   renderMatchPanel();
 
   const messages = AppData.getMessages(match.id);
+  AppUI.refreshSessionControls();
   chatPanel.innerHTML = `
     <div class="chat-wrap">
       <div class="chat-head">
@@ -571,6 +698,7 @@
     event.preventDefault();
     const input = document.getElementById("chat-input");
     AppData.sendMessage(match.id, user.id, input.value);
+    AppUI.refreshSessionControls();
     location.reload();
   });
 })();

@@ -124,6 +124,21 @@ button:disabled {
   border: 1px solid rgba(214, 195, 169, 0.08);
 }
 
+.nav-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 20px;
+  height: 20px;
+  margin-left: 6px;
+  padding: 0 6px;
+  border-radius: 999px;
+  background: rgba(211, 90, 115, 0.24);
+  color: #fff5ef;
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
 .site-nav .nav-button {
   padding: 10px 14px;
 }

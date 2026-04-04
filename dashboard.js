@@ -61,6 +61,8 @@
   }
 
   function getMatchStep(match, likes, requests) {
+    const pendingUnmatch = AppData.getPendingUnmatchRequestForUser(user.id);
+
     if (!match) {
       if (requests.length) {
         return {
@@ -88,6 +90,19 @@
         detail: `No active match, no pending likes to review, and no match requests waiting. ${user.name} should be in browse until new interest comes in.`,
         ctaLabel: "Find A Match",
         ctaHref: "profiles.html",
+      };
+    }
+
+    if (pendingUnmatch) {
+      const initiatedByMe = pendingUnmatch.initiatorId === user.id;
+      return {
+        key: initiatedByMe ? "unmatch_waiting" : "unmatch_response",
+        title: initiatedByMe ? "Waiting on unmatch response" : "Respond to unmatch request",
+        detail: initiatedByMe
+          ? `You requested to unmatch. ${AppData.getOtherUser(match, user.id).name} has 24 hours to respond before they receive a Shun.`
+          : `${AppData.getOtherUser(match, user.id).name} asked to unmatch. You have 24 hours to answer yes or no or you will receive a Shun.`,
+        ctaLabel: "Open Match Flow",
+        ctaHref: "match.html",
       };
     }
 

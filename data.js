@@ -196,6 +196,7 @@
         proposedAt: match.dateProposal.proposedAt || "",
         acceptedBy: Array.isArray(match.dateProposal.acceptedBy) ? match.dateProposal.acceptedBy : [],
       } : null,
+      dateProposalHistory: Array.isArray(match.dateProposalHistory) ? match.dateProposalHistory : [],
       datePhotoUploaded: Boolean(match.datePhotoUploaded),
       decisions: match.decisions || {},
       closedReason: match.closedReason || "",
@@ -576,6 +577,7 @@
       introVideos: {},
       dateConfirmedBy: [],
       dateProposal: null,
+      dateProposalHistory: [],
       datePhotoUploaded: false,
       decisions: {},
       closedReason: "",
@@ -712,6 +714,22 @@
     });
   }
 
+  function getUsersMissingIntro(match) {
+    return match.userIds.filter((userId) => !match.introVideos[userId]);
+  }
+
+  function getUsersMissingDateParticipation(match) {
+    const proposal = match.dateProposal;
+    if (!proposal || !proposal.proposedFor) {
+      return [...match.userIds];
+    }
+    return match.userIds.filter((userId) => !proposal.acceptedBy.includes(userId));
+  }
+
+  function getUsersMissingDecision(match) {
+    return match.userIds.filter((userId) => !match.decisions[userId]);
+  }
+
   function createSuccessStory(matchId) {
     const match = state.matches.find((entry) => entry.id === matchId);
     if (!match) return;
@@ -792,6 +810,7 @@
     const note = String(payload.note || "").trim();
     if (!proposedFor || !location) return null;
 
+    const entryType = match.dateProposal && match.dateProposal.proposedFor ? "counter" : "proposal";
     match.dateProposal = {
       proposedByUserId: userId,
       proposedFor,
@@ -800,6 +819,16 @@
       proposedAt: nowIso(),
       acceptedBy: [userId],
     };
+    match.dateProposalHistory = Array.isArray(match.dateProposalHistory) ? match.dateProposalHistory : [];
+    match.dateProposalHistory.push({
+      id: uid("dateplan"),
+      type: entryType,
+      actorUserId: userId,
+      proposedFor,
+      location,
+      note,
+      createdAt: nowIso(),
+    });
     match.dateConfirmedBy = [userId];
     save();
     return match.dateProposal;
@@ -812,6 +841,16 @@
 
     if (!match.dateProposal.acceptedBy.includes(userId)) {
       match.dateProposal.acceptedBy.push(userId);
+      match.dateProposalHistory = Array.isArray(match.dateProposalHistory) ? match.dateProposalHistory : [];
+      match.dateProposalHistory.push({
+        id: uid("dateplan"),
+        type: "accept",
+        actorUserId: userId,
+        proposedFor: match.dateProposal.proposedFor,
+        location: match.dateProposal.location,
+        note: match.dateProposal.note,
+        createdAt: nowIso(),
+      });
     }
     if (!match.dateConfirmedBy.includes(userId)) {
       match.dateConfirmedBy.push(userId);
@@ -864,6 +903,14 @@
       title: "Review their date proposal",
       detail: `${getUser(proposal.proposedByUserId)?.name || "Your match"} proposed ${proposal.proposedFor} at ${proposal.location}. You can confirm it or suggest a different time.`,
     };
+  }
+
+  function getDateProposalHistory(matchId) {
+    const match = state.matches.find((entry) => entry.id === matchId);
+    if (!match) return [];
+    return (match.dateProposalHistory || [])
+      .slice()
+      .sort((left, right) => new Date(right.createdAt).getTime() - new Date(left.createdAt).getTime());
   }
 
   function submitDecision(matchId, userId, decision) {
@@ -965,6 +1012,10 @@
     });
   }
 
+  function getUnreadMessageCount(userId) {
+    return getUnreadMessagesForUser(userId).length;
+  }
+
   function markMessagesRead(userId, matchId) {
     if (!userId || !matchId) return;
     state.messageReads = state.messageReads || {};
@@ -1056,8 +1107,22 @@
 
     const notifications = [];
     const incomingRequests = getIncomingMatchRequests(userId);
+    const outgoingRequests = getOutgoingMatchRequests(userId);
+    const incomingLikes = getIncomingLikes(userId);
     const pendingUnmatch = getPendingUnmatchRequestToRespond(userId);
+    const anyPendingUnmatch = getPendingUnmatchRequestForUser(userId);
     const activeMatch = getActiveMatchForUser(userId);
+
+    if (!activeMatch && incomingLikes.length) {
+      notifications.push({
+        id: `likes-${userId}`,
+        type: "likes",
+        title: `${incomingLikes.length} incoming like${incomingLikes.length === 1 ? "" : "s"}`,
+        detail: "Review who liked you and decide whether to send a match request.",
+        href: "likes.html",
+        priority: 1,
+      });
+    }
 
     if (incomingRequests.length) {
       notifications.push({
@@ -1067,6 +1132,17 @@
         detail: "Review and confirm pending match requests.",
         href: "match-requests.html",
         priority: 1,
+      });
+    }
+
+    if (!activeMatch && outgoingRequests.length) {
+      notifications.push({
+        id: `outgoing-match-requests-${userId}`,
+        type: "outgoing_match_request",
+        title: `${outgoingRequests.length} match request${outgoingRequests.length === 1 ? "" : "s"} awaiting response`,
+        detail: "These people still need to confirm or ignore your request.",
+        href: "likes.html",
+        priority: 2,
       });
     }
 
@@ -1082,17 +1158,34 @@
       });
     }
 
+    if (anyPendingUnmatch && anyPendingUnmatch.initiatorId === userId) {
+      const otherUser = getUser(anyPendingUnmatch.responderId);
+      notifications.push({
+        id: `unmatch-waiting-${anyPendingUnmatch.id}`,
+        type: "unmatch_waiting",
+        title: "Waiting on unmatch response",
+        detail: `${otherUser ? otherUser.name : "Your match"} has 24 hours to answer your unmatch request.`,
+        href: "match.html",
+        priority: 1,
+      });
+    }
+
     if (activeMatch && activeMatch.status === "pending_intro") {
       const hoursRemaining = Math.ceil((new Date(activeMatch.introDeadline).getTime() - new Date(state.system.now).getTime()) / (60 * 60 * 1000));
+      const hasMyIntro = Boolean(activeMatch.introVideos[userId]);
+      const otherUser = getOtherUser(activeMatch, userId);
+      const hasOtherIntro = Boolean(otherUser && activeMatch.introVideos[otherUser.id]);
       notifications.push({
         id: `intro-deadline-${activeMatch.id}`,
         type: "intro_deadline",
-        title: "Intro video deadline active",
+        title: hasMyIntro ? `Waiting for ${otherUser ? otherUser.name : "your match"}'s intro` : "Your intro video is due",
         detail: hoursRemaining > 0
-          ? `Submit the intro video within ${hoursRemaining} hour${hoursRemaining === 1 ? "" : "s"} to avoid a Shun.`
+          ? hasMyIntro
+            ? `${otherUser ? otherUser.name : "Your match"} still needs to submit their intro within ${hoursRemaining} hour${hoursRemaining === 1 ? "" : "s"}.`
+            : `Submit the intro video within ${hoursRemaining} hour${hoursRemaining === 1 ? "" : "s"} to avoid a Shun.`
           : "Intro deadline has expired. Reload to process the result.",
         href: "match.html",
-        priority: 1,
+        priority: hasMyIntro && hasOtherIntro ? 2 : 1,
       });
     }
 
@@ -1103,6 +1196,21 @@
         type: "date_planning",
         title: dateState.title,
         detail: `${dateState.detail} Finish setting the date before ${new Date(activeMatch.dateDeadline).toLocaleString()} or both people receive a Shun.`,
+        href: "match.html",
+        priority: 1,
+      });
+    }
+
+    if (activeMatch && activeMatch.status === "decision_window") {
+      const myDecision = activeMatch.decisions[userId];
+      const otherUser = getOtherUser(activeMatch, userId);
+      notifications.push({
+        id: `decision-window-${activeMatch.id}`,
+        type: "decision_window",
+        title: myDecision ? `Waiting for ${otherUser ? otherUser.name : "your match"}'s final decision` : "Final decision required",
+        detail: myDecision
+          ? `You already responded. ${otherUser ? otherUser.name : "Your match"} still needs to finish the final step before the deadline.`
+          : "Choose attract, mutual not a fit, or shun before the deadline expires.",
         href: "match.html",
         priority: 1,
       });
@@ -1143,13 +1251,31 @@
     state.matches.forEach((match) => {
       if (!["pending_intro", "date_planning", "decision_window"].includes(match.status)) return;
       if (match.status === "pending_intro" && currentTime > new Date(match.introDeadline).getTime()) {
-        closeMatch(match, "shun", "Failed to submit both intro videos in time.", true, "intro_timeout");
+        const missingUsers = getUsersMissingIntro(match);
+        const allMissing = missingUsers.length === match.userIds.length;
+        if (allMissing) {
+          closeMatch(match, "shun", "Neither person submitted the intro video in time.", true, "intro_timeout");
+        } else {
+          closeMatchForSpecificUsers(match, "shun", "Only the person who failed to submit the intro video in time received a Shun.", missingUsers, "intro_timeout");
+        }
         changed = true;
       } else if (match.status === "date_planning" && currentTime > new Date(match.dateDeadline).getTime()) {
-        closeMatch(match, "shun", "Failed to plan and verify the first date in time.", true, "date_timeout");
+        const missingUsers = getUsersMissingDateParticipation(match);
+        const allMissing = missingUsers.length === match.userIds.length;
+        if (allMissing) {
+          closeMatch(match, "shun", "Neither person participated in setting the first date in time.", true, "date_timeout");
+        } else {
+          closeMatchForSpecificUsers(match, "shun", "Only the person who failed to respond to the live date proposal in time received a Shun.", missingUsers, "date_timeout");
+        }
         changed = true;
       } else if (match.status === "decision_window" && currentTime > new Date(match.decisionDeadline).getTime()) {
-        closeMatch(match, "shun", "Failed to finish the final decision step in time.", true, "decision_timeout");
+        const missingUsers = getUsersMissingDecision(match);
+        const allMissing = missingUsers.length === match.userIds.length;
+        if (allMissing) {
+          closeMatch(match, "shun", "Neither person finished the final decision step in time.", true, "decision_timeout");
+        } else {
+          closeMatchForSpecificUsers(match, "shun", "Only the person who failed to submit the final decision in time received a Shun.", missingUsers, "decision_timeout");
+        }
         changed = true;
       }
     });
@@ -1387,6 +1513,7 @@
     respondToUnmatchRequest,
     getMessages,
     getUnreadMessagesForUser,
+    getUnreadMessageCount,
     markMessagesRead,
     sendMessage,
     createReport,
@@ -1398,6 +1525,7 @@
     getDraftStory,
     getNotificationsForUser,
     getDatePlanningState,
+    getDateProposalHistory,
     advanceDay,
     resetAll,
     defaultPreferences,

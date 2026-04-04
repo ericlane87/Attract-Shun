@@ -179,51 +179,47 @@
     const nav = document.querySelector(".site-nav");
     if (!nav || !window.AppAuth || !AppData.isAuthenticated()) return;
     const currentUser = AppData.currentUser();
-    const notificationCount = currentUser ? AppData.getNotificationsForUser(currentUser.id).length : 0;
+    if (!currentUser) return;
 
-    if (!nav.querySelector("[data-notifications-link]")) {
-      const notificationsLink = document.createElement("a");
-      notificationsLink.href = "notifications.html";
-      notificationsLink.dataset.notificationsLink = "true";
-      notificationsLink.innerHTML = `Notifications${notificationCount ? ` <span class="nav-count">${notificationCount}</span>` : ""}`;
-      nav.appendChild(notificationsLink);
+    const counts = {
+      notifications: AppData.getNotificationsForUser(currentUser.id).length,
+      messages: AppData.getUnreadMessageCount(currentUser.id),
+      likes: AppData.getIncomingLikes(currentUser.id).length,
+      requests: AppData.getIncomingMatchRequests(currentUser.id).length,
+    };
+
+    function labelWithCount(label, count) {
+      return `${label}${count ? ` <span class="nav-count">${count}</span>` : ""}`;
     }
 
-    if (!nav.querySelector("[data-messages-link]")) {
-      const messagesLink = document.createElement("a");
-      messagesLink.href = "messages.html";
-      messagesLink.dataset.messagesLink = "true";
-      messagesLink.textContent = "Messages";
-      nav.appendChild(messagesLink);
+    function ensureLink(datasetName, href, label, count) {
+      let link = nav.querySelector(`[data-${datasetName}]`);
+      if (!link) {
+        link = document.createElement("a");
+        link.href = href;
+        link.dataset[datasetName] = "true";
+        nav.appendChild(link);
+      }
+      link.innerHTML = labelWithCount(label, count);
+      return link;
     }
 
-    if (!nav.querySelector("[data-likes-link]")) {
-      const likesLink = document.createElement("a");
-      likesLink.href = "likes.html";
-      likesLink.dataset.likesLink = "true";
-      likesLink.textContent = "Likes";
-      nav.appendChild(likesLink);
+    ensureLink("notificationsLink", "notifications.html", "Notifications", counts.notifications);
+    ensureLink("messagesLink", "messages.html", "Messages", counts.messages);
+    ensureLink("likesLink", "likes.html", "Likes", counts.likes);
+    ensureLink("matchRequestsLink", "match-requests.html", "Match Requests", counts.requests);
+
+    if (!nav.querySelector("[data-logout-button]")) {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = "ghost-button nav-button";
+      button.dataset.logoutButton = "true";
+      button.textContent = "Logout";
+      button.addEventListener("click", () => {
+        window.AppAuth.logoutAndRedirect();
+      });
+      nav.appendChild(button);
     }
-
-    if (!nav.querySelector("[data-match-requests-link]")) {
-      const requestsLink = document.createElement("a");
-      requestsLink.href = "match-requests.html";
-      requestsLink.dataset.matchRequestsLink = "true";
-      requestsLink.textContent = "Match Requests";
-      nav.appendChild(requestsLink);
-    }
-
-    if (nav.querySelector("[data-logout-button]")) return;
-
-    const button = document.createElement("button");
-    button.type = "button";
-    button.className = "ghost-button nav-button";
-    button.dataset.logoutButton = "true";
-    button.textContent = "Logout";
-    button.addEventListener("click", () => {
-      window.AppAuth.logoutAndRedirect();
-    });
-    nav.appendChild(button);
   }
 
   window.AppUI = {
@@ -235,6 +231,7 @@
     renderLikeList,
     setPageChip,
     initSessionControls,
+    refreshSessionControls: initSessionControls,
     openShunBreakdown,
     bindShunBreakdownTriggers,
   };
