@@ -3,7 +3,6 @@
   const AppUI = window.AppUI;
   const user = AppData.currentUser();
 
-  AppUI.injectExperienceRibbon();
   AppUI.setPageChip("settings-user-chip", user ? `Settings for ${user.name}` : "No active user");
 
   const form = document.getElementById("settings-form");
@@ -11,15 +10,7 @@
 
   if (!user) {
     form.innerHTML = "";
-    summary.innerHTML = AppUI.renderEntryState({
-      kicker: "Settings",
-      title: "Settings unlock after account creation",
-      copy: "Create an account to manage visibility, match preferences, and notifications.",
-      primaryHref: "create-account.html",
-      primaryLabel: "Create Account",
-      secondaryHref: "admin.html",
-      secondaryLabel: "View Demo Profiles",
-    });
+    summary.innerHTML = `<div class="empty-state">Open <a href="admin.html">Admin</a> to create a user first.</div>`;
     return;
   }
 
@@ -55,7 +46,6 @@
         allowWeeklyFeature: formData.get("allowWeeklyFeature") === "on",
       },
     });
-    AppUI.showToast("Settings saved.");
-    setTimeout(() => location.reload(), 350);
+    location.reload();
   });
 })();

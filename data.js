@@ -11,12 +11,6 @@
       minAge: 24,
       maxAge: 38,
       distanceMiles: 25,
-      minHeightInches: 0,
-      preferredRace: "any",
-      preferredChildrenStatus: "any",
-      excludedRace: "none",
-      excludedChildrenStatus: "none",
-      excludedZodiac: "none",
       allowWeeklyFeature: false,
       notifications: true,
       showIntentBadge: true,
@@ -28,6 +22,9 @@
     return {
       system: {
         now: new Date("2026-03-31T12:00:00-04:00").toISOString(),
+      },
+      session: {
+        loggedInUserId: "",
       },
       currentUserId: "",
       users: [],
@@ -43,23 +40,13 @@
     return {
       id: user.id || uid("user"),
       name: user.name || "Unnamed",
+      email: (user.email || "").trim().toLowerCase(),
+      password: user.password || "demo1234",
+      sex: user.sex || "",
       age: Number(user.age || 18),
       city: user.city || "",
-      email: user.email || "",
-      gender: user.gender || "",
-      lookingFor: user.lookingFor || "",
       intent: user.intent || "long_term",
       bio: user.bio || "",
-      zodiacSign: user.zodiacSign || "Aries",
-      heightInches: Number(user.heightInches || 68),
-      race: user.race || "Prefer not to say",
-      childrenStatus: user.childrenStatus || "Open to kids",
-      interests: Array.isArray(user.interests) ? user.interests : [],
-      photos: Array.isArray(user.photos) ? user.photos.slice(0, 5) : [],
-      profilePhotoIndex: Number.isInteger(user.profilePhotoIndex) ? user.profilePhotoIndex : 0,
-      locationLabel: user.locationLabel || user.city || "",
-      latitude: typeof user.latitude === "number" ? user.latitude : null,
-      longitude: typeof user.longitude === "number" ? user.longitude : null,
       shunCount: Number(user.shunCount || 0),
       activeMatchId: user.activeMatchId || null,
       status: user.status || "available",
@@ -83,9 +70,6 @@
       decisionDeadline: match.decisionDeadline || new Date().toISOString(),
       introVideos: match.introVideos || {},
       dateConfirmedBy: Array.isArray(match.dateConfirmedBy) ? match.dateConfirmedBy : [],
-      plannedDateBy: match.plannedDateBy || {},
-      agreedDate: match.agreedDate || "",
-      dateOccurredBy: Array.isArray(match.dateOccurredBy) ? match.dateOccurredBy : [],
       datePhotoUploaded: Boolean(match.datePhotoUploaded),
       decisions: match.decisions || {},
       closedReason: match.closedReason || "",
@@ -123,6 +107,9 @@
     return {
       system: {
         now: (merged.system && merged.system.now) || base.system.now,
+      },
+      session: {
+        loggedInUserId: (merged.session && merged.session.loggedInUserId) || "",
       },
       currentUserId: merged.currentUserId || "",
       users: Array.isArray(merged.users) ? merged.users.map(normalizeUser) : [],
@@ -175,6 +162,10 @@
     return getUser(state.currentUserId);
   }
 
+  function loggedInUser() {
+    return getUser(state.session.loggedInUserId);
+  }
+
   function formatIntent(intent) {
     return intent === "long_term" ? "Long term" : "Casual";
   }
@@ -184,23 +175,46 @@
     save();
   }
 
-  function findUserByEmail(email) {
-    const normalizedEmail = String(email || "").trim().toLowerCase();
-    if (!normalizedEmail) return null;
-    return state.users.find((user) => String(user.email || "").trim().toLowerCase() === normalizedEmail) || null;
+  function setLoggedInUser(userId) {
+    state.session.loggedInUserId = userId || "";
+    state.currentUserId = userId || "";
+    save();
+  }
+
+  function isAuthenticated() {
+    return Boolean(state.session.loggedInUserId && getUser(state.session.loggedInUserId));
+  }
+
+  function logout() {
+    state.session.loggedInUserId = "";
+    state.currentUserId = "";
+    save();
+  }
+
+  function login(identifier, password) {
+    const normalizedIdentifier = String(identifier || "").trim().toLowerCase();
+    const normalizedPassword = String(password || "");
+    const user = state.users.find((entry) => {
+      const nameMatch = entry.name.trim().toLowerCase() === normalizedIdentifier;
+      const emailMatch = entry.email === normalizedIdentifier;
+      return (nameMatch || emailMatch) && entry.password === normalizedPassword;
+    });
+    if (!user) return null;
+    setLoggedInUser(user.id);
+    return user;
   }
 
   function createUser(payload) {
     const user = normalizeUser({
       id: uid("user"),
       name: payload.name,
+      email: payload.email,
+      password: payload.password,
+      sex: payload.sex,
       age: payload.age,
       city: payload.city,
-      email: payload.email,
-      gender: payload.gender,
-      lookingFor: payload.lookingFor,
       intent: payload.intent,
-      bio: payload.bio || "",
+      bio: payload.bio,
       onboardingCompleted: false,
       onboardingStep: "identity",
       preferences: defaultPreferences(),
@@ -231,24 +245,8 @@
     const user = getUser(userId);
     if (!user) return null;
 
-    user.name = payload.name;
-    user.email = payload.email;
-    user.age = Number(payload.age);
-    user.gender = payload.gender;
-    user.lookingFor = payload.lookingFor;
     user.bio = payload.bio;
     user.intent = payload.intent;
-    user.zodiacSign = payload.zodiacSign;
-    user.heightInches = Number(payload.heightInches);
-    user.race = payload.race;
-    user.childrenStatus = payload.childrenStatus;
-    user.interests = Array.isArray(payload.interests) ? payload.interests : [];
-    user.photos = Array.isArray(payload.photos) ? payload.photos.slice(0, 5) : [];
-    user.profilePhotoIndex = Math.max(0, Math.min(Number(payload.profilePhotoIndex || 0), Math.max(user.photos.length - 1, 0)));
-    user.locationLabel = payload.locationLabel || user.locationLabel || "";
-    user.latitude = typeof payload.latitude === "number" ? payload.latitude : user.latitude;
-    user.longitude = typeof payload.longitude === "number" ? payload.longitude : user.longitude;
-    user.city = user.locationLabel;
     user.verified = true;
     user.onboardingCompleted = true;
     user.onboardingStep = "complete";
@@ -257,50 +255,10 @@
       minAge: Number(payload.minAge),
       maxAge: Number(payload.maxAge),
       distanceMiles: Number(payload.distanceMiles),
-      minHeightInches: Number(payload.minHeightInches || 0),
-      preferredRace: payload.preferredRace || "any",
-      preferredChildrenStatus: payload.preferredChildrenStatus || "any",
-      excludedRace: payload.excludedRace || "none",
-      excludedChildrenStatus: payload.excludedChildrenStatus || "none",
-      excludedZodiac: payload.excludedZodiac || "none",
       allowWeeklyFeature: Boolean(payload.allowWeeklyFeature),
     };
     save();
     return user;
-  }
-
-  function distanceMilesBetween(userA, userB) {
-    if ([userA.latitude, userA.longitude, userB.latitude, userB.longitude].some((value) => typeof value !== "number")) {
-      return null;
-    }
-
-    const toRadians = (value) => (value * Math.PI) / 180;
-    const earthRadiusMiles = 3958.8;
-    const dLat = toRadians(userB.latitude - userA.latitude);
-    const dLon = toRadians(userB.longitude - userA.longitude);
-    const lat1 = toRadians(userA.latitude);
-    const lat2 = toRadians(userB.latitude);
-
-    const a = Math.sin(dLat / 2) ** 2 +
-      Math.cos(lat1) * Math.cos(lat2) * Math.sin(dLon / 2) ** 2;
-    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-    return earthRadiusMiles * c;
-  }
-
-  function normalizeGenderValue(value) {
-    const normalized = String(value || "").trim().toLowerCase().replaceAll("-", "_").replaceAll(" ", "_");
-    if (["woman", "women", "female"].includes(normalized)) return "woman";
-    if (["man", "men", "male"].includes(normalized)) return "man";
-    if (["non_binary", "nonbinary", "nb"].includes(normalized)) return "non_binary";
-    if (["everyone", "all"].includes(normalized)) return "everyone";
-    return normalized;
-  }
-
-  function lookingForMatches(lookingFor, candidateGender) {
-    const desired = normalizeGenderValue(lookingFor);
-    const candidate = normalizeGenderValue(candidateGender);
-    if (!desired || desired === "everyone") return true;
-    return desired === candidate;
   }
 
   function getIncomingLikes(userId) {
@@ -323,22 +281,11 @@
     return state.users.filter((candidate) => {
       if (candidate.id === user.id) return false;
       if (candidate.intent !== user.intent) return false;
+      if (user.sex && candidate.sex && candidate.sex === user.sex) return false;
       if (alreadySeen.has(candidate.id)) return false;
       if (candidate.accountStatus === "banned") return false;
       if (!candidate.preferences.profileVisible) return false;
-      if (!lookingForMatches(user.lookingFor, candidate.gender)) return false;
-      if (!lookingForMatches(candidate.lookingFor, user.gender)) return false;
-      if (!(candidate.age >= user.preferences.minAge && candidate.age <= user.preferences.maxAge)) return false;
-      if (user.preferences.minHeightInches && candidate.heightInches < user.preferences.minHeightInches) return false;
-      if (user.preferences.preferredRace !== "any" && candidate.race !== user.preferences.preferredRace) return false;
-      if (user.preferences.preferredChildrenStatus !== "any" && candidate.childrenStatus !== user.preferences.preferredChildrenStatus) return false;
-      if (user.preferences.excludedRace !== "none" && candidate.race === user.preferences.excludedRace) return false;
-      if (user.preferences.excludedChildrenStatus !== "none" && candidate.childrenStatus === user.preferences.excludedChildrenStatus) return false;
-      if (user.preferences.excludedZodiac !== "none" && candidate.zodiacSign === user.preferences.excludedZodiac) return false;
-
-      const distance = distanceMilesBetween(user, candidate);
-      if (distance !== null && distance > user.preferences.distanceMiles) return false;
-      return true;
+      return candidate.age >= user.preferences.minAge && candidate.age <= user.preferences.maxAge;
     });
   }
 
@@ -352,10 +299,6 @@
 
   function getLatestMatchForUser(userId) {
     return state.matches.filter((match) => match.userIds.includes(userId)).slice(-1)[0] || null;
-  }
-
-  function getMatchesForUser(userId) {
-    return state.matches.filter((match) => match.userIds.includes(userId)).slice().reverse();
   }
 
   function maybeCreateMatch(fromUserId, toUserId) {
@@ -382,9 +325,6 @@
       decisionDeadline: addDays(createdAt, 28),
       introVideos: {},
       dateConfirmedBy: [],
-      plannedDateBy: {},
-      agreedDate: "",
-      dateOccurredBy: [],
       datePhotoUploaded: false,
       decisions: {},
       closedReason: "",
@@ -479,30 +419,12 @@
   function confirmDate(matchId, userId) {
     const match = state.matches.find((entry) => entry.id === matchId);
     if (!match || match.status !== "date_planning") return;
-    if (!match.agreedDate) return;
-    if (!match.dateOccurredBy.includes(userId)) {
-      match.dateOccurredBy.push(userId);
+    if (!match.dateConfirmedBy.includes(userId)) {
+      match.dateConfirmedBy.push(userId);
     }
-    if (match.dateOccurredBy.length === 2) {
+    if (match.dateConfirmedBy.length === 2) {
       match.datePhotoUploaded = true;
       match.status = "decision_window";
-    }
-    save();
-  }
-
-  function setPlannedDate(matchId, userId, dateValue) {
-    const match = state.matches.find((entry) => entry.id === matchId);
-    if (!match || match.status !== "date_planning") return;
-    const nextValue = String(dateValue || "").trim();
-    if (!nextValue) return;
-    match.plannedDateBy[userId] = nextValue;
-    match.dateOccurredBy = [];
-
-    const selectedDates = match.userIds.map((id) => match.plannedDateBy[id]).filter(Boolean);
-    if (selectedDates.length === 2 && selectedDates[0] === selectedDates[1]) {
-      match.agreedDate = selectedDates[0];
-    } else {
-      match.agreedDate = "";
     }
     save();
   }
@@ -631,19 +553,97 @@
   }
 
   function seedDemoUsers() {
-    if (state.users.length > 0) return;
-    [
-      ["Ava Brooks", 28, "Brooklyn", "long_term", "Reader, graceful communicator, wants one serious relationship not endless swiping."],
-      ["Noah Ellis", 31, "Queens", "long_term", "Chef, emotionally direct, family-minded, and not interested in casual ambiguity."],
-      ["Elena Price", 33, "Brooklyn", "long_term", "Calm, polished, affectionate, and ready for commitment with the right person."],
-      ["Theo Grant", 30, "Astoria", "long_term", "Designer, active, consistent, and willing to lead with effort."],
-      ["Jade Carter", 26, "Harlem", "casual", "Bold, social, and looking for chemistry without pretending it is more than it is."],
-      ["Miles Bennett", 29, "Jersey City", "casual", "Live music, rooftop nights, and honest casual dating."],
-    ].forEach(([name, age, city, intent, bio]) => {
-      const user = createUser({ name, age, city, intent, bio });
+    const targetCount = 100;
+    if (state.users.length >= targetCount) return;
+
+    const femaleFirstNames = [
+      "Ava", "Mia", "Nora", "Elena", "Jade", "Lena", "Sofia", "Ruby", "Chloe", "Zoe",
+      "Maya", "Layla", "Aria", "Cora", "Ivy", "Naomi", "Clara", "Lucy", "Tessa", "Paige",
+      "Violet", "Hazel", "Julia", "Brielle", "Sabrina", "Camila", "Eva", "Summer", "Sadie", "Keira",
+      "Adeline", "Celeste", "Daphne", "Esme", "Freya", "Gia", "Holly", "Isla", "Josephine", "Kira",
+      "Leila", "Marina", "Noelle", "Olive", "Piper", "Quinn", "Rosalie", "Sienna", "Valerie", "Willa"
+    ];
+    const maleFirstNames = [
+      "Noah", "Liam", "Theo", "Miles", "Ethan", "Julian", "Caleb", "Owen", "Grant", "Roman",
+      "Lucas", "Mason", "Hudson", "Logan", "Wyatt", "Cole", "Asher", "Nolan", "Brooks", "Dean",
+      "Eli", "Felix", "Gavin", "Holden", "Isaac", "Jasper", "Kai", "Levi", "Micah", "Nico",
+      "Orion", "Parker", "Reid", "Silas", "Tristan", "Vincent", "Wesley", "Xavier", "Yuri", "Zane",
+      "Alden", "Beckett", "Carter", "Damian", "Emmett", "Finley", "Graham", "Harvey", "Jonah", "Knox"
+    ];
+    const lastNames = [
+      "Brooks", "Ellis", "Price", "Grant", "Carter", "Bennett", "Hayes", "Monroe", "Sullivan", "Reed",
+      "Coleman", "Bryant", "Foster", "Bailey", "Porter", "Wallace", "Perry", "Hughes", "Ward", "Russell",
+      "Jenkins", "Powell", "Myers", "Long", "Greene", "Parker", "Cook", "Bell", "Murphy", "Rivera",
+      "Hayden", "Kim", "Brody", "Morris", "Spencer", "Diaz", "Warren", "Fisher", "West", "Holland",
+      "Bishop", "Stephens", "Woods", "Carr", "Griffin", "Pierce", "Fox", "Barnes", "Santos", "Mills"
+    ];
+    const cities = [
+      "New York", "Los Angeles", "Chicago", "Houston", "Phoenix", "Philadelphia", "San Antonio", "San Diego", "Dallas", "Austin",
+      "Jacksonville", "San Jose", "Columbus", "Charlotte", "Indianapolis", "Seattle", "Denver", "Boston", "Nashville", "Detroit",
+      "Portland", "Las Vegas", "Baltimore", "Atlanta", "Miami", "Orlando", "Tampa", "Cleveland", "Cincinnati", "Pittsburgh",
+      "St. Louis", "Kansas City", "Minneapolis", "Milwaukee", "Omaha", "Raleigh", "Richmond", "Buffalo", "Rochester", "Albany",
+      "Jersey City", "Newark", "Hoboken", "Yonkers", "Irvine", "Pasadena", "Burbank", "Sacramento", "Fresno", "Oakland"
+    ];
+    const longTermTraits = [
+      "values consistency", "wants a real partner", "prefers intentional communication", "is ready for commitment", "likes thoughtful dates",
+      "cares about emotional maturity", "wants to build something steady", "takes dating seriously", "enjoys honest conversations", "likes calm chemistry"
+    ];
+    const casualTraits = [
+      "likes easy chemistry", "wants something fun and direct", "enjoys spontaneous plans", "prefers low-pressure dating", "likes playful energy",
+      "is open about keeping it casual", "enjoys nightlife and quick connection", "wants attraction without confusion", "likes fast banter", "prefers going with the flow"
+    ];
+    const hobbies = [
+      "coffee walks", "live music", "morning workouts", "museum stops", "weekend road trips",
+      "bookstores", "rooftop dinners", "pickleball", "cooking at home", "photography",
+      "farmers markets", "concert nights", "trail runs", "vinyl collecting", "brunch spots"
+    ];
+
+    function buildBio(name, intent, index) {
+      const traitList = intent === "long_term" ? longTermTraits : casualTraits;
+      const hobbyA = hobbies[index % hobbies.length];
+      const hobbyB = hobbies[(index + 4) % hobbies.length];
+      return `${name} ${traitList[index % traitList.length]}, enjoys ${hobbyA} and ${hobbyB}, and wants dating to feel clear, respectful, and worth showing up for.`;
+    }
+
+    function createSeedUser(firstName, sex, index) {
+      const lastName = lastNames[index % lastNames.length];
+      const name = `${firstName} ${lastName}`;
+      const age = 24 + (index % 15);
+      const city = cities[index % cities.length];
+      const intent = index % 2 === 0 ? "long_term" : "casual";
+      const emailBase = `${firstName}.${lastName}.${index + 1}`.toLowerCase().replace(/[^a-z0-9.]/g, "");
+      const email = `${emailBase}@attract.local`;
+      const bio = buildBio(firstName, intent, index);
+      const user = createUser({
+        name,
+        email,
+        password: "demo1234",
+        sex,
+        age,
+        city,
+        intent,
+        bio,
+      });
       user.onboardingCompleted = true;
       user.onboardingStep = "complete";
+    }
+
+    const seedPool = [
+      ...femaleFirstNames.map((firstName, index) => ({ firstName, sex: "female", index })),
+      ...maleFirstNames.map((firstName, index) => ({ firstName, sex: "male", index: index + femaleFirstNames.length })),
+    ];
+
+    const availableSeeds = seedPool.filter((entry) => {
+      const lastName = lastNames[entry.index % lastNames.length];
+      const emailBase = `${entry.firstName}.${lastName}.${entry.index + 1}`.toLowerCase().replace(/[^a-z0-9.]/g, "");
+      const email = `${emailBase}@attract.local`;
+      return !state.users.some((user) => user.email === email);
     });
+
+    availableSeeds.slice(0, targetCount - state.users.length).forEach((entry) => {
+      createSeedUser(entry.firstName, entry.sex, entry.index);
+    });
+
     if (!state.currentUserId && state.users[0]) {
       state.currentUserId = state.users[0].id;
     }
@@ -658,9 +658,13 @@
     addDays,
     formatIntent,
     currentUser,
+    loggedInUser,
     getUser,
     setCurrentUser,
-    findUserByEmail,
+    setLoggedInUser,
+    isAuthenticated,
+    login,
+    logout,
     createUser,
     updateCurrentUserProfile,
     completeOnboarding,
@@ -670,10 +674,8 @@
     getActiveMatchForUser,
     getOtherUser,
     getLatestMatchForUser,
-    getMatchesForUser,
     recordSwipe,
     submitIntro,
-    setPlannedDate,
     confirmDate,
     submitDecision,
     unmatchCurrent,

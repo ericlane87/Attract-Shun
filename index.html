@@ -12,298 +12,121 @@
 <body data-page="landing">
   <header class="site-header">
     <div class="brand-lockup">
-      <p class="eyebrow" data-i18n="headerEyebrow">Intentional dating</p>
+      <p class="eyebrow">Intentional dating</p>
       <a class="brand" href="index.html" aria-label="ATTRACT Shun home">
         <img class="brand-logo" src="logo.svg" alt="ATTRACT Shun">
       </a>
     </div>
-    <div class="header-center-cta">
-      <button class="store-badge" id="ios-app-button" type="button">
-        <span class="store-icon apple-icon" aria-hidden="true"></span>
-        <span class="store-copy">
-          <span class="store-kicker" data-i18n="appIosKicker">Download for iOS</span>
-          <strong data-i18n="appIosLabel">from the App Store</strong>
-        </span>
-      </button>
-      <button class="store-badge" id="android-app-button" type="button">
-        <span class="store-icon play-icon" aria-hidden="true">
-          <span class="play-triangle"></span>
-        </span>
-        <span class="store-copy">
-          <span class="store-kicker" data-i18n="appAndroidKicker">Download for Android</span>
-          <strong data-i18n="appAndroidLabel">from Google Play</strong>
-        </span>
-      </button>
-    </div>
-    <div class="header-actions">
-      <div class="language-menu">
-        <button class="language-trigger" id="language-trigger" type="button" aria-expanded="false" onclick="window.toggleLanguageSheet && window.toggleLanguageSheet()">
-          <span class="language-globe" aria-hidden="true"></span>
-          <span class="language-trigger-label" data-i18n="languageShort">Language</span>
-          <span class="language-current" id="language-current">English</span>
-        </button>
-      </div>
-    </div>
-    <button class="menu-toggle" type="button" aria-label="Open menu" aria-expanded="false">
-      <span></span>
-      <span></span>
-      <span></span>
-    </button>
     <nav class="site-nav">
-      <a href="create-account.html" data-i18n="navCreate">Create Account</a>
-      <a href="sign-in.html" data-i18n="navSignIn">Sign In</a>
-      <a href="dashboard.html" data-i18n="navDashboard">Dashboard</a>
-      <a href="connections.html" data-i18n="navConnections">Connections</a>
-      <a href="browse.html" data-i18n="navBrowse">Browse</a>
-      <a href="match.html" data-i18n="navMatch">Match Flow</a>
-      <a href="reports.html" data-i18n="navSafety">Safety</a>
-      <a href="success.html" data-i18n="navStories">Stories</a>
-      <a href="settings.html" data-i18n="navSettings">Settings</a>
-      <a href="admin.html" data-i18n="navStudio">Studio</a>
+      <a href="login.html">Login</a>
+      <a href="onboarding.html">Onboarding</a>
+      <a href="dashboard.html">Dashboard</a>
+      <a href="browse.html">Browse</a>
+      <a href="match.html">Match</a>
+      <a href="reports.html">Reports</a>
+      <a href="success.html">Success</a>
+      <a href="settings.html">Settings</a>
+      <a href="admin.html">Admin</a>
     </nav>
   </header>
 
   <main class="page-shell">
     <section class="hero-panel hero-grid">
       <div>
-        <p class="eyebrow" data-i18n="heroEyebrow">Intentional dating, rethought</p>
+        <p class="eyebrow">Local-first production prototype</p>
         <img class="hero-logo" src="logo.svg" alt="ATTRACT Shun">
-        <div class="hero-badges">
-          <span class="feature-chip" data-i18n="badgeOneMatch">One live match</span>
-          <span class="feature-chip" data-i18n="badgeInterest">Interest scores</span>
-          <span class="feature-chip" data-i18n="badgeIntent">Intent-first dating</span>
-        </div>
-        <h1 data-i18n="heroTitle">One match at a time. Built for people who mean it.</h1>
-        <p class="hero-copy" data-i18n="heroCopy">
-          ATTRACT Shun is designed for focused dating. Intent-based pools, one live match, guided milestones,
-          and visible accountability keep attention on real connection instead of endless swiping.
+        <h1>One match at a time. Built for people who mean it.</h1>
+        <p class="hero-copy">
+          This front-end prototype enforces strict intent pools, a single active match and conversation,
+          guided intro-to-date milestones, and attract-or-shun outcomes, all stored locally for testing.
         </p>
         <div class="cta-row">
-          <a class="primary-link" href="create-account.html" data-i18n="ctaCreate">Create Your Profile</a>
-          <a class="ghost-link" href="sign-in.html" data-i18n="ctaSignIn">Sign In</a>
+          <a class="primary-link" href="login.html">Login To App</a>
+          <a class="ghost-link" href="admin.html">Create Users</a>
         </div>
       </div>
       <div class="hero-card">
-        <div class="live-indicator">
-          <span class="live-dot"></span>
-          <span data-i18n="systemLabel">Focused dating system</span>
+        <div class="mini-stat">
+          <span>Storage</span>
+          <strong>Browser local storage</strong>
         </div>
         <div class="mini-stat">
-          <span data-i18n="pillarFocusLabel">Focus</span>
-          <strong data-i18n="pillarFocusValue">One active match at a time</strong>
+          <span>Auth</span>
+          <strong>Mocked for prototype</strong>
         </div>
         <div class="mini-stat">
-          <span data-i18n="pillarIntentLabel">Intent</span>
-          <strong data-i18n="pillarIntentValue">Casual and long-term stay separate</strong>
+          <span>Payments</span>
+          <strong>Excluded</strong>
         </div>
         <div class="mini-stat">
-          <span data-i18n="pillarSignalLabel">Signal</span>
-          <strong data-i18n="pillarSignalValue">Every like carries a 1-10 interest score</strong>
-        </div>
-        <div class="mini-stat">
-          <span data-i18n="pillarMomentumLabel">Momentum</span>
-          <strong data-i18n="pillarMomentumValue">Matches move from intro to date to decision</strong>
-        </div>
-        <div class="hero-preview">
-          <div class="preview-card">
-            <div class="preview-top">
-              <span class="preview-name">Ava, 28</span>
-              <span class="preview-pill">8/10</span>
-            </div>
-            <p data-i18n="previewCopy">Intentional, calm, ready for a relationship with real follow-through.</p>
-          </div>
-          <div class="preview-track">
-            <div class="preview-node active"></div>
-            <div class="preview-line"></div>
-            <div class="preview-node"></div>
-            <div class="preview-line"></div>
-            <div class="preview-node"></div>
-          </div>
+          <span>Firebase</span>
+          <strong>Ready to plug later</strong>
         </div>
       </div>
     </section>
 
     <section class="section-grid">
       <article class="content-card">
-        <p class="card-kicker" data-i18n="coreRuleKicker">Core rule</p>
-        <h2 data-i18n="coreRuleTitle">Users can like many, but hold only one live match.</h2>
-        <p data-i18n="coreRuleCopy">
+        <p class="card-kicker">Core rule</p>
+        <h2>Users can like many, but hold only one live match.</h2>
+        <p>
           Incoming likes remain visible, but while a user is matched they cannot continue swiping or open new conversations.
         </p>
       </article>
       <article class="content-card">
-        <p class="card-kicker" data-i18n="intentKicker">Intent separated</p>
-        <h2 data-i18n="intentTitle">Casual and long-term pools never overlap.</h2>
-        <p data-i18n="intentCopy">
+        <p class="card-kicker">Intent separated</p>
+        <h2>Casual and long-term pools never overlap.</h2>
+        <p>
           Discovery candidates are strictly filtered by chosen intent so the product feels opinionated and clear.
         </p>
       </article>
       <article class="content-card">
-        <p class="card-kicker" data-i18n="signalKicker">Signal quality</p>
-        <h2 data-i18n="signalTitle">Every right swipe includes a 1 to 10 interest score.</h2>
-        <p data-i18n="signalCopy">
+        <p class="card-kicker">Signal quality</p>
+        <h2>Every right swipe includes a 1 to 10 interest score.</h2>
+        <p>
           Mutual matches can immediately see how strongly the other person was interested before investing energy.
         </p>
       </article>
     </section>
 
-    <section class="diagram-showcase">
-      <article class="diagram-card">
-        <div class="diagram-copy">
-          <p class="card-kicker" data-i18n="diagramOneKicker">How the system works</p>
-          <h2 data-i18n="diagramOneTitle">A relationship path people can understand in seconds.</h2>
-          <p data-i18n="diagramOneCopy">
-            Instead of hiding the rules behind features, ATTRACT Shun makes the process visible:
-            match, introduce, plan, decide. The structure itself becomes part of the product story.
-          </p>
-        </div>
-        <img class="diagram-image" src="flow-diagram.svg" alt="ATTRACT Shun flow diagram showing browse, match, intro, date, and attract or shun decision">
-      </article>
-      <article class="diagram-card">
-        <div class="diagram-copy">
-          <p class="card-kicker" data-i18n="diagramTwoKicker">What a journey looks like</p>
-          <h2 data-i18n="diagramTwoTitle">Show one connection moving from interest to outcome.</h2>
-          <p data-i18n="diagramTwoCopy">
-            For a non-technical audience, a visual walkthrough lands faster than feature lists. This
-            makes the product feel concrete and easy to imagine in use.
-          </p>
-        </div>
-        <img class="diagram-image" src="journey-visual.svg" alt="ATTRACT Shun journey visual showing two users matching and moving through the system">
-      </article>
-    </section>
-
     <section class="showcase">
       <div class="section-heading">
-        <p class="eyebrow" data-i18n="flowEyebrow">Product flow</p>
-        <h2 data-i18n="flowTitle">The screens stay focused because the rules do the explaining</h2>
+        <p class="eyebrow">Product flow</p>
+        <h2>Logical screens built as a real website flow</h2>
       </div>
       <div class="flow-grid">
         <article class="flow-step">
           <span>01</span>
-          <h3 data-i18n="flowOneTitle">Profile setup</h3>
-          <p data-i18n="flowOneCopy">Create your profile, lock in your intent, and shape who should appear in discovery.</p>
+          <h3>Admin setup</h3>
+          <p>Create users, seed demo data, switch active user, and simulate time.</p>
         </article>
         <article class="flow-step">
           <span>02</span>
-          <h3 data-i18n="flowTwoTitle">User dashboard</h3>
-          <p data-i18n="flowTwoCopy">Track your account status, next action, interest signals, and current relationship state.</p>
+          <h3>User dashboard</h3>
+          <p>After login, see account state, shun count, next required action, and engagement lock status.</p>
         </article>
         <article class="flow-step">
           <span>03</span>
-          <h3 data-i18n="flowThreeTitle">Browse and swipe</h3>
-          <p data-i18n="flowThreeCopy">Review candidates in the same pool, pass, or swipe right with a required interest score.</p>
+          <h3>Browse and swipe</h3>
+          <p>Review candidates in the same pool, pass, or swipe right with a required interest score.</p>
         </article>
         <article class="flow-step">
           <span>04</span>
-          <h3 data-i18n="flowFourTitle">Active match</h3>
-          <p data-i18n="flowFourCopy">Progress through intro video, date confirmation, chat, and attract-or-shun decision logic.</p>
+          <h3>Active match</h3>
+          <p>Progress through intro video, date confirmation, chat, and attract-or-shun decision logic.</p>
         </article>
         <article class="flow-step">
           <span>05</span>
-          <h3 data-i18n="flowFiveTitle">Trust and safety</h3>
-          <p data-i18n="flowFiveCopy">Use visible policy enforcement and structured reporting to reduce games, ghosting, and bad behavior.</p>
+          <h3>Trust and safety</h3>
+          <p>File reports, review moderation state, and keep policy enforcement visible inside the product.</p>
         </article>
         <article class="flow-step">
           <span>06</span>
-          <h3 data-i18n="flowSixTitle">Success and settings</h3>
-          <p data-i18n="flowSixCopy">Capture testimonials after attract outcomes and manage visibility, notifications, and discovery preferences.</p>
+          <h3>Success and settings</h3>
+          <p>Capture testimonials after attract outcomes and manage visibility, notifications, and discovery preferences.</p>
         </article>
       </div>
     </section>
-
-    <section class="spotlight-grid">
-      <article class="spotlight-card spotlight-primary">
-        <p class="card-kicker" data-i18n="spotlightOneKicker">Why it feels different</p>
-        <h2 data-i18n="spotlightOneTitle">Attention is earned here, not scattered.</h2>
-        <p data-i18n="spotlightOneCopy">
-          ATTRACT Shun removes the usual chaos of dating apps by forcing clarity. People know what they want,
-          express how strongly they are interested, and move through a visible relationship path with deadlines.
-        </p>
-      </article>
-      <article class="spotlight-card">
-        <p class="card-kicker" data-i18n="spotlightTwoKicker">Attract</p>
-        <h3 data-i18n="spotlightTwoTitle">Strong mutual interest becomes momentum.</h3>
-        <p data-i18n="spotlightTwoCopy">When both people lean in, the app rewards clarity and makes next steps feel simple.</p>
-      </article>
-      <article class="spotlight-card">
-        <p class="card-kicker" data-i18n="spotlightThreeKicker">Shun</p>
-        <h3 data-i18n="spotlightThreeTitle">Bad behavior leaves a visible signal.</h3>
-        <p data-i18n="spotlightThreeCopy">Ghosting, disrespect, and weak follow-through stop hiding behind infinite swiping.</p>
-      </article>
-    </section>
-
-    <footer class="site-footer">
-      <div class="footer-grid">
-        <div class="footer-lead">
-          <p class="eyebrow" data-i18n="footerLeadEyebrow">Built for clarity</p>
-          <h2 data-i18n="footerLeadTitle">A dating platform designed around focus, accountability, and real follow-through.</h2>
-          <p data-i18n="footerLeadCopy">ATTRACT Shun is built for people who want clearer intent, stronger signals, safer interactions, and a relationship path that does not hide behind endless swiping.</p>
-        </div>
-        <div class="footer-column">
-          <h3 data-i18n="footerLegal">Legal</h3>
-          <div class="footer-links">
-            <a href="#" data-i18n="footerPrivacy">Privacy</a>
-            <a href="#" data-i18n="footerConsumerPrivacy">Consumer Health Data Privacy Policy</a>
-            <a href="#" data-i18n="footerTerms">Terms</a>
-            <a href="#" data-i18n="footerCookies">Cookie Policy</a>
-            <a href="#" data-i18n="footerIP">Intellectual Property</a>
-            <a href="#" data-i18n="footerAccessibility">Accessibility Statement</a>
-          </div>
-        </div>
-        <div class="footer-column">
-          <h3 data-i18n="footerSupport">Support</h3>
-          <div class="footer-links">
-            <a href="#" data-i18n="footerSafetyPolicy">Safety Policy Information</a>
-            <a href="#" data-i18n="footerFAQ">FAQ</a>
-            <a href="#" data-i18n="footerPress">Press Room</a>
-            <a href="#" data-i18n="footerContact">Contact</a>
-            <a href="#" data-i18n="footerGiftCards">Gift Cards</a>
-            <a href="#" data-i18n="footerPromo">Promo Code</a>
-          </div>
-        </div>
-        <div class="footer-column">
-          <h3 data-i18n="footerSocial">Social</h3>
-          <div class="footer-links">
-            <a href="#">Instagram</a>
-            <a href="#">TikTok</a>
-            <a href="#">YouTube</a>
-            <a href="#">X / Twitter</a>
-            <a href="#">Facebook</a>
-            <a href="#" data-i18n="footerTechBlog">Tech Blog</a>
-          </div>
-        </div>
-        <div class="footer-column">
-          <h3 data-i18n="footerGetApp">Get the app</h3>
-          <div class="footer-links">
-            <a href="#" data-i18n="footerIOS">Download for iOS from the App Store</a>
-            <a href="#" data-i18n="footerAndroid">Download for Android from Google Play</a>
-            <a href="#" data-i18n="footerCareers">Careers</a>
-            <a href="#" data-i18n="footerCareersPortal">Careers Portal</a>
-            <a href="#" data-i18n="footerDestinations">Destinations</a>
-          </div>
-        </div>
-      </div>
-      <div class="footer-bottom">
-        <p data-i18n="footerRights">© 2026 ATTRACT Shun. All rights reserved.</p>
-      </div>
-    </footer>
   </main>
-  <div class="language-sheet" id="language-sheet" hidden>
-    <div class="language-sheet-backdrop" id="language-sheet-backdrop"></div>
-    <div class="language-sheet-card" role="dialog" aria-modal="true" aria-labelledby="language-sheet-title">
-      <div class="language-sheet-head">
-        <h3 id="language-sheet-title">Choose a language</h3>
-        <button class="modal-close" id="language-sheet-close" type="button" aria-label="Close" onclick="window.closeLanguageSheet && window.closeLanguageSheet()">&times;</button>
-      </div>
-      <div class="language-sheet-body">
-        <button class="ghost-button language-option-button" type="button" onclick="window.setSiteLanguage && window.setSiteLanguage('en')">English</button>
-        <button class="ghost-button language-option-button" type="button" onclick="window.setSiteLanguage && window.setSiteLanguage('es')">Español</button>
-        <button class="ghost-button language-option-button" type="button" onclick="window.setSiteLanguage && window.setSiteLanguage('fr')">Français</button>
-        <button class="ghost-button language-option-button" type="button" onclick="window.setSiteLanguage && window.setSiteLanguage('pt')">Português</button>
-      </div>
-    </div>
-  </div>
-  <script src="shared.js"></script>
-  <script src="index.js"></script>
 </body>
 </html>

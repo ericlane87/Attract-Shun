@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login | Attract / Shun</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body data-page="login">
+  <header class="site-header">
+    <div class="brand-lockup">
+      <p class="eyebrow">Intentional dating</p>
+      <a class="brand" href="index.html" aria-label="ATTRACT Shun home">
+        <img class="brand-logo" src="logo.svg" alt="ATTRACT Shun">
+      </a>
+    </div>
+    <nav class="site-nav">
+      <a href="login.html">Login</a>
+      <a href="admin.html">Admin</a>
+    </nav>
+  </header>
+
+  <main class="page-shell">
+    <section class="auth-shell">
+      <article class="panel-card auth-panel">
+        <div class="page-intro auth-intro">
+          <div>
+            <p class="eyebrow">Sign in</p>
+            <h1>Enter the app through a real login screen</h1>
+          </div>
+        </div>
+
+        <form id="login-form" class="stack">
+          <label class="field">
+            <span>Email or full name</span>
+            <input name="identifier" type="text" autocomplete="username" placeholder="ava@attract.local" required>
+          </label>
+          <label class="field">
+            <span>Password</span>
+            <input name="password" type="password" autocomplete="current-password" placeholder="demo1234" required>
+          </label>
+          <div id="login-error" class="auth-error" hidden></div>
+          <button class="primary-button" type="submit">Login</button>
+        </form>
+
+        <div class="hint-box">
+          Demo accounts use password <strong>demo1234</strong>. Create or manage users in <a href="admin.html">Admin</a>.
+        </div>
+      </article>
+
+      <article class="panel-card auth-panel">
+        <div class="panel-head">
+          <h2>Quick login</h2>
+          <span class="pill">Local prototype</span>
+        </div>
+        <div id="quick-login-list" class="stack"></div>
+      </article>
+    </section>
+  </main>
+
+  <script src="data.js"></script>
+  <script src="login.js"></script>
+</body>
+</html>

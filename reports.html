@@ -17,22 +17,16 @@
         <img class="brand-logo" src="logo.svg" alt="ATTRACT Shun">
       </a>
     </div>
-    <button class="menu-toggle" type="button" aria-label="Open menu" aria-expanded="false">
-      <span></span>
-      <span></span>
-      <span></span>
-    </button>
     <nav class="site-nav">
-      <a href="create-account.html">Create Account</a>
-      <a href="sign-in.html">Sign In</a>
+      <a href="login.html">Login</a>
+      <a href="onboarding.html">Onboarding</a>
       <a href="dashboard.html">Dashboard</a>
-      <a href="connections.html">Connections</a>
       <a href="browse.html">Browse</a>
-      <a href="match.html">Match Flow</a>
-      <a href="reports.html">Safety</a>
-      <a href="success.html">Stories</a>
+      <a href="match.html">Match</a>
+      <a href="reports.html">Reports</a>
+      <a href="success.html">Success</a>
       <a href="settings.html">Settings</a>
-      <a href="admin.html">Studio</a>
+      <a href="admin.html">Admin</a>
     </nav>
   </header>
 
@@ -41,7 +35,6 @@
       <div>
         <p class="eyebrow">Trust and safety</p>
         <h1>Reports, policy, and moderation state</h1>
-        <p class="page-intro-copy">Safety is visible, structured, and part of the product experience instead of being buried behind support screens.</p>
       </div>
       <div class="info-chip" id="reports-user-chip"></div>
     </section>
@@ -79,7 +72,7 @@
         </div>
         <div class="list-stack">
           <div class="summary-card">Zero tolerance for verified sexual harassment.</div>
-          <div class="summary-card">Identity verification is part of the account trust model for all active profiles.</div>
+          <div class="summary-card">Identity verification is assumed for all active profiles in this prototype.</div>
           <div class="summary-card">Misleading info, ghosting, and disrespect can lead to shun marks or account action.</div>
         </div>
       </article>
@@ -103,6 +96,8 @@
   </main>
 
   <script src="data.js"></script>
+  <script src="auth.js"></script>
+  <script>AppAuth.protectPage();</script>
   <script src="shared.js"></script>
   <script src="reports.js"></script>
 </body>

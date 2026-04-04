@@ -26,7 +26,7 @@
       <div class="profile-top">
         <div>
           <p class="profile-name">${user.name}, ${user.age}</p>
-          <p class="profile-meta">${user.city} · ${AppData.formatIntent(user.intent)} · ${user.verified ? "ID verified" : "Unverified"}</p>
+          <p class="profile-meta">${user.city} · ${user.sex || "Unspecified"} · ${AppData.formatIntent(user.intent)} · ${user.verified ? "ID verified" : "Unverified"}</p>
         </div>
         <div class="avatar">${initials(user.name)}</div>
       </div>
@@ -35,6 +35,7 @@
         <span class="status-pill">${activeMatch ? "Matched" : "Available"}</span>
         <span class="heart-badge">Shun ${user.shunCount}</span>
       </div>
+      <p class="small-copy">${user.email || "No login email assigned."}</p>
     `;
   }
 
@@ -63,167 +64,36 @@
     if (el) el.textContent = text;
   }
 
-  function injectExperienceRibbon() {
-    const pageShell = document.querySelector(".page-shell");
-    const siteHeader = document.querySelector(".site-header");
-    if (!pageShell || !siteHeader || document.getElementById("experience-ribbon")) return;
-
-    const user = AppData.currentUser();
-    const activeMatch = user ? AppData.getActiveMatchForUser(user.id) : null;
-    const ribbon = document.createElement("section");
-    ribbon.id = "experience-ribbon";
-    ribbon.className = "experience-ribbon";
-
-    ribbon.innerHTML = user
-      ? `
-        <div class="ribbon-main">
-          <div class="ribbon-avatar">${initials(user.name)}</div>
-          <div>
-            <p class="ribbon-title">${user.name}</p>
-            <p class="ribbon-copy">${AppData.formatIntent(user.intent)} pool · ${activeMatch ? "Active match in progress" : "Available to browse"}</p>
-          </div>
-        </div>
-        <div class="ribbon-actions">
-          <a class="ghost-link" href="dashboard.html">Overview</a>
-          <a class="ghost-link" href="browse.html">Browse</a>
-          <a class="ghost-link" href="match.html">Match Flow</a>
-        </div>
-      `
-      : `
-        <div class="ribbon-main">
-          <div>
-            <p class="ribbon-title">No active profile selected</p>
-            <p class="ribbon-copy">Create a profile to enter the pool, or use Studio to switch demo users and shape the experience.</p>
-          </div>
-        </div>
-        <div class="ribbon-actions">
-          <a class="ghost-link" href="admin.html">Open Studio</a>
-        </div>
-      `;
-
-    pageShell.insertBefore(ribbon, pageShell.firstChild);
-  }
-
-  function initHamburgerMenu() {
+  function initSessionControls() {
     const nav = document.querySelector(".site-nav");
-    const toggle = document.querySelector(".menu-toggle");
-    if (!nav || !toggle) return;
-
-    function closeMenu() {
-      document.body.classList.remove("menu-open");
-      toggle.setAttribute("aria-expanded", "false");
+    if (!nav || !window.AppAuth || !AppData.isAuthenticated()) return;
+    if (!nav.querySelector("[data-messages-link]")) {
+      const messagesLink = document.createElement("a");
+      messagesLink.href = "messages.html";
+      messagesLink.dataset.messagesLink = "true";
+      messagesLink.textContent = "Messages";
+      nav.appendChild(messagesLink);
     }
 
-    toggle.addEventListener("click", () => {
-      const opening = !document.body.classList.contains("menu-open");
-      document.body.classList.toggle("menu-open", opening);
-      toggle.setAttribute("aria-expanded", opening ? "true" : "false");
-    });
-
-    nav.querySelectorAll("a").forEach((link) => link.addEventListener("click", closeMenu));
-    document.addEventListener("keydown", (event) => {
-      if (event.key === "Escape") closeMenu();
-    });
-  }
-
-  function ensureOverlayRoot() {
-    let root = document.getElementById("ui-overlay-root");
-    if (!root) {
-      root = document.createElement("div");
-      root.id = "ui-overlay-root";
-      document.body.appendChild(root);
+    if (!nav.querySelector("[data-likes-link]")) {
+      const likesLink = document.createElement("a");
+      likesLink.href = "likes.html";
+      likesLink.dataset.likesLink = "true";
+      likesLink.textContent = "Likes";
+      nav.appendChild(likesLink);
     }
-    return root;
-  }
 
-  function closeModal() {
-    const root = ensureOverlayRoot();
-    root.innerHTML = "";
-  }
+    if (nav.querySelector("[data-logout-button]")) return;
 
-  function showModal(options) {
-    const root = ensureOverlayRoot();
-    root.innerHTML = `
-      <div class="modal-backdrop">
-        <div class="modal-card">
-          <div class="modal-head">
-            <h3>${options.title || "Notice"}</h3>
-            <button class="modal-close" type="button" aria-label="Close">&times;</button>
-          </div>
-          <div class="modal-body">${options.body || ""}</div>
-          <div class="modal-actions">
-            ${options.secondaryLabel ? `<button class="ghost-button" type="button" data-modal-action="secondary">${options.secondaryLabel}</button>` : ""}
-            <button class="${options.primaryClass || "primary-button"}" type="button" data-modal-action="primary">${options.primaryLabel || "Continue"}</button>
-          </div>
-        </div>
-      </div>
-    `;
-
-    root.querySelector(".modal-close")?.addEventListener("click", closeModal);
-    root.querySelector(".modal-backdrop")?.addEventListener("click", (event) => {
-      if (event.target.classList.contains("modal-backdrop")) {
-        closeModal();
-      }
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "ghost-button nav-button";
+    button.dataset.logoutButton = "true";
+    button.textContent = "Logout";
+    button.addEventListener("click", () => {
+      window.AppAuth.logoutAndRedirect();
     });
-    root.querySelector("[data-modal-action='secondary']")?.addEventListener("click", () => {
-      closeModal();
-      if (options.onSecondary) options.onSecondary();
-    });
-    root.querySelector("[data-modal-action='primary']")?.addEventListener("click", () => {
-      closeModal();
-      if (options.onPrimary) options.onPrimary();
-    });
-  }
-
-  function confirmAction(options) {
-    showModal({
-      title: options.title,
-      body: options.body,
-      primaryLabel: options.primaryLabel || "Confirm",
-      secondaryLabel: options.secondaryLabel || "Cancel",
-      primaryClass: options.primaryClass || "primary-button",
-      onPrimary: options.onConfirm,
-      onSecondary: options.onCancel,
-    });
-  }
-
-  function showToast(message) {
-    const root = ensureOverlayRoot();
-    const toast = document.createElement("div");
-    toast.className = "toast";
-    toast.textContent = message;
-    root.appendChild(toast);
-    requestAnimationFrame(() => toast.classList.add("visible"));
-    setTimeout(() => {
-      toast.classList.remove("visible");
-      setTimeout(() => toast.remove(), 220);
-    }, 2200);
-  }
-
-  function renderEntryState(options) {
-    return `
-      <div class="entry-state">
-        <div class="entry-state-copy">
-          <p class="entry-kicker">${options.kicker || "Get started"}</p>
-          <h3>${options.title}</h3>
-          <p>${options.copy}</p>
-        </div>
-        ${options.steps && options.steps.length ? `
-          <div class="entry-steps">
-            ${options.steps.map((step, index) => `
-              <div class="entry-step">
-                <span>${index + 1}</span>
-                <strong>${step}</strong>
-              </div>
-            `).join("")}
-          </div>
-        ` : ""}
-        <div class="cta-row">
-          <a class="primary-link" href="${options.primaryHref || "create-account.html"}">${options.primaryLabel || "Create Account"}</a>
-          ${options.secondaryHref ? `<a class="ghost-link" href="${options.secondaryHref}">${options.secondaryLabel || "View Demo Profiles"}</a>` : ""}
-        </div>
-      </div>
-    `;
+    nav.appendChild(button);
   }
 
   window.AppUI = {
@@ -233,13 +103,8 @@
     renderUserSummaryCard,
     renderLikeList,
     setPageChip,
-    injectExperienceRibbon,
-    showModal,
-    closeModal,
-    confirmAction,
-    showToast,
-    renderEntryState,
+    initSessionControls,
   };
 
-  initHamburgerMenu();
+  initSessionControls();
 })();

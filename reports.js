@@ -3,7 +3,6 @@
   const AppUI = window.AppUI;
   const user = AppData.currentUser();
 
-  AppUI.injectExperienceRibbon();
   AppUI.setPageChip("reports-user-chip", user ? `Reporting as ${user.name}` : "No active user");
 
   const form = document.getElementById("report-form");
@@ -13,16 +12,8 @@
 
   if (!user) {
     form.innerHTML = "";
-    historyEl.innerHTML = AppUI.renderEntryState({
-      kicker: "Trust and safety",
-      title: "Reports appear after connections exist",
-      copy: "Safety tools become relevant once accounts are matching and interacting through the app.",
-      primaryHref: "create-account.html",
-      primaryLabel: "Create Account",
-      secondaryHref: "admin.html",
-      secondaryLabel: "View Demo Profiles",
-    });
-    queueEl.innerHTML = `<div class="empty-state">Moderation items will appear here once reports are submitted.</div>`;
+    historyEl.innerHTML = `<div class="empty-state">Open <a href="admin.html">Admin</a> to create a user first.</div>`;
+    queueEl.innerHTML = `<div class="empty-state">No active user.</div>`;
     return;
   }
 
@@ -52,8 +43,7 @@
       category: formData.get("category"),
       details: formData.get("details"),
     });
-    AppUI.showToast("Report submitted for review.");
-    setTimeout(() => location.reload(), 350);
+    location.reload();
   });
 
   const history = AppData.getReportsForUser(user.id);
@@ -99,10 +89,9 @@
     queueEl.querySelectorAll("button[data-id]").forEach((button) => {
       button.addEventListener("click", () => {
         const status = button.dataset.action;
-        const resolution = status === "actioned" ? "Admin action applied." : "Dismissed after review.";
+        const resolution = status === "actioned" ? "Admin action applied in local prototype." : "Dismissed in local prototype.";
         AppData.updateReportStatus(button.dataset.id, status, resolution);
-        AppUI.showToast(status === "actioned" ? "Report actioned." : "Report dismissed.");
-        setTimeout(() => location.reload(), 350);
+        location.reload();
       });
     });
   }

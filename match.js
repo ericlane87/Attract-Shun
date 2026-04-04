@@ -3,64 +3,14 @@
   const AppUI = window.AppUI;
 
   const user = AppData.currentUser();
-  AppUI.injectExperienceRibbon();
   AppUI.setPageChip("match-user-chip", user ? `Matching as ${user.name}` : "No active user");
 
   const matchPanel = document.getElementById("match-panel");
   const chatPanel = document.getElementById("chat-panel");
 
-  function renderMessages(messages, otherUser) {
-    const log = document.getElementById("chat-log");
-    if (!log) return;
-    log.innerHTML = "";
-
-    if (!messages.length) {
-      log.innerHTML = `
-        <div class="empty-state">No messages yet. Start the conversation with intention.</div>
-        <div class="prompt-row">
-          <button class="prompt-chip" type="button" data-prompt="What made you interested in my profile?">Why were you interested?</button>
-          <button class="prompt-chip" type="button" data-prompt="What kind of connection are you hoping for here?">What are you looking for?</button>
-          <button class="prompt-chip" type="button" data-prompt="What would your ideal first date look like?">Ideal first date?</button>
-        </div>
-      `;
-
-      log.querySelectorAll("[data-prompt]").forEach((button) => {
-        button.addEventListener("click", () => {
-          document.getElementById("chat-input").value = button.dataset.prompt;
-          document.getElementById("chat-input").focus();
-        });
-      });
-      return;
-    }
-
-    messages.forEach((message) => {
-      const messageEl = document.createElement("div");
-      messageEl.className = `chat-message${message.senderId === user.id ? " mine" : ""}`;
-      messageEl.innerHTML = `
-        <div class="chat-bubble">
-          <strong>${message.senderId === user.id ? "You" : otherUser.name}</strong>
-          <div>${message.text}</div>
-          <div class="small-copy">${new Date(message.createdAt).toLocaleString()}</div>
-        </div>
-      `;
-      log.appendChild(messageEl);
-    });
-
-    log.scrollTop = log.scrollHeight;
-  }
-
   if (!user) {
-    matchPanel.innerHTML = AppUI.renderEntryState({
-      kicker: "Live match",
-      title: "Your match flow starts after connection",
-      copy: "Create an account, browse, and match with someone to unlock the guided intro, date, and decision flow.",
-      steps: ["Create account", "Browse", "Match", "Start conversation"],
-      primaryHref: "create-account.html",
-      primaryLabel: "Create Account",
-      secondaryHref: "browse.html",
-      secondaryLabel: "See Browse",
-    });
-    chatPanel.innerHTML = `<div class="empty-state">The conversation area opens once you have an active match.</div>`;
+    matchPanel.innerHTML = `<div class="empty-state">Open <a href="admin.html">Admin</a> and create or seed users first.</div>`;
+    chatPanel.innerHTML = `<div class="empty-state">No active user.</div>`;
     return;
   }
 
@@ -90,24 +40,11 @@
 
   const otherUser = AppData.getOtherUser(match, user.id);
   const myIntro = Boolean(match.introVideos[user.id]);
-  const myPlannedDate = match.plannedDateBy[user.id] || "";
-  const otherPlannedDate = match.plannedDateBy[otherUser.id] || "";
-  const agreedDate = match.agreedDate;
-  const myDateConfirm = match.dateOccurredBy.includes(user.id);
+  const myDateConfirm = match.dateConfirmedBy.includes(user.id);
   const myDecision = match.decisions[user.id];
-  const phaseSummary = match.status === "pending_intro"
-    ? "Both people need to introduce themselves before the match can advance."
-    : match.status === "date_planning"
-      ? "This stage is about agreeing on the same date, then confirming the date happened."
-      : "Both people now choose whether this becomes Attract or Shun.";
-  const messages = AppData.getMessages(match.id);
 
   matchPanel.innerHTML = `
     <div class="match-card">
-      <div class="profile-rail">
-        <span class="rail-pill">One live connection</span>
-        <span class="rail-pill">${messages.length || 0} messages</span>
-      </div>
       <div class="profile-top">
         <div>
           <p class="profile-name">${otherUser.name}</p>
@@ -115,13 +52,6 @@
         </div>
         <span class="status-pill">${match.status.replace("_", " ")}</span>
       </div>
-      <div class="journey-card compact">
-        <div class="journey-step ${["pending_intro","date_planning","decision_window"].includes(match.status) ? "done" : ""}"><span>1</span><strong>Match</strong></div>
-        <div class="journey-step ${match.status === "pending_intro" ? "active" : ["date_planning","decision_window"].includes(match.status) ? "done" : ""}"><span>2</span><strong>Intro</strong></div>
-        <div class="journey-step ${match.status === "date_planning" ? "active" : match.status === "decision_window" ? "done" : ""}"><span>3</span><strong>Date</strong></div>
-        <div class="journey-step ${match.status === "decision_window" ? "active" : ""}"><span>4</span><strong>Decision</strong></div>
-      </div>
-      <div class="hint-box">${phaseSummary}</div>
       <div class="timeline">
         <div class="timeline-row ${match.status === "pending_intro" ? "active" : myIntro ? "done" : ""}">
           <div>
@@ -133,24 +63,9 @@
         <div class="timeline-row ${match.status === "date_planning" ? "active" : myDateConfirm ? "done" : ""}">
           <div>
             <strong>Plan first date</strong>
-            <div class="small-copy">Pick the same date by ${AppUI.formatDate(match.dateDeadline)}. Once both dates match, confirm that the date happened.</div>
+            <div class="small-copy">Confirm the date and mock photo verification by ${AppUI.formatDate(match.dateDeadline)}.</div>
           </div>
-          <div class="inline-action-row">
-            <input id="date-input" type="date" value="${myPlannedDate}" ${match.status !== "date_planning" ? "disabled" : ""}>
-            <button id="date-save-btn" class="ghost-button" type="button" ${match.status !== "date_planning" ? "disabled" : ""}>Save Date</button>
-          </div>
-        </div>
-        <div class="summary-card compact-card">
-          <p class="profile-name">Date alignment</p>
-          <p class="profile-meta">You: ${myPlannedDate || "Not set"} · ${otherUser.name}: ${otherPlannedDate || "Not set"}</p>
-          <p class="small-copy">${agreedDate ? `Both of you aligned on ${agreedDate}.` : "Once both people select the same date, the confirmation button unlocks."}</p>
-        </div>
-        <div class="timeline-row ${match.status === "date_planning" && agreedDate ? "active" : myDateConfirm ? "done" : ""}">
-          <div>
-            <strong>Confirm the date happened</strong>
-            <div class="small-copy">Both people confirm the date happened before the decision step opens.</div>
-          </div>
-          <button id="date-btn" class="ghost-button" type="button" ${(myDateConfirm || match.status !== "date_planning" || !agreedDate) ? "disabled" : ""}>${myDateConfirm ? "Confirmed" : "Confirm Date Happened"}</button>
+          <button id="date-btn" class="ghost-button" type="button" ${myDateConfirm || match.status !== "date_planning" ? "disabled" : ""}>${myDateConfirm ? "Confirmed" : "Confirm Date"}</button>
         </div>
         <div class="timeline-row ${match.status === "decision_window" ? "active" : myDecision ? "done" : ""}">
           <div>
@@ -171,44 +86,20 @@
   if (document.getElementById("intro-btn")) {
     document.getElementById("intro-btn").addEventListener("click", () => {
       AppData.submitIntro(match.id, user.id);
-      AppUI.showToast("Introduction submitted.");
-      setTimeout(() => location.reload(), 350);
-    });
-  }
-
-  if (document.getElementById("date-save-btn")) {
-    document.getElementById("date-save-btn").addEventListener("click", () => {
-      const value = document.getElementById("date-input").value;
-      if (!value) {
-        AppUI.showToast("Choose a date first.");
-        return;
-      }
-      AppData.setPlannedDate(match.id, user.id, value);
-      AppUI.showToast("Date saved.");
-      setTimeout(() => location.reload(), 350);
+      location.reload();
     });
   }
 
   if (document.getElementById("date-btn")) {
     document.getElementById("date-btn").addEventListener("click", () => {
       AppData.confirmDate(match.id, user.id);
-      AppUI.showToast("Date confirmation saved.");
-      setTimeout(() => location.reload(), 350);
+      location.reload();
     });
   }
 
   document.getElementById("unmatch-btn").addEventListener("click", () => {
-    AppUI.confirmAction({
-      title: "End this match?",
-      body: "<p>This closes the current connection and applies the configured shun logic.</p>",
-      primaryLabel: "End Match",
-      primaryClass: "danger-button",
-      onConfirm: () => {
-        AppData.unmatchCurrent(user.id);
-        AppUI.showToast("Match ended.");
-        setTimeout(() => location.reload(), 350);
-      },
-    });
+    AppData.unmatchCurrent(user.id);
+    location.reload();
   });
 
   if (match.status === "decision_window") {
@@ -220,27 +111,25 @@
     `;
     document.getElementById("attract-btn").addEventListener("click", () => {
       AppData.submitDecision(match.id, user.id, "attract");
-      AppUI.showToast("Attract decision saved.");
-      setTimeout(() => location.reload(), 350);
+      location.reload();
     });
     document.getElementById("fit-btn").addEventListener("click", () => {
       AppData.submitDecision(match.id, user.id, "not_a_fit");
-      AppUI.showToast("Decision saved.");
-      setTimeout(() => location.reload(), 350);
+      location.reload();
     });
     document.getElementById("shun-btn").addEventListener("click", () => {
       AppData.submitDecision(match.id, user.id, "shun");
-      AppUI.showToast("Shun decision saved.");
-      setTimeout(() => location.reload(), 350);
+      location.reload();
     });
   }
 
+  const messages = AppData.getMessages(match.id);
   chatPanel.innerHTML = `
     <div class="chat-wrap">
       <div class="chat-head">
         <div>
           <p class="profile-name">${otherUser.name}</p>
-          <p class="profile-meta">The only active conversation for this account.</p>
+          <p class="profile-meta">This is the only active conversation this user can hold.</p>
         </div>
         <span class="status-pill">${messages.length} messages</span>
       </div>
@@ -252,15 +141,28 @@
     </div>
   `;
 
-  renderMessages(messages, otherUser);
+  const log = document.getElementById("chat-log");
+  if (!messages.length) {
+    log.innerHTML = `<div class="empty-state">No messages yet. Start the conversation.</div>`;
+  } else {
+    messages.forEach((message) => {
+      const messageEl = document.createElement("div");
+      messageEl.className = `chat-message${message.senderId === user.id ? " mine" : ""}`;
+      messageEl.innerHTML = `
+        <div class="chat-bubble">
+          <strong>${message.senderId === user.id ? "You" : otherUser.name}</strong>
+          <div>${message.text}</div>
+          <div class="small-copy">${new Date(message.createdAt).toLocaleString()}</div>
+        </div>
+      `;
+      log.appendChild(messageEl);
+    });
+  }
 
   document.getElementById("chat-form").addEventListener("submit", (event) => {
     event.preventDefault();
     const input = document.getElementById("chat-input");
-    const nextValue = input.value.trim();
-    if (!nextValue) return;
-    AppData.sendMessage(match.id, user.id, nextValue);
-    input.value = "";
-    renderMessages(AppData.getMessages(match.id), otherUser);
+    AppData.sendMessage(match.id, user.id, input.value);
+    location.reload();
   });
 })();

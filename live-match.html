@@ -3,13 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Match | Attract / Shun</title>
+  <title>Live Match | Attract / Shun</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
 </head>
-<body data-page="match">
+<body data-page="live-match">
   <header class="site-header">
     <div class="brand-lockup">
       <p class="eyebrow">Intentional dating</p>
@@ -21,7 +21,8 @@
       <a href="login.html">Login</a>
       <a href="onboarding.html">Onboarding</a>
       <a href="dashboard.html">Dashboard</a>
-      <a href="browse.html">Browse</a>
+      <a href="find-match.html">Find A Match</a>
+      <a href="live-match.html">Live Match</a>
       <a href="match.html">Match</a>
       <a href="reports.html">Reports</a>
       <a href="success.html">Success</a>
@@ -33,25 +34,21 @@
   <main class="page-shell">
     <section class="page-intro">
       <div>
-        <p class="eyebrow">Active match</p>
-        <h1>Manage the live relationship workflow</h1>
+        <p class="eyebrow">Live Match</p>
+        <h1>Live Match will be defined next</h1>
       </div>
-      <div class="info-chip" id="match-user-chip"></div>
     </section>
 
     <section class="dashboard-grid">
       <article class="panel-card">
-        <div class="panel-head">
-          <h2>Checklist and outcome</h2>
+        <div class="summary-card">
+          <p class="profile-name">Live Match placeholder</p>
+          <p class="profile-meta">This route is set up and ready for the live-match flow you want to explain later.</p>
+          <div class="cta-row">
+            <a class="primary-link" href="find-match.html">Open Find A Match</a>
+            <a class="ghost-link" href="dashboard.html">Back To Dashboard</a>
+          </div>
         </div>
-        <div id="match-panel"></div>
-      </article>
-
-      <article class="panel-card">
-        <div class="panel-head">
-          <h2>Conversation</h2>
-        </div>
-        <div id="chat-panel"></div>
       </article>
     </section>
   </main>
@@ -60,6 +57,5 @@
   <script src="auth.js"></script>
   <script>AppAuth.protectPage();</script>
   <script src="shared.js"></script>
-  <script src="match.js"></script>
 </body>
 </html>

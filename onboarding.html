@@ -17,31 +17,24 @@
         <img class="brand-logo" src="logo.svg" alt="ATTRACT Shun">
       </a>
     </div>
-    <button class="menu-toggle" type="button" aria-label="Open menu" aria-expanded="false">
-      <span></span>
-      <span></span>
-      <span></span>
-    </button>
     <nav class="site-nav">
-      <a href="create-account.html">Create Account</a>
-      <a href="sign-in.html">Sign In</a>
+      <a href="login.html">Login</a>
+      <a href="onboarding.html">Onboarding</a>
       <a href="dashboard.html">Dashboard</a>
-      <a href="connections.html">Connections</a>
       <a href="browse.html">Browse</a>
-      <a href="match.html">Match Flow</a>
-      <a href="reports.html">Safety</a>
-      <a href="success.html">Stories</a>
+      <a href="match.html">Match</a>
+      <a href="reports.html">Reports</a>
+      <a href="success.html">Success</a>
       <a href="settings.html">Settings</a>
-      <a href="admin.html">Studio</a>
+      <a href="admin.html">Admin</a>
     </nav>
   </header>
 
   <main class="page-shell">
     <section class="page-intro">
       <div>
-        <p class="eyebrow">Profile setup</p>
-        <h1>Build the profile people actually match against</h1>
-        <p class="page-intro-copy">The basics from account creation appear here first. Finish the profile with photos, bio, location, lifestyle details, and structured deal makers and deal breakers.</p>
+        <p class="eyebrow">Onboarding</p>
+        <h1>Complete a realistic first-run setup</h1>
       </div>
       <div class="info-chip" id="onboarding-user-chip"></div>
     </section>
@@ -56,230 +49,47 @@
 
       <article class="panel-card">
         <div class="panel-head">
-          <h2>Complete profile</h2>
+          <h2>Finish onboarding</h2>
         </div>
-        <form id="onboarding-form" class="stack profile-builder">
-          <section class="builder-section">
-            <div class="section-head">
-              <h3>Basics</h3>
-              <p class="small-copy">These values were started during account creation and can still be refined here.</p>
-            </div>
-            <div class="two-col">
-              <label class="field">
-                <span>Name</span>
-                <input name="name" type="text" maxlength="40" required>
-              </label>
-              <label class="field">
-                <span>Email</span>
-                <input name="email" type="email" maxlength="80" required>
-              </label>
-            </div>
-            <div class="three-col">
-              <label class="field">
-                <span>Age</span>
-                <input name="age" type="number" min="18" max="99" required>
-              </label>
-              <label class="field">
-                <span>Dating intent</span>
-                <select name="intent" required>
-                  <option value="long_term">Long term</option>
-                  <option value="casual">Casual</option>
-                </select>
-              </label>
-              <label class="field">
-                <span>Gender</span>
-                <select name="gender" required>
-                  <option value="woman">Woman</option>
-                  <option value="man">Man</option>
-                  <option value="non_binary">Non-binary</option>
-                </select>
-              </label>
-            </div>
+        <form id="onboarding-form" class="stack">
+          <label class="field">
+            <span>Dating intent</span>
+            <select name="intent" required>
+              <option value="long_term">Long term</option>
+              <option value="casual">Casual</option>
+            </select>
+          </label>
+          <label class="field">
+            <span>Bio</span>
+            <textarea name="bio" rows="5" maxlength="240" required></textarea>
+          </label>
+          <div class="three-col">
             <label class="field">
-              <span>Looking for</span>
-              <select name="lookingFor" required>
-                <option value="woman">Women</option>
-                <option value="man">Men</option>
-                <option value="non_binary">Non-binary people</option>
-                <option value="everyone">Everyone</option>
-              </select>
+              <span>Min age</span>
+              <input name="minAge" type="number" min="18" max="99" required>
             </label>
-          </section>
-
-          <section class="builder-section">
-            <div class="section-head">
-              <h3>Location</h3>
-              <p class="small-copy">This comes from the browser and cannot be edited manually.</p>
-            </div>
-            <div class="location-lockup">
-              <label class="field">
-                <span>Current location</span>
-                <input id="location-label" name="locationLabel" type="text" readonly required>
-              </label>
-              <button class="ghost-button" id="detect-location-button" type="button">Use Browser Location</button>
-            </div>
-            <p class="inline-note" id="location-status">We use the browser location to lock this profile to a real area.</p>
-          </section>
-
-          <section class="builder-section">
-            <div class="section-head">
-              <h3>Profile details</h3>
-              <p class="small-copy">These are the structured details we can later use for better matching logic.</p>
-            </div>
-            <div class="three-col">
-              <label class="field">
-                <span>Zodiac sign</span>
-                <select name="zodiacSign" id="zodiac-sign-select" required></select>
-              </label>
-              <label class="field">
-                <span>Height</span>
-                <select name="heightInches" id="height-select" required></select>
-              </label>
-              <label class="field">
-                <span>Race</span>
-                <select name="race" required>
-                  <option value="Prefer not to say">Prefer not to say</option>
-                  <option value="Black">Black</option>
-                  <option value="White">White</option>
-                  <option value="Latino">Latino</option>
-                  <option value="Asian">Asian</option>
-                  <option value="Middle Eastern">Middle Eastern</option>
-                  <option value="Indigenous">Indigenous</option>
-                  <option value="Mixed">Mixed</option>
-                  <option value="Other">Other</option>
-                </select>
-              </label>
-            </div>
-            <div class="two-col">
-              <label class="field">
-                <span>Children</span>
-                <select name="childrenStatus" required>
-                  <option value="Open to kids">Open to kids</option>
-                  <option value="Want kids">Want kids</option>
-                  <option value="Have kids">Have kids</option>
-                  <option value="Do not want kids">Do not want kids</option>
-                  <option value="Unsure">Unsure</option>
-                </select>
-              </label>
-              <label class="field">
-                <span>Photos</span>
-                <input id="photo-input" type="file" accept="image/*" multiple>
-              </label>
-            </div>
             <label class="field">
-              <span>Bio</span>
-              <textarea name="bio" rows="5" maxlength="320" required></textarea>
+              <span>Max age</span>
+              <input name="maxAge" type="number" min="18" max="99" required>
             </label>
-            <div class="field">
-              <span>Interests</span>
-              <div id="interest-options" class="choice-grid"></div>
-            </div>
-            <div id="photo-preview-grid" class="photo-grid"></div>
-            <p class="inline-note">Upload up to 5 photos. You can set any uploaded image as the main profile photo.</p>
-          </section>
-
-          <section class="builder-section">
-            <div class="section-head">
-              <h3>Deal makers</h3>
-              <p class="small-copy">These are the structured qualities the app should prioritize when discovery opens.</p>
-            </div>
-            <div class="three-col">
-              <label class="field">
-                <span>Minimum age</span>
-                <input name="minAge" type="number" min="18" max="99" required>
-              </label>
-              <label class="field">
-                <span>Maximum age</span>
-                <input name="maxAge" type="number" min="18" max="99" required>
-              </label>
-              <label class="field">
-                <span>Search radius</span>
-                <input name="distanceMiles" type="number" min="1" max="100" required>
-              </label>
-            </div>
-            <div class="three-col">
-              <label class="field">
-                <span>Minimum height</span>
-                <select name="minHeightInches" id="min-height-select"></select>
-              </label>
-              <label class="field">
-                <span>Preferred race</span>
-                <select name="preferredRace">
-                  <option value="any">Any</option>
-                  <option value="Black">Black</option>
-                  <option value="White">White</option>
-                  <option value="Latino">Latino</option>
-                  <option value="Asian">Asian</option>
-                  <option value="Middle Eastern">Middle Eastern</option>
-                  <option value="Indigenous">Indigenous</option>
-                  <option value="Mixed">Mixed</option>
-                  <option value="Other">Other</option>
-                </select>
-              </label>
-              <label class="field">
-                <span>Preferred children path</span>
-                <select name="preferredChildrenStatus">
-                  <option value="any">Any</option>
-                  <option value="Open to kids">Open to kids</option>
-                  <option value="Want kids">Want kids</option>
-                  <option value="Have kids">Have kids</option>
-                  <option value="Do not want kids">Do not want kids</option>
-                  <option value="Unsure">Unsure</option>
-                </select>
-              </label>
-            </div>
-          </section>
-
-          <section class="builder-section">
-            <div class="section-head">
-              <h3>Deal breakers</h3>
-              <p class="small-copy">No free typing here. These are clean, structured filters the system can respect later.</p>
-            </div>
-            <div class="three-col">
-              <label class="field">
-                <span>Exclude race</span>
-                <select name="excludedRace">
-                  <option value="none">None</option>
-                  <option value="Black">Black</option>
-                  <option value="White">White</option>
-                  <option value="Latino">Latino</option>
-                  <option value="Asian">Asian</option>
-                  <option value="Middle Eastern">Middle Eastern</option>
-                  <option value="Indigenous">Indigenous</option>
-                  <option value="Mixed">Mixed</option>
-                  <option value="Other">Other</option>
-                </select>
-              </label>
-              <label class="field">
-                <span>Exclude children path</span>
-                <select name="excludedChildrenStatus">
-                  <option value="none">None</option>
-                  <option value="Open to kids">Open to kids</option>
-                  <option value="Want kids">Want kids</option>
-                  <option value="Have kids">Have kids</option>
-                  <option value="Do not want kids">Do not want kids</option>
-                  <option value="Unsure">Unsure</option>
-                </select>
-              </label>
-              <label class="field">
-                <span>Exclude zodiac sign</span>
-                <select name="excludedZodiac" id="excluded-zodiac-select"></select>
-              </label>
-            </div>
-            <p class="inline-note">Location is enforced by the browser-detected area and the distance radius you set above.</p>
-          </section>
-
+            <label class="field">
+              <span>Distance</span>
+              <input name="distanceMiles" type="number" min="1" max="100" required>
+            </label>
+          </div>
           <label class="toggle-row">
             <input name="allowWeeklyFeature" type="checkbox">
             <span>Allow weekly dating page feature if a verified first date happens</span>
           </label>
-          <button class="primary-button" type="submit">Save Profile</button>
+          <button class="primary-button" type="submit">Save Onboarding</button>
         </form>
       </article>
     </section>
   </main>
 
   <script src="data.js"></script>
+  <script src="auth.js"></script>
+  <script>AppAuth.protectPage();</script>
   <script src="shared.js"></script>
   <script src="onboarding.js"></script>
 </body>

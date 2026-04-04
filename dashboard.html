@@ -17,22 +17,16 @@
         <img class="brand-logo" src="logo.svg" alt="ATTRACT Shun">
       </a>
     </div>
-    <button class="menu-toggle" type="button" aria-label="Open menu" aria-expanded="false">
-      <span></span>
-      <span></span>
-      <span></span>
-    </button>
     <nav class="site-nav">
-      <a href="create-account.html">Create Account</a>
-      <a href="sign-in.html">Sign In</a>
+      <a href="login.html">Login</a>
+      <a href="onboarding.html">Onboarding</a>
       <a href="dashboard.html">Dashboard</a>
-      <a href="connections.html">Connections</a>
       <a href="browse.html">Browse</a>
-      <a href="match.html">Match Flow</a>
-      <a href="reports.html">Safety</a>
-      <a href="success.html">Stories</a>
+      <a href="match.html">Match</a>
+      <a href="reports.html">Reports</a>
+      <a href="success.html">Success</a>
       <a href="settings.html">Settings</a>
-      <a href="admin.html">Studio</a>
+      <a href="admin.html">Admin</a>
     </nav>
   </header>
 
@@ -41,7 +35,6 @@
       <div>
         <p class="eyebrow">Dashboard</p>
         <h1>Your account state and next step</h1>
-        <p class="page-intro-copy">Everything important stays in one place: profile standing, incoming attention, and what should happen next.</p>
       </div>
       <div class="info-chip" id="dashboard-user-chip"></div>
     </section>
@@ -56,23 +49,23 @@
 
       <article class="panel-card">
         <div class="panel-head">
-          <h2>System summary</h2>
+          <h2>System flow</h2>
         </div>
-        <div id="dashboard-stats" class="stat-grid"></div>
+        <div id="dashboard-stats" class="stack"></div>
       </article>
     </section>
 
     <section class="dashboard-grid">
       <article class="panel-card">
         <div class="panel-head">
-          <h2 id="dashboard-workflow-heading">Next action</h2>
+          <h2>Next action</h2>
         </div>
         <div id="dashboard-next-step"></div>
       </article>
 
       <article class="panel-card">
         <div class="panel-head">
-          <h2 id="dashboard-side-heading">Interested in you</h2>
+          <h2>Interested in you</h2>
         </div>
         <div id="dashboard-likes" class="list-stack"></div>
       </article>
@@ -80,6 +73,8 @@
   </main>
 
   <script src="data.js"></script>
+  <script src="auth.js"></script>
+  <script>AppAuth.protectPage();</script>
   <script src="shared.js"></script>
   <script src="dashboard.js"></script>
 </body>
