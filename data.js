@@ -289,6 +289,33 @@
     });
   }
 
+  function getBrowseCandidates(userId) {
+    const user = getUser(userId);
+    if (!user) return [];
+
+    const alreadySeen = new Set(
+      state.swipes
+        .filter((swipe) => swipe.fromUserId === userId)
+        .map((swipe) => swipe.toUserId)
+    );
+
+    return state.users
+      .filter((candidate) => {
+        if (candidate.id === user.id) return false;
+        if (candidate.intent !== user.intent) return false;
+        if (user.sex && candidate.sex && candidate.sex === user.sex) return false;
+        if (candidate.accountStatus === "banned") return false;
+        if (!candidate.preferences.profileVisible) return false;
+        return candidate.age >= user.preferences.minAge && candidate.age <= user.preferences.maxAge;
+      })
+      .sort((left, right) => {
+        const leftSeen = alreadySeen.has(left.id) ? 1 : 0;
+        const rightSeen = alreadySeen.has(right.id) ? 1 : 0;
+        if (leftSeen !== rightSeen) return leftSeen - rightSeen;
+        return left.name.localeCompare(right.name);
+      });
+  }
+
   function getActiveMatchForUser(userId) {
     return state.matches.find((match) => match.userIds.includes(userId) && ["pending_intro", "date_planning", "decision_window"].includes(match.status)) || null;
   }
@@ -671,6 +698,7 @@
     seedDemoUsers,
     getIncomingLikes,
     getAvailableCandidates,
+    getBrowseCandidates,
     getActiveMatchForUser,
     getOtherUser,
     getLatestMatchForUser,

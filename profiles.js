@@ -157,7 +157,7 @@
       return;
     }
 
-    const candidates = AppData.getAvailableCandidates(user.id);
+    const candidates = AppData.getBrowseCandidates(user.id);
     if (!candidates.length) {
       traditionalPanel.innerHTML = `
         <div class="candidate-card">
