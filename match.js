@@ -516,13 +516,13 @@
         const errorEl = document.getElementById("date-plan-error");
         if (errorEl) errorEl.textContent = "";
         const formData = new FormData(dateProposalForm);
-        const proposal = AppData.proposeDate(match.id, user.id, {
+        const result = AppData.proposeDate(match.id, user.id, {
           proposedFor: formData.get("proposedFor"),
           location: formData.get("location"),
           note: formData.get("note"),
         });
-        if (!proposal) {
-          if (errorEl) errorEl.textContent = "Add a date, time, and location to send a proposal.";
+        if (!result || !result.ok) {
+          if (errorEl) errorEl.textContent = (result && result.error) || "Could not save the date proposal.";
           return;
         }
         location.reload();

@@ -692,6 +692,12 @@
   function closeMatch(match, status, reason, applyShunToAll, shunCategory) {
     match.status = status;
     match.closedReason = reason;
+    state.unmatchRequests.forEach((request) => {
+      if (request.matchId !== match.id || request.status !== "pending") return;
+      request.status = "closed_match_ended";
+      request.respondedAt = nowIso();
+      request.responderAnswer = "match_closed";
+    });
     match.userIds.forEach((userId) => {
       const user = getUser(userId);
       if (!user) return;
@@ -704,6 +710,12 @@
   function closeMatchForSpecificUsers(match, status, reason, usersToShun, shunCategory) {
     match.status = status;
     match.closedReason = reason;
+    state.unmatchRequests.forEach((request) => {
+      if (request.matchId !== match.id || request.status !== "pending") return;
+      request.status = "closed_match_ended";
+      request.respondedAt = nowIso();
+      request.responderAnswer = "match_closed";
+    });
     const shunSet = new Set(usersToShun || []);
     match.userIds.forEach((userId) => {
       const user = getUser(userId);
@@ -802,13 +814,39 @@
 
   function proposeDate(matchId, userId, payload) {
     const match = state.matches.find((entry) => entry.id === matchId);
-    if (!match || match.status !== "date_planning") return null;
-    if (!match.userIds.includes(userId)) return null;
+    if (!match || match.status !== "date_planning") {
+      return { ok: false, error: "Date planning is not active." };
+    }
+    if (!match.userIds.includes(userId)) {
+      return { ok: false, error: "Only matched users can propose a date." };
+    }
 
     const proposedFor = String(payload.proposedFor || "").trim();
     const location = String(payload.location || "").trim();
     const note = String(payload.note || "").trim();
-    if (!proposedFor || !location) return null;
+    if (!proposedFor || !location) {
+      return { ok: false, error: "Add a date, time, and location." };
+    }
+
+    const proposedTime = new Date(proposedFor).getTime();
+    if (Number.isNaN(proposedTime)) {
+      return { ok: false, error: "Choose a valid date and time." };
+    }
+    if (proposedTime <= Date.now()) {
+      return { ok: false, error: "The proposed date has to be in the future." };
+    }
+    if (proposedTime > new Date(match.dateDeadline).getTime()) {
+      return { ok: false, error: "The proposed date must happen before the date-planning deadline." };
+    }
+
+    const currentProposal = match.dateProposal;
+    const isSameAsCurrent = currentProposal &&
+      currentProposal.proposedFor === proposedFor &&
+      currentProposal.location === location &&
+      String(currentProposal.note || "") === note;
+    if (isSameAsCurrent) {
+      return { ok: false, error: "This is already the current proposal. Confirm it or change the details." };
+    }
 
     const entryType = match.dateProposal && match.dateProposal.proposedFor ? "counter" : "proposal";
     match.dateProposal = {
@@ -831,7 +869,7 @@
     });
     match.dateConfirmedBy = [userId];
     save();
-    return match.dateProposal;
+    return { ok: true, proposal: match.dateProposal };
   }
 
   function acceptDateProposal(matchId, userId) {
