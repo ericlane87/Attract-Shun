@@ -1,17 +1,17 @@
 :root {
-  --bg: #f6f0e8;
-  --panel: rgba(255, 251, 246, 0.92);
-  --panel-strong: #fffaf5;
-  --line: rgba(78, 48, 34, 0.12);
-  --ink: #201714;
-  --muted: #715f53;
-  --brand: #8f2434;
-  --brand-deep: #62121e;
-  --accent: #b78b42;
-  --success: #245e48;
-  --danger: #8a2031;
-  --soft-gold: rgba(183, 139, 66, 0.14);
-  --shadow: 0 18px 50px rgba(86, 50, 34, 0.12);
+  --bg: #0d1118;
+  --panel: rgba(17, 24, 34, 0.9);
+  --panel-strong: #121a25;
+  --line: rgba(214, 195, 169, 0.12);
+  --ink: #f4ede3;
+  --muted: #a89a88;
+  --brand: #d35a73;
+  --brand-deep: #8f2434;
+  --accent: #c9a45a;
+  --success: #59b08c;
+  --danger: #ea7388;
+  --soft-gold: rgba(201, 164, 90, 0.16);
+  --shadow: 0 24px 60px rgba(0, 0, 0, 0.34);
   --radius-lg: 28px;
   --radius-md: 18px;
   --radius-sm: 12px;
@@ -27,9 +27,9 @@ body {
   color: var(--ink);
   font-family: "Space Grotesk", sans-serif;
   background:
-    radial-gradient(circle at top left, rgba(143, 36, 52, 0.1), transparent 24%),
-    radial-gradient(circle at 85% 0%, rgba(183, 139, 66, 0.14), transparent 20%),
-    linear-gradient(180deg, #efe2d2 0%, var(--bg) 34%, #f8f3eb 100%);
+    radial-gradient(circle at top left, rgba(211, 90, 115, 0.18), transparent 24%),
+    radial-gradient(circle at 85% 0%, rgba(201, 164, 90, 0.14), transparent 20%),
+    linear-gradient(180deg, #0b1016 0%, var(--bg) 38%, #111927 100%);
 }
 
 a {
@@ -116,8 +116,8 @@ button:disabled {
 .site-nav a {
   padding: 10px 14px;
   border-radius: 999px;
-  background: rgba(255, 251, 246, 0.56);
-  border: 1px solid rgba(78, 48, 34, 0.08);
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(214, 195, 169, 0.08);
 }
 
 .site-nav .nav-button {
@@ -136,8 +136,8 @@ body[data-page="likes"] .site-nav a[href="likes.html"],
 body[data-page="reports"] .site-nav a[href="reports.html"],
 body[data-page="success"] .site-nav a[href="success.html"],
 body[data-page="settings"] .site-nav a[href="settings.html"] {
-  background: rgba(143, 36, 52, 0.12);
-  color: var(--brand-deep);
+  background: rgba(211, 90, 115, 0.18);
+  color: #fff4ef;
 }
 
 .page-shell {
@@ -223,7 +223,7 @@ body[data-page="settings"] .site-nav a[href="settings.html"] {
   align-self: end;
   display: grid;
   gap: 14px;
-  background: linear-gradient(180deg, rgba(255, 248, 241, 0.98), rgba(242, 226, 209, 0.96));
+  background: linear-gradient(180deg, rgba(24, 33, 47, 0.98), rgba(14, 21, 31, 0.96));
   border: 1px solid var(--line);
   border-radius: var(--radius-lg);
   padding: 24px;
@@ -285,17 +285,17 @@ body[data-page="settings"] .site-nav a[href="settings.html"] {
 .ghost-link,
 .ghost-button,
 .pass-button {
-  background: rgba(98, 18, 30, 0.08);
-  color: var(--brand-deep);
+  background: rgba(255, 255, 255, 0.06);
+  color: #f7ebdd;
 }
 
 .danger-button {
-  background: rgba(138, 32, 49, 0.12);
+  background: rgba(234, 115, 136, 0.12);
   color: var(--danger);
 }
 
 .success-button {
-  background: rgba(36, 94, 72, 0.12);
+  background: rgba(89, 176, 140, 0.12);
   color: var(--success);
 }
 
@@ -460,7 +460,7 @@ body[data-page="settings"] .site-nav a[href="settings.html"] {
   padding: 14px;
   border: 1px solid var(--line);
   border-radius: var(--radius-md);
-  background: rgba(255, 255, 255, 0.68);
+  background: rgba(255, 255, 255, 0.04);
 }
 
 .toggle-row input {
@@ -475,7 +475,7 @@ textarea {
   padding: 12px 14px;
   border-radius: var(--radius-sm);
   border: 1px solid var(--line);
-  background: rgba(255, 255, 255, 0.86);
+  background: rgba(255, 255, 255, 0.05);
   color: var(--ink);
 }
 
@@ -573,7 +573,7 @@ textarea {
   padding: 16px;
   border: 1px solid var(--line);
   border-radius: var(--radius-md);
-  background: rgba(255, 255, 255, 0.78);
+  background: rgba(255, 255, 255, 0.04);
 }
 
 .stat-label {
@@ -590,7 +590,7 @@ textarea {
 }
 
 .candidate-card {
-  background: linear-gradient(180deg, rgba(255, 248, 241, 0.98), rgba(243, 230, 215, 0.95));
+  background: linear-gradient(180deg, rgba(24, 33, 47, 0.98), rgba(14, 21, 31, 0.95));
 }
 
 .browse-summary {
@@ -608,7 +608,7 @@ textarea {
   padding: 18px;
   border-radius: var(--radius-lg);
   border: 1px solid var(--line);
-  background: linear-gradient(180deg, rgba(255, 248, 241, 0.98), rgba(243, 230, 215, 0.95));
+  background: linear-gradient(180deg, rgba(24, 33, 47, 0.98), rgba(14, 21, 31, 0.95));
   box-shadow: var(--shadow);
   display: grid;
   grid-template-rows: auto 1fr auto;
@@ -674,8 +674,8 @@ input[type="range"] {
 .hint-box {
   padding: 14px;
   border-radius: var(--radius-md);
-  background: rgba(183, 139, 66, 0.12);
-  color: #6f531f;
+  background: rgba(201, 164, 90, 0.12);
+  color: #f2d8a2;
 }
 
 .timeline {
@@ -687,7 +687,7 @@ input[type="range"] {
   border: 1px solid var(--line);
   border-radius: var(--radius-md);
   padding: 14px;
-  background: rgba(255, 255, 255, 0.75);
+  background: rgba(255, 255, 255, 0.04);
 }
 
 .timeline-row strong {
@@ -729,11 +729,11 @@ input[type="range"] {
   max-width: 82%;
   padding: 12px 14px;
   border-radius: 16px;
-  background: rgba(113, 95, 83, 0.1);
+  background: rgba(255, 255, 255, 0.06);
 }
 
 .chat-message.mine .chat-bubble {
-  background: rgba(143, 36, 52, 0.12);
+  background: rgba(211, 90, 115, 0.16);
 }
 
 .chat-compose input {
