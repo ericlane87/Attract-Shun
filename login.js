@@ -36,7 +36,7 @@
     quickList.innerHTML = AppData.state.users.map((user) => `
       <button class="ghost-button quick-login-button" type="button" data-login-id="${user.id}">
         <span>${user.name}</span>
-        <span class="small-copy">${user.email || "Use full name"} / demo1234</span>
+        <span class="small-copy">Email: ${user.email || "Use full name"} | Password: demo1234</span>
       </button>
     `).join("");
 
