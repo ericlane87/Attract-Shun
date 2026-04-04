@@ -139,6 +139,10 @@
       return;
     }
 
+    if (AppData.state.users.length < 100) {
+      AppData.seedDemoUsers();
+    }
+
     AppUI.renderLikeList(likesPanel, AppData.getIncomingLikes(user.id));
 
     if (!user.onboardingCompleted) {
