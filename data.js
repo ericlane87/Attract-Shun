@@ -18,6 +18,47 @@
     };
   }
 
+  const DEAL_MAKER_POOL = [
+    "Clear communication", "Emotionally available", "Consistent effort", "Family minded", "Ambitious",
+    "Playful humor", "Healthy lifestyle", "Wants commitment", "Travel curious", "Kind under pressure",
+    "Faith or values driven", "Financially responsible", "Good listener", "Affectionate", "Creative"
+  ];
+
+  const DEAL_BREAKER_POOL = [
+    "Dishonesty", "Flaky communication", "Cruel humor", "Smoking", "Still hung up on an ex",
+    "Avoids commitment", "Disrespectful tone", "Heavy partying", "No work-life balance", "Jealous behavior",
+    "No ambition", "Poor hygiene", "Love bombing", "Zero accountability", "Rude to service staff"
+  ];
+
+  function nameSeed(name) {
+    return String(name || "").split("").reduce((sum, char) => sum + char.charCodeAt(0), 0);
+  }
+
+  function fallbackDealMakers(name) {
+    const seed = nameSeed(name);
+    return [
+      DEAL_MAKER_POOL[seed % DEAL_MAKER_POOL.length],
+      DEAL_MAKER_POOL[(seed + 3) % DEAL_MAKER_POOL.length],
+      DEAL_MAKER_POOL[(seed + 7) % DEAL_MAKER_POOL.length],
+    ];
+  }
+
+  function fallbackDealBreakers(name) {
+    const seed = nameSeed(name);
+    return [
+      DEAL_BREAKER_POOL[seed % DEAL_BREAKER_POOL.length],
+      DEAL_BREAKER_POOL[(seed + 4) % DEAL_BREAKER_POOL.length],
+      DEAL_BREAKER_POOL[(seed + 8) % DEAL_BREAKER_POOL.length],
+    ];
+  }
+
+  function fallbackPhotos(user) {
+    return [0, 1, 2].map((offset) => ({
+      id: `${user.id || "profile"}-photo-${offset + 1}`,
+      label: offset === 0 ? "Main profile photo" : offset === 1 ? "Lifestyle photo" : "Weekend photo",
+    }));
+  }
+
   function createEmptyState() {
     return {
       system: {
@@ -47,9 +88,9 @@
       city: user.city || "",
       intent: user.intent || "long_term",
       bio: user.bio || "",
-      photos: Array.isArray(user.photos) ? user.photos : [],
-      dealMakers: Array.isArray(user.dealMakers) ? user.dealMakers : [],
-      dealBreakers: Array.isArray(user.dealBreakers) ? user.dealBreakers : [],
+      photos: Array.isArray(user.photos) && user.photos.length ? user.photos : fallbackPhotos(user),
+      dealMakers: Array.isArray(user.dealMakers) && user.dealMakers.length ? user.dealMakers : fallbackDealMakers(user.name),
+      dealBreakers: Array.isArray(user.dealBreakers) && user.dealBreakers.length ? user.dealBreakers : fallbackDealBreakers(user.name),
       shunCount: Number(user.shunCount || 0),
       activeMatchId: user.activeMatchId || null,
       status: user.status || "available",
