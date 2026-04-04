@@ -22,6 +22,30 @@
     return;
   }
 
+  const activeMatch = AppData.getActiveMatchForUser(user.id);
+  if (activeMatch) {
+    const otherUser = AppData.getOtherUser(activeMatch, user.id);
+    listEl.innerHTML = `
+      <div class="summary-card">
+        <p class="profile-name">Match requests locked</p>
+        <p class="profile-meta">You are currently matched with ${otherUser.name}. Confirming any other request is locked until this match ends.</p>
+        <div class="cta-row">
+          <a class="primary-link" href="match.html">Open Current Match</a>
+        </div>
+      </div>
+    `;
+    summaryEl.innerHTML = `
+      <div class="summary-card">
+        <p class="profile-name">One active match only</p>
+        <p class="profile-meta">This account cannot confirm another match request while a live match exists.</p>
+        <div class="cta-row">
+          <a class="ghost-link" href="dashboard.html">Back To Dashboard</a>
+        </div>
+      </div>
+    `;
+    return;
+  }
+
   function closeModal() {
     profileModal.hidden = true;
     document.body.classList.remove("modal-open");

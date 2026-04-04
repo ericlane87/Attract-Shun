@@ -22,6 +22,30 @@
     return;
   }
 
+  const activeMatch = AppData.getActiveMatchForUser(user.id);
+  if (activeMatch) {
+    const otherUser = AppData.getOtherUser(activeMatch, user.id);
+    likesListEl.innerHTML = `
+      <div class="summary-card">
+        <p class="profile-name">Discovery locked by active match</p>
+        <p class="profile-meta">You are currently matched with ${otherUser.name}. Review likes is paused until you finish this match or unmatch.</p>
+        <div class="cta-row">
+          <a class="primary-link" href="match.html">Open Current Match</a>
+        </div>
+      </div>
+    `;
+    summaryEl.innerHTML = `
+      <div class="summary-card">
+        <p class="profile-name">One person at a time</p>
+        <p class="profile-meta">Likes remain stored, but sending new match requests is locked while an active match exists.</p>
+        <div class="cta-row">
+          <a class="ghost-link" href="dashboard.html">Back To Dashboard</a>
+        </div>
+      </div>
+    `;
+    return;
+  }
+
   function closeModal() {
     profileModal.hidden = true;
     document.body.classList.remove("modal-open");

@@ -180,14 +180,28 @@
     `;
   }
 
-  likesEl.innerHTML = `
-    <div class="cta-row" style="margin-bottom: 16px;">
-      <a class="ghost-link" href="likes.html">Review Likes</a>
-      <a class="ghost-link" href="match-requests.html">Review Match Requests</a>
-    </div>
-  `;
-  const listContainer = document.createElement("div");
-  listContainer.className = "list-stack";
-  likesEl.appendChild(listContainer);
-  AppUI.renderLikeList(listContainer, likes);
+  if (activeMatch) {
+    const otherUser = AppData.getOtherUser(activeMatch, user.id);
+    likesEl.innerHTML = `
+      <div class="summary-card">
+        <p class="profile-name">Current match: ${otherUser.name}</p>
+        <p class="profile-meta">Discovery is locked while this match is active. Focus stays on this one person until you complete the flow or unmatch.</p>
+        <div class="cta-row">
+          <a class="primary-link" href="match.html">Open Match Flow</a>
+          <a class="ghost-link" href="messages.html">Open Messages</a>
+        </div>
+      </div>
+    `;
+  } else {
+    likesEl.innerHTML = `
+      <div class="cta-row" style="margin-bottom: 16px;">
+        <a class="ghost-link" href="likes.html">Review Likes</a>
+        <a class="ghost-link" href="match-requests.html">Review Match Requests</a>
+      </div>
+    `;
+    const listContainer = document.createElement("div");
+    listContainer.className = "list-stack";
+    likesEl.appendChild(listContainer);
+    AppUI.renderLikeList(listContainer, likes);
+  }
 })();
