@@ -110,6 +110,14 @@
       nav.appendChild(likesLink);
     }
 
+    if (!nav.querySelector("[data-match-requests-link]")) {
+      const requestsLink = document.createElement("a");
+      requestsLink.href = "match-requests.html";
+      requestsLink.dataset.matchRequestsLink = "true";
+      requestsLink.textContent = "Match Requests";
+      nav.appendChild(requestsLink);
+    }
+
     if (nav.querySelector("[data-logout-button]")) return;
 
     const button = document.createElement("button");

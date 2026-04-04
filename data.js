@@ -1,5 +1,5 @@
 (function () {
-  const STORAGE_KEY = "attract-shun-local-prototype-v5";
+  const STORAGE_KEY = "attract-shun-local-prototype-v6";
   const DAY_MS = 24 * 60 * 60 * 1000;
 
   function uid(prefix) {
@@ -127,6 +127,7 @@
       currentUserId: "",
       users: [],
       swipes: [],
+      matchRequests: [],
       matches: [],
       messages: [],
       reports: [],
@@ -179,6 +180,17 @@
     };
   }
 
+  function normalizeMatchRequest(request) {
+    return {
+      id: request.id || uid("matchreq"),
+      fromUserId: request.fromUserId || "",
+      toUserId: request.toUserId || "",
+      status: request.status || "pending",
+      createdAt: request.createdAt || new Date().toISOString(),
+      respondedAt: request.respondedAt || "",
+    };
+  }
+
   function normalizeReport(report) {
     return {
       id: report.id || uid("report"),
@@ -216,6 +228,7 @@
       currentUserId: merged.currentUserId || "",
       users: Array.isArray(merged.users) ? merged.users.map(normalizeUser) : [],
       swipes: Array.isArray(merged.swipes) ? merged.swipes : [],
+      matchRequests: Array.isArray(merged.matchRequests) ? merged.matchRequests.map(normalizeMatchRequest) : [],
       matches: Array.isArray(merged.matches) ? merged.matches.map(normalizeMatch) : [],
       messages: Array.isArray(merged.messages) ? merged.messages : [],
       reports: Array.isArray(merged.reports) ? merged.reports.map(normalizeReport) : [],
@@ -373,15 +386,34 @@
   }
 
   function getIncomingLikes(userId) {
-    return state.swipes
+    const latestByUser = new Map();
+    state.swipes
       .filter((swipe) => swipe.toUserId === userId && swipe.direction === "right")
+      .forEach((swipe) => {
+        const existing = latestByUser.get(swipe.fromUserId);
+        if (!existing || new Date(swipe.createdAt).getTime() > new Date(existing.createdAt).getTime()) {
+          latestByUser.set(swipe.fromUserId, swipe);
+        }
+      });
+
+    return Array.from(latestByUser.values())
       .map((swipe) => ({ swipe, user: getUser(swipe.fromUserId) }))
-      .filter((entry) => entry.user);
+      .filter((entry) => entry.user)
+      .sort((left, right) => new Date(right.swipe.createdAt).getTime() - new Date(left.swipe.createdAt).getTime());
+  }
+
+  function hasIncomingLike(fromUserId, toUserId) {
+    return state.swipes.some((swipe) =>
+      swipe.fromUserId === fromUserId &&
+      swipe.toUserId === toUserId &&
+      swipe.direction === "right"
+    );
   }
 
   function getAvailableCandidates(userId) {
     const user = getUser(userId);
     if (!user) return [];
+    if (user.activeMatchId) return [];
 
     const alreadySeen = new Set(
       state.swipes
@@ -403,6 +435,7 @@
   function getBrowseCandidates(userId) {
     const user = getUser(userId);
     if (!user) return [];
+    if (user.activeMatchId) return [];
 
     const recentThreshold = Date.now() - (30 * DAY_MS);
     const baseCandidates = state.users
@@ -410,6 +443,7 @@
         if (candidate.id === user.id) return false;
         if (candidate.accountStatus === "banned") return false;
         if (!candidate.preferences.profileVisible) return false;
+        if (user.sex && candidate.sex && candidate.sex === user.sex) return false;
         return true;
       });
 
@@ -442,18 +476,11 @@
     return state.matches.filter((match) => match.userIds.includes(userId)).slice(-1)[0] || null;
   }
 
-  function maybeCreateMatch(fromUserId, toUserId) {
+  function createMatch(fromUserId, toUserId) {
     const fromUser = getUser(fromUserId);
     const toUser = getUser(toUserId);
     if (!fromUser || !toUser) return null;
     if (fromUser.activeMatchId || toUser.activeMatchId) return null;
-
-    const reciprocal = state.swipes.find((swipe) =>
-      swipe.fromUserId === toUserId &&
-      swipe.toUserId === fromUserId &&
-      swipe.direction === "right"
-    );
-    if (!reciprocal) return null;
 
     const createdAt = nowIso();
     const match = normalizeMatch({
@@ -482,6 +509,11 @@
   }
 
   function recordSwipe(fromUserId, toUserId, direction, interestScore) {
+    const fromUser = getUser(fromUserId);
+    const toUser = getUser(toUserId);
+    if (!fromUser || !toUser) return null;
+    if (fromUser.activeMatchId || toUser.activeMatchId) return null;
+
     state.swipes.push({
       id: uid("swipe"),
       fromUserId,
@@ -490,7 +522,75 @@
       interestScore: direction === "right" ? Number(interestScore) : null,
       createdAt: nowIso(),
     });
-    const match = direction === "right" ? maybeCreateMatch(fromUserId, toUserId) : null;
+    save();
+    return null;
+  }
+
+  function getPendingMatchRequestBetween(userId, otherUserId) {
+    return state.matchRequests.find((request) =>
+      request.status === "pending" &&
+      ((request.fromUserId === userId && request.toUserId === otherUserId) ||
+      (request.fromUserId === otherUserId && request.toUserId === userId))
+    ) || null;
+  }
+
+  function getIncomingMatchRequests(userId) {
+    return state.matchRequests
+      .filter((request) => request.toUserId === userId && request.status === "pending")
+      .map((request) => ({ request, user: getUser(request.fromUserId) }))
+      .filter((entry) => entry.user)
+      .sort((left, right) => new Date(right.request.createdAt).getTime() - new Date(left.request.createdAt).getTime());
+  }
+
+  function getOutgoingMatchRequests(userId) {
+    return state.matchRequests
+      .filter((request) => request.fromUserId === userId && request.status === "pending")
+      .map((request) => ({ request, user: getUser(request.toUserId) }))
+      .filter((entry) => entry.user)
+      .sort((left, right) => new Date(right.request.createdAt).getTime() - new Date(left.request.createdAt).getTime());
+  }
+
+  function sendMatchRequest(fromUserId, toUserId) {
+    const fromUser = getUser(fromUserId);
+    const toUser = getUser(toUserId);
+    if (!fromUser || !toUser) return null;
+    if (fromUser.activeMatchId || toUser.activeMatchId) return null;
+    if (!hasIncomingLike(toUserId, fromUserId)) return null;
+
+    const existing = getPendingMatchRequestBetween(fromUserId, toUserId);
+    if (existing) return existing;
+
+    const request = normalizeMatchRequest({
+      id: uid("matchreq"),
+      fromUserId,
+      toUserId,
+      status: "pending",
+      createdAt: nowIso(),
+    });
+    state.matchRequests.push(request);
+    save();
+    return request;
+  }
+
+  function confirmMatchRequest(requestId, userId) {
+    const request = state.matchRequests.find((entry) => entry.id === requestId && entry.status === "pending");
+    if (!request || request.toUserId !== userId) return null;
+    const confirmer = getUser(userId);
+    if (!confirmer || confirmer.activeMatchId) return null;
+
+    const match = createMatch(request.fromUserId, request.toUserId);
+    if (!match) return null;
+
+    request.status = "confirmed";
+    request.respondedAt = nowIso();
+    state.matchRequests.forEach((entry) => {
+      const samePair = [entry.fromUserId, entry.toUserId].includes(request.fromUserId) &&
+        [entry.fromUserId, entry.toUserId].includes(request.toUserId);
+      if (entry.id !== request.id && samePair && entry.status === "pending") {
+        entry.status = "confirmed";
+        entry.respondedAt = request.respondedAt;
+      }
+    });
     save();
     return match;
   }
@@ -866,8 +966,14 @@
     ensureHardcodedTestUsers,
     seedDemoUsers,
     getIncomingLikes,
+    hasIncomingLike,
     getAvailableCandidates,
     getBrowseCandidates,
+    getPendingMatchRequestBetween,
+    getIncomingMatchRequests,
+    getOutgoingMatchRequests,
+    sendMatchRequest,
+    confirmMatchRequest,
     getActiveMatchForUser,
     getOtherUser,
     getLatestMatchForUser,

@@ -10,14 +10,34 @@
   const nextEl = document.getElementById("dashboard-next-step");
   const likesEl = document.getElementById("dashboard-likes");
 
-  function getMatchStep(match) {
+  function getMatchStep(match, likes, requests) {
     if (!match) {
+      if (requests.length) {
+        return {
+          key: "match_requests",
+          title: "Review match requests",
+          detail: `${requests.length} pending match request${requests.length === 1 ? "" : "s"} need attention before browsing more people.`,
+          ctaLabel: "Open Match Requests",
+          ctaHref: "match-requests.html",
+        };
+      }
+
+      if (likes.length) {
+        return {
+          key: "review_likes",
+          title: "Review likes",
+          detail: `${likes.length} people already liked this account. Review them and decide whether to send a match request.`,
+          ctaLabel: "Open Likes",
+          ctaHref: "likes.html",
+        };
+      }
+
       return {
         key: "browse",
         title: "Browse for a match",
-        detail: `No active match right now. ${user.name} should be in browse until a mutual right swipe creates a match.`,
-        ctaLabel: "Go To Browse",
-        ctaHref: "browse.html",
+        detail: `No active match, no pending likes to review, and no match requests waiting. ${user.name} should be in browse until new interest comes in.`,
+        ctaLabel: "Find A Match",
+        ctaHref: "profiles.html",
       };
     }
 
@@ -50,7 +70,8 @@
     };
   }
 
-  function renderFlowPanel(activeMatch, likes) {
+  function renderFlowPanel(activeMatch, likes, requests) {
+    const nextStep = getMatchStep(activeMatch, likes, requests);
     const steps = [
       {
         title: "Profile onboarding",
@@ -63,12 +84,12 @@
         title: activeMatch ? "Match status" : "Browse status",
         detail: activeMatch
           ? `Active match with ${AppData.getOtherUser(activeMatch, user.id).name}. Swiping is locked while this match is live.`
-          : `No active match. ${likes.length} incoming like${likes.length === 1 ? "" : "s"} waiting, but the user should browse for a mutual match.`,
+          : `No active match. ${likes.length} incoming like${likes.length === 1 ? "" : "s"} and ${requests.length} match request${requests.length === 1 ? "" : "s"} are waiting.`,
         state: user.onboardingCompleted ? "active" : "",
       },
       {
         title: activeMatch ? "Current match step" : "Next destination",
-        detail: getMatchStep(activeMatch).detail,
+        detail: nextStep.detail,
         state: user.onboardingCompleted ? "active" : "",
       },
     ];
@@ -79,10 +100,14 @@
           <div class="stat-label">Current mode</div>
           <div class="stat-value">${activeMatch ? "Match" : user.onboardingCompleted ? "Browse" : "Onboarding"}</div>
         </div>
-        <div class="stat-card">
+        <a class="stat-card" href="likes.html">
           <div class="stat-label">Incoming likes</div>
           <div class="stat-value">${likes.length}</div>
-        </div>
+        </a>
+        <a class="stat-card" href="match-requests.html">
+          <div class="stat-label">Match requests</div>
+          <div class="stat-value">${requests.length}</div>
+        </a>
         <div class="stat-card">
           <div class="stat-label">Availability</div>
           <div class="stat-value">${activeMatch ? "Locked" : "Open"}</div>
@@ -112,9 +137,10 @@
 
   const activeMatch = AppData.getActiveMatchForUser(user.id);
   const likes = AppData.getIncomingLikes(user.id);
+  const requests = AppData.getIncomingMatchRequests(user.id);
 
   profileEl.innerHTML = AppUI.renderUserSummaryCard(user);
-  statsEl.innerHTML = renderFlowPanel(activeMatch, likes);
+  statsEl.innerHTML = renderFlowPanel(activeMatch, likes, requests);
 
   if (!user.onboardingCompleted) {
     nextEl.innerHTML = `
@@ -127,19 +153,20 @@
       </div>
     `;
   } else if (!activeMatch) {
+    const step = getMatchStep(activeMatch, likes, requests);
     nextEl.innerHTML = `
       <div class="summary-card">
-        <p class="profile-name">Current step: find a match</p>
-        <p class="profile-meta">This user has no active match. Open the grid-style dating page to browse clickable profiles with profile photos.</p>
+        <p class="profile-name">${step.title}</p>
+        <p class="profile-meta">${step.detail}</p>
         <div class="cta-row">
-          <a class="primary-link" href="profiles.html">Find A Match</a>
-          <a class="ghost-link" href="live-match.html">Live Match</a>
+          <a class="primary-link" href="${step.ctaHref}">${step.ctaLabel}</a>
+          <a class="ghost-link" href="profiles.html">Find A Match</a>
         </div>
       </div>
     `;
   } else {
     const otherUser = AppData.getOtherUser(activeMatch, user.id);
-    const step = getMatchStep(activeMatch);
+    const step = getMatchStep(activeMatch, likes, requests);
 
     nextEl.innerHTML = `
       <div class="summary-card">
@@ -153,5 +180,14 @@
     `;
   }
 
-  AppUI.renderLikeList(likesEl, likes);
+  likesEl.innerHTML = `
+    <div class="cta-row" style="margin-bottom: 16px;">
+      <a class="ghost-link" href="likes.html">Review Likes</a>
+      <a class="ghost-link" href="match-requests.html">Review Match Requests</a>
+    </div>
+  `;
+  const listContainer = document.createElement("div");
+  listContainer.className = "list-stack";
+  likesEl.appendChild(listContainer);
+  AppUI.renderLikeList(listContainer, likes);
 })();
