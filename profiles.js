@@ -7,6 +7,7 @@
 
   const traditionalPanel = document.getElementById("traditional-panel");
   const likesPanel = document.getElementById("incoming-likes-panel");
+  const pageIntro = document.querySelector(".page-intro");
   const profileModal = document.getElementById("profile-modal");
   const modalCard = document.getElementById("profile-modal-card");
   const modalClose = document.getElementById("profile-modal-close");
@@ -29,6 +30,12 @@
     document.body.classList.remove("modal-open");
     modalState.candidateId = "";
     modalState.photoIndex = 0;
+  }
+
+  function scrollToBrowseTop() {
+    const topTarget = pageIntro || traditionalPanel;
+    if (!topTarget) return;
+    topTarget.scrollIntoView({ behavior: "smooth", block: "start" });
   }
 
   function applyAction(candidateId, direction, score) {
@@ -252,12 +259,14 @@
       prevButton.addEventListener("click", () => {
         browseState.page = Math.max(0, browseState.page - 1);
         render();
+        scrollToBrowseTop();
       });
     }
     if (nextButton) {
       nextButton.addEventListener("click", () => {
         browseState.page += 1;
         render();
+        scrollToBrowseTop();
       });
     }
   }
