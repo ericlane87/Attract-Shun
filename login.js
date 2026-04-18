@@ -3,6 +3,7 @@
 
   const form = document.getElementById("login-form");
   const errorEl = document.getElementById("login-error");
+  const demoAccountList = document.getElementById("demo-account-list");
   const quickList = document.getElementById("quick-login-list");
   const params = new URLSearchParams(window.location.search);
   const nextPage = params.get("next") || "dashboard.html";
@@ -31,6 +32,22 @@
     const destination = user ? nextPage : "dashboard.html";
     window.location.href = destination;
   }
+
+  function loginWithDemoEmail(email) {
+    hideError();
+    const user = AppData.login(email, "demo1234");
+    if (!user) {
+      showError("That demo account is not available yet. Refresh the page and try again.");
+      return;
+    }
+    completeLogin(user);
+  }
+
+  demoAccountList?.querySelectorAll("[data-demo-email]").forEach((button) => {
+    button.addEventListener("click", () => {
+      loginWithDemoEmail(button.dataset.demoEmail);
+    });
+  });
 
   function renderQuickLogins() {
     if (!AppData.state.users.length) {

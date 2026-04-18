@@ -182,10 +182,7 @@
     if (!currentUser) return;
 
     const counts = {
-      notifications: AppData.getNotificationsForUser(currentUser.id).length,
       messages: AppData.getUnreadMessageCount(currentUser.id),
-      likes: AppData.getIncomingLikes(currentUser.id).length,
-      requests: AppData.getIncomingMatchRequests(currentUser.id).length,
     };
 
     function labelWithCount(label, count) {
@@ -204,10 +201,7 @@
       return link;
     }
 
-    ensureLink("notificationsLink", "notifications.html", "Notifications", counts.notifications);
     ensureLink("messagesLink", "messages.html", "Messages", counts.messages);
-    ensureLink("likesLink", "likes.html", "Likes", counts.likes);
-    ensureLink("matchRequestsLink", "match-requests.html", "Match Requests", counts.requests);
 
     if (!nav.querySelector("[data-logout-button]")) {
       const button = document.createElement("button");

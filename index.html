@@ -19,113 +19,84 @@
       </a>
     </div>
     <nav class="site-nav">
-      <a href="login.html">Login</a>
-      <a href="onboarding.html">Onboarding</a>
-      <a href="dashboard.html">Dashboard</a>
-      <a href="browse.html">Browse</a>
-      <a href="match.html">Match</a>
-      <a href="reports.html">Reports</a>
-      <a href="success.html">Success</a>
-      <a href="settings.html">Settings</a>
-      <a href="admin.html">Admin</a>
+      <a href="system-flow.html">Flow</a>
+      <a href="create-account.html">Create Account</a>
+      <a href="sign-in.html">Sign In</a>
     </nav>
   </header>
 
-  <main class="page-shell">
-    <section class="hero-panel hero-grid">
-      <div>
-        <p class="eyebrow">Local-first production prototype</p>
-        <img class="hero-logo" src="logo.svg" alt="ATTRACT Shun">
-        <h1>One match at a time. Built for people who mean it.</h1>
+  <main class="page-shell home-shell">
+    <section class="home-hero">
+      <div class="home-hero-copy">
+        <p class="eyebrow">Intentional dating, rethought</p>
+        <h1>Meet one person with your full attention.</h1>
         <p class="hero-copy">
-          This front-end prototype enforces strict intent pools, a single active match and conversation,
-          guided intro-to-date milestones, and attract-or-shun outcomes, all stored locally for testing.
+          ATTRACT Shun slows dating down to the part that matters: one live match, clear intent, and a guided path from interest to a real date.
         </p>
         <div class="cta-row">
-          <a class="primary-link" href="login.html">Login To App</a>
-          <a class="ghost-link" href="admin.html">Create Users</a>
+          <a class="primary-link" href="create-account.html">Create Your Profile</a>
+          <a class="ghost-link" href="sign-in.html">Sign In</a>
         </div>
       </div>
-      <div class="hero-card">
-        <div class="mini-stat">
-          <span>Storage</span>
-          <strong>Browser local storage</strong>
+
+      <div class="phone-preview" aria-label="Preview of the ATTRACT Shun dating experience">
+        <div class="phone-topbar">
+          <span></span>
+          <strong>Today</strong>
+          <span></span>
         </div>
-        <div class="mini-stat">
-          <span>Auth</span>
-          <strong>Mocked for prototype</strong>
+        <div class="preview-profile">
+          <div class="preview-photo">
+            <span>AM</span>
+          </div>
+          <div>
+            <p class="profile-name">Amina, 31</p>
+            <p class="profile-meta">Brooklyn · Long-term</p>
+          </div>
         </div>
-        <div class="mini-stat">
-          <span>Payments</span>
-          <strong>Excluded</strong>
+        <p class="preview-line">Intentional, warm, and ready to build something that leaves the app.</p>
+        <div class="preview-score">
+          <span>Interest</span>
+          <strong>9.2</strong>
         </div>
-        <div class="mini-stat">
-          <span>Firebase</span>
-          <strong>Ready to plug later</strong>
+        <div class="preview-actions" aria-hidden="true">
+          <span>Pass</span>
+          <span>Attract</span>
         </div>
       </div>
     </section>
 
-    <section class="section-grid">
-      <article class="content-card">
-        <p class="card-kicker">Core rule</p>
-        <h2>Users can like many, but hold only one live match.</h2>
-        <p>
-          Incoming likes remain visible, but while a user is matched they cannot continue swiping or open new conversations.
-        </p>
+    <section class="home-principles" aria-label="What makes ATTRACT Shun different">
+      <article>
+        <span>01</span>
+        <h2>One match at a time</h2>
+        <p>No endless tabs of half-conversations. When a match is live, your attention stays there.</p>
       </article>
-      <article class="content-card">
-        <p class="card-kicker">Intent separated</p>
-        <h2>Casual and long-term pools never overlap.</h2>
-        <p>
-          Discovery candidates are strictly filtered by chosen intent so the product feels opinionated and clear.
-        </p>
+      <article>
+        <span>02</span>
+        <h2>Clear intent only</h2>
+        <p>Discovery is shaped around people who want the same kind of relationship path.</p>
       </article>
-      <article class="content-card">
-        <p class="card-kicker">Signal quality</p>
-        <h2>Every right swipe includes a 1 to 10 interest score.</h2>
-        <p>
-          Mutual matches can immediately see how strongly the other person was interested before investing energy.
-        </p>
+      <article>
+        <span>03</span>
+        <h2>Momentum built in</h2>
+        <p>Interest moves into an intro, a date plan, and a real decision without getting lost.</p>
       </article>
     </section>
 
-    <section class="showcase">
-      <div class="section-heading">
-        <p class="eyebrow">Product flow</p>
-        <h2>Logical screens built as a real website flow</h2>
+    <section class="home-flow">
+      <div>
+        <p class="eyebrow">How it works</p>
+        <h2>A calmer path from profile to date.</h2>
+        <p>
+          Create a profile, meet people in your intent pool, and let one connection develop without the noise of constant swiping.
+        </p>
       </div>
-      <div class="flow-grid">
-        <article class="flow-step">
-          <span>01</span>
-          <h3>Admin setup</h3>
-          <p>Create users, seed demo data, switch active user, and simulate time.</p>
-        </article>
-        <article class="flow-step">
-          <span>02</span>
-          <h3>User dashboard</h3>
-          <p>After login, see account state, shun count, next required action, and engagement lock status.</p>
-        </article>
-        <article class="flow-step">
-          <span>03</span>
-          <h3>Browse and swipe</h3>
-          <p>Review candidates in the same pool, pass, or swipe right with a required interest score.</p>
-        </article>
-        <article class="flow-step">
-          <span>04</span>
-          <h3>Active match</h3>
-          <p>Progress through intro video, date confirmation, chat, and attract-or-shun decision logic.</p>
-        </article>
-        <article class="flow-step">
-          <span>05</span>
-          <h3>Trust and safety</h3>
-          <p>File reports, review moderation state, and keep policy enforcement visible inside the product.</p>
-        </article>
-        <article class="flow-step">
-          <span>06</span>
-          <h3>Success and settings</h3>
-          <p>Capture testimonials after attract outcomes and manage visibility, notifications, and discovery preferences.</p>
-        </article>
+      <div class="flow-strip" aria-label="Relationship flow">
+        <span>Profile</span>
+        <span>Intent pool</span>
+        <span>One match</span>
+        <span>Date plan</span>
       </div>
     </section>
   </main>

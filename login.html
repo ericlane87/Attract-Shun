@@ -19,8 +19,9 @@
       </a>
     </div>
     <nav class="site-nav">
-      <a href="login.html">Login</a>
-      <a href="admin.html">Admin</a>
+      <a href="system-flow.html">Flow</a>
+      <a href="create-account.html">Create Account</a>
+      <a href="sign-in.html">Sign In</a>
     </nav>
   </header>
 
@@ -54,17 +55,28 @@
           <div>Use any seeded demo account email or full name.</div>
           <div>Password: <strong>demo1234</strong></div>
           <div>Hardcoded test accounts:</div>
-          <div><strong>ava.brooks.1@attract.local</strong></div>
-          <div><strong>noah.brooks.1@attract.local</strong></div>
-          <div><strong>mia.ellis.25@attract.local</strong></div>
-          <div>Create or manage users in <a href="admin.html">Admin</a>.</div>
+          <div id="demo-account-list" class="demo-account-list">
+            <button class="ghost-button quick-login-button" type="button" data-demo-email="ava.brooks.1@attract.local">
+              <span>Ava Brooks</span>
+              <span class="small-copy">ava.brooks.1@attract.local</span>
+            </button>
+            <button class="ghost-button quick-login-button" type="button" data-demo-email="noah.brooks.1@attract.local">
+              <span>Noah Brooks</span>
+              <span class="small-copy">noah.brooks.1@attract.local</span>
+            </button>
+            <button class="ghost-button quick-login-button" type="button" data-demo-email="mia.ellis.25@attract.local">
+              <span>Mia Ellis</span>
+              <span class="small-copy">mia.ellis.25@attract.local</span>
+            </button>
+          </div>
+          <div>Use these demo accounts to test the app flow.</div>
         </div>
       </article>
 
       <article class="panel-card auth-panel">
         <div class="panel-head">
           <h2>Quick login</h2>
-          <span class="pill">Local prototype</span>
+          <span class="pill">Demo mode</span>
         </div>
         <div class="hint-box">
           Click any profile below to log in instantly, or copy the email shown and use password <strong>demo1234</strong>.

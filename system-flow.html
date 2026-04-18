@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>System Flow | Attract / Shun</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+  <script src="version.js"></script>
+  <script>AppAssets.loadStyle("styles.css");</script>
+</head>
+<body data-page="system-flow">
+  <header class="site-header">
+    <div class="brand-lockup">
+      <p class="eyebrow">Intentional dating</p>
+      <a class="brand" href="index.html" aria-label="ATTRACT Shun home">
+        <img class="brand-logo" src="logo.svg" alt="ATTRACT Shun">
+      </a>
+    </div>
+    <nav class="site-nav">
+      <a href="system-flow.html">Flow</a>
+      <a href="dashboard.html">Dashboard</a>
+      <a href="connections.html">Connections</a>
+      <a href="browse.html">Browse</a>
+      <a href="match.html">Match</a>
+      <a href="settings.html">Settings</a>
+    </nav>
+  </header>
+
+  <main class="page-shell">
+    <section class="flow-hero">
+      <div>
+        <p class="eyebrow">System logic map</p>
+        <h1>How a user moves from signup to outcome.</h1>
+        <p>
+          This page shows the relationship cycle at the behavior level: how people enter discovery, like and vet each other,
+          move into one active match, respond to deadlines, exit cleanly, or receive Shuns for poor follow-through.
+        </p>
+      </div>
+      <aside class="flow-timer-card">
+        <p class="card-kicker">Core rule</p>
+        <h2>One live match locks discovery.</h2>
+        <p>Likes remain stored, but browsing, new match requests, and new conversations are paused until the active match closes.</p>
+      </aside>
+    </section>
+
+    <section class="flow-map" aria-label="Full user flow">
+      <article class="flow-node start">
+        <span class="flow-step-id">01</span>
+        <h2>Signup and Entry</h2>
+        <p>User creates an account, completes onboarding, and becomes eligible for discovery.</p>
+        <div class="flow-outcomes">
+          <span>Incomplete onboarding: browse locked</span>
+          <span>Complete onboarding: enter discovery</span>
+        </div>
+      </article>
+
+      <div class="flow-connector">Eligible users move into the same intent pool</div>
+
+      <article class="flow-node">
+        <span class="flow-step-id">02</span>
+        <h2>Discovery Pool</h2>
+        <p>The user sees available people who pass the basic product filters.</p>
+        <ul>
+          <li>Same intent pool only.</li>
+          <li>Unavailable if either person already has an active match.</li>
+          <li>Hidden or banned accounts are excluded.</li>
+          <li>Already-seen profiles are removed from that user's discovery list.</li>
+        </ul>
+      </article>
+
+      <div class="flow-split">
+        <article class="flow-node path-neutral">
+          <span class="flow-step-id">03A</span>
+          <h2>Pass</h2>
+          <p>User says no. The swipe is recorded, the profile leaves discovery, and no other action is required.</p>
+        </article>
+        <article class="flow-node path-good">
+          <span class="flow-step-id">03B</span>
+          <h2>Like With Interest Score</h2>
+          <p>User likes someone and must attach a 1 to 10 interest score. This creates an incoming like for the other person.</p>
+          <div class="flow-outcomes">
+            <span>Score is visible when the like is reviewed</span>
+            <span>No active match is created yet</span>
+          </div>
+        </article>
+      </div>
+
+      <div class="flow-connector">The liked person reviews the incoming like</div>
+
+      <article class="flow-node">
+        <span class="flow-step-id">04</span>
+        <h2>Incoming Like Review</h2>
+        <p>The recipient can ignore it, close it, or decide they want to move forward.</p>
+        <div class="flow-split compact">
+          <div>
+            <strong>No interest</strong>
+            <p>The like remains history. No match is made.</p>
+          </div>
+          <div>
+            <strong>Interested back</strong>
+            <p>The recipient sends a match request to confirm intent before locking both people.</p>
+          </div>
+        </div>
+      </article>
+
+      <div class="flow-connector">A match request creates the final confirmation step</div>
+
+      <article class="flow-node path-waiting">
+        <span class="flow-step-id">05</span>
+        <h2>Match Request</h2>
+        <p>The original liker receives a request. Confirming it creates the active match.</p>
+        <div class="flow-split compact">
+          <div>
+            <strong>Request ignored</strong>
+            <p>No active match. Both remain free to continue discovery unless another match is active.</p>
+          </div>
+          <div>
+            <strong>Request confirmed</strong>
+            <p>A match opens, both profiles are locked into one active connection, and other pending requests touching either user are closed.</p>
+          </div>
+        </div>
+      </article>
+
+      <div class="flow-connector">Confirmed match starts a timed relationship track</div>
+
+      <article class="flow-node active-match">
+        <span class="flow-step-id">06</span>
+        <h2>Active Match Lock</h2>
+        <p>Both users now focus on one person. They can chat, send intro video, plan a date, request unmatch, or report.</p>
+        <div class="flow-outcomes">
+          <span>Browse locked</span>
+          <span>Likes still visible but paused</span>
+          <span>New match requests locked</span>
+          <span>Conversation opens for this match</span>
+        </div>
+      </article>
+
+      <section class="timeline-lane" aria-label="Timed match stages">
+        <article class="flow-node timed">
+          <span class="flow-step-id">07</span>
+          <h2>Intro Video</h2>
+          <p>Each person must submit a short intro video.</p>
+          <div class="deadline-pill">Deadline: 24 hours from match creation</div>
+          <div class="flow-split compact">
+            <div>
+              <strong>Both submit</strong>
+              <p>Match advances to date planning.</p>
+            </div>
+            <div>
+              <strong>Timer expires</strong>
+              <p>Missing person receives a Shun. If both miss it, both receive a Shun and the match closes.</p>
+            </div>
+          </div>
+        </article>
+
+        <article class="flow-node timed">
+          <span class="flow-step-id">08</span>
+          <h2>Plan First Date</h2>
+          <p>Either person can propose a time and location. The other can confirm or counter. The proposed date must happen before the deadline.</p>
+          <div class="deadline-pill">Deadline: 14 days from match creation</div>
+          <div class="flow-split compact">
+            <div>
+              <strong>Both accept a plan</strong>
+              <p>Match advances to the final decision window.</p>
+            </div>
+            <div>
+              <strong>Timer expires</strong>
+              <p>Person who failed to participate receives a Shun. If neither participates, both receive a Shun and the match closes.</p>
+            </div>
+          </div>
+        </article>
+
+        <article class="flow-node timed">
+          <span class="flow-step-id">09</span>
+          <h2>Final Decision</h2>
+          <p>After date planning is complete, each person chooses the outcome.</p>
+          <div class="deadline-pill">Deadline: 28 days from match creation</div>
+          <div class="decision-grid">
+            <div>
+              <strong>Attract + Attract</strong>
+              <p>Success outcome. Match closes cleanly and testimonial/story can be created.</p>
+            </div>
+            <div>
+              <strong>Not a fit + Not a fit</strong>
+              <p>Mutual close. No Shun assigned.</p>
+            </div>
+            <div>
+              <strong>Mixed or Shun decision</strong>
+              <p>Negative/non-mutual outcome. Match closes as Shun and both users receive a decision Shun in the current prototype.</p>
+            </div>
+            <div>
+              <strong>Timer expires</strong>
+              <p>Missing decision-maker receives a Shun. If both miss it, both receive a Shun and the match closes.</p>
+            </div>
+          </div>
+        </article>
+      </section>
+
+      <section class="side-paths" aria-label="Exit and safety paths">
+        <article class="flow-node path-danger">
+          <span class="flow-step-id">A</span>
+          <h2>Unmatch Request</h2>
+          <p>Either person can request to end the match during any active stage. The other person gets 24 hours to answer.</p>
+          <div class="decision-grid">
+            <div>
+              <strong>Other says yes, mutual</strong>
+              <p>Match closes. No Shun.</p>
+            </div>
+            <div>
+              <strong>Other says no, not mutual</strong>
+              <p>Requester receives an unmatch-not-mutual Shun.</p>
+            </div>
+            <div>
+              <strong>No response in 24 hours</strong>
+              <p>Responder receives an unmatch-no-response Shun.</p>
+            </div>
+          </div>
+        </article>
+
+        <article class="flow-node path-danger">
+          <span class="flow-step-id">B</span>
+          <h2>Report and AI Review</h2>
+          <p>A user can report a recent match. The intended moderation path is AI-assisted review of chat history, report details, and match context.</p>
+          <div class="decision-grid">
+            <div>
+              <strong>Report dismissed</strong>
+              <p>No user penalty. Report remains in history.</p>
+            </div>
+            <div>
+              <strong>Reported user at fault</strong>
+              <p>User receives a moderation Shun or, for severe harassment, account status can become banned.</p>
+            </div>
+            <div>
+              <strong>Reporter is abusing reports</strong>
+              <p>System should support assigning the penalty to the reporter after AI/moderation determines bad-faith reporting.</p>
+            </div>
+          </div>
+        </article>
+      </section>
+    </section>
+
+    <section class="scoreboard-section">
+      <div>
+        <p class="eyebrow">Accountability</p>
+        <h2>Shun score categories to track.</h2>
+        <p>The Shun score is the visible accountability count. Each Shun increases the user's total and is stored by reason.</p>
+      </div>
+      <div class="score-grid">
+        <article><strong>Intro timeout</strong><span>Missed the 24 hour intro video deadline.</span></article>
+        <article><strong>Date timeout</strong><span>Failed to participate in date planning by day 14.</span></article>
+        <article><strong>Decision timeout</strong><span>Failed to submit the final outcome by day 28.</span></article>
+        <article><strong>Decision Shun</strong><span>Negative or non-mutual final outcome.</span></article>
+        <article><strong>Unmatch not mutual</strong><span>Requested unmatch and the other person disputed it.</span></article>
+        <article><strong>No unmatch response</strong><span>Failed to answer an unmatch request within 24 hours.</span></article>
+        <article><strong>Moderation</strong><span>Report/AI/moderation action assigns a penalty or ban.</span></article>
+      </div>
+    </section>
+  </main>
+</body>
+</html>
